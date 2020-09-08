@@ -1,0 +1,49 @@
+{
+  "AWSTemplateFormatVersion" : "2010-09-09",
+
+  "Description" : "Create a Gen3 Stack on CentOS7.",
+
+  "Parameters" : { },
+  "Resources" : {
+
+    "Gen3User" : {
+    "Type" : "AWS::IAM::User",
+    "Properties" : {
+       "Path" : "/",
+       "ManagedPolicyArns" : [ "arn:aws:iam::aws:policy/AmazonS3FullAccess" ],
+       "UserName" : "g3user"
+       }
+    },
+    "g3userAccessKey" : {
+      "Type" : "AWS::IAM::AccessKey",
+      "DependsOn" : "Gen3User",
+      "Properties" : {
+          "Status" : "Active",
+          "UserName" : "g3user"
+        }
+    },
+
+    "Gen3Bucket" : {
+    "Type" : "AWS::S3::Bucket",
+    "Properties" : {
+      "BucketEncryption": {
+        "ServerSideEncryptionConfiguration": [ {   "ServerSideEncryptionByDefault": { "SSEAlgorithm": "AES256" } } ]
+        },
+      "BucketName" : "gen3bucket88996",
+      "PublicAccessBlockConfiguration" : {  "BlockPublicAcls" : "True" }
+      }
+    }
+  },
+
+  "Outputs" : {
+    "g3userAccessKey" : {
+      "Description" : "Access Key for the g3user",
+      "Value" : { "Ref" : "g3userAccessKey" }
+    },
+    "g3userSecretKey" : {
+      "Description" : "Secret Key for the g3user",
+      "Value" : { "Fn::GetAtt" : [ "g3userAccessKey", "SecretAccessKey" ]}
+    }
+  }
+
+}

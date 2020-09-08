@@ -1,0 +1,23 @@
+
+# General
+.DS_Store
+
+# Thumbnails
+._*
+
+default.profraw
+
+.idea
+node_modules
+
+# IDE - VSCode
+.vscode/*
+
+*~
+.artifactory
+.idea/*
+**/.idea/*
+.ensime_cache/*
+.config/*
+.local/*
+.ensime
