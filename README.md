@@ -2,7 +2,7 @@
 Site for deploying and managing infrastructure and code for ClinicoGenomics
 
 Project :     ClinicoGenomics Platform and Analytics
-ASK ID  :     UHGWM110-026707
+<br>ASK ID  :     UHGWM110-026707
 
 ## Platform Projects / Technologies
 - ClinicoGenomics Analysis (Galaxy)
@@ -15,4 +15,6 @@ ASK ID  :     UHGWM110-026707
 - Patrick O'Shea
 - Carlos Garcia
 - Deva Jebadurai
-- 
+-
+## Infrastructure Diagram
+![Azure Cloud Infrastructure](Infrastructure/ClinicoGenomicsAzure.png)
