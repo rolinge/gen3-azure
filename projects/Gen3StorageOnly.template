@@ -29,7 +29,7 @@
       "BucketEncryption": {
         "ServerSideEncryptionConfiguration": [ {   "ServerSideEncryptionByDefault": { "SSEAlgorithm": "AES256" } } ]
         },
-      "BucketName" : "gen3bucket88996",
+      "BucketName" : "gen3bucket88997",
       "PublicAccessBlockConfiguration" : {  "BlockPublicAcls" : "True" }
       }
     }

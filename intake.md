@@ -57,7 +57,7 @@ Code promotion will be managed with a "Blue/Green" technique where we will build
 ## Section 3: Architecture Summary
 
 ### Architecture Overview
-![Gen3 Logical Architecture](https://gen3.org/figs/architecture.png)
+![Gen3 Logical Architecture](Infrastructure/g3architecture.png)
 ![DataBiology Logical Architecture](Infrastructure/DataBiologyLogicalArch.png)
 ## Section 4: Network Summary
 
