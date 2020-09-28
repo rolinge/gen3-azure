@@ -3,7 +3,24 @@
 
   "Description" : "Create a Gen3 Stack on CentOS7.",
 
-  "Parameters" : { },
+  "Parameters" : {
+    "BName": {
+      "Default": "gen3bucket88997",
+      "Description" : "The name of the bucket created, lets and numbers only",
+      "Type": "String",
+      "MinLength": "1",
+      "MaxLength": "16",
+      "AllowedPattern" : "[a-zA-Z][a-zA-Z0-9]*"
+    },
+    "UName": {
+      "Default": "g3user",
+      "Description" : "The username created for storage access",
+      "Type": "String",
+      "MinLength": "1",
+      "MaxLength": "16",
+      "AllowedPattern" : "[a-zA-Z][a-zA-Z0-9]*"
+    }
+ },
   "Resources" : {
 
     "Gen3User" : {
@@ -11,7 +28,7 @@
     "Properties" : {
        "Path" : "/",
        "ManagedPolicyArns" : [ "arn:aws:iam::aws:policy/AmazonS3FullAccess" ],
-       "UserName" : "g3user"
+       "UserName" : { "Ref" : "UName" }
        }
     },
     "g3userAccessKey" : {
@@ -19,7 +36,7 @@
       "DependsOn" : "Gen3User",
       "Properties" : {
           "Status" : "Active",
-          "UserName" : "g3user"
+          "UserName" :  { "Ref" : "UName" }
         }
     },
 
@@ -29,7 +46,7 @@
       "BucketEncryption": {
         "ServerSideEncryptionConfiguration": [ {   "ServerSideEncryptionByDefault": { "SSEAlgorithm": "AES256" } } ]
         },
-      "BucketName" : "gen3bucket88997",
+      "BucketName" : { "Ref" : "BName" },
       "PublicAccessBlockConfiguration" : {  "BlockPublicAcls" : "True" }
       }
     }
