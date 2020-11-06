@@ -28,6 +28,10 @@ variable "max_count" {
   default = 4
 }
 
+variable "POSTGRES_PASSWORD" {
+  type    = string
+  default = "postgrestest"
+}
 variable "min_count" {
   default = 2
 }

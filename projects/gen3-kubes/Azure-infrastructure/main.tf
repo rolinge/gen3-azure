@@ -28,6 +28,8 @@ resource "azurerm_subnet" "dce_aks_subnet" {
   resource_group_name  = azurerm_resource_group.rg.name
   address_prefixes       = ["10.1.0.0/24"]
   virtual_network_name = azurerm_virtual_network.dce_aks_vnet.name
+  service_endpoints         = ["Microsoft.Sql", "Microsoft.Storage"]
+
 }
 
 resource "azurerm_kubernetes_cluster" "dce_aks_cluster" {
@@ -65,6 +67,9 @@ resource "azurerm_kubernetes_cluster" "dce_aks_cluster" {
       oms_agent {
         enabled                    = true
         log_analytics_workspace_id = azurerm_log_analytics_workspace.k8[0].id
+      }
+      kube_dashboard {
+        enabled                    = true
       }
     }
   }
