@@ -1,0 +1,22 @@
+pipeline:
+  terraform:
+    terraformVersion: 0.12.24
+    azure:
+      node: docker-cc-eac
+      defaultBranch: azure-kubernetes-starter
+      subscriptions:
+        redbox:
+          credentials:
+            servicePrincipal: Redbox-ServicePrincipal
+      environments:
+        redbox:
+          subscription: redbox
+          tfvars:
+            file: ./terraform.tfvars
+          prompt: false
+          remoteState:
+            resourceGroup: {{ redbox_account_name }}
+            storageAccount: {{ storage_account }}
+            location: westus
+            
+      
