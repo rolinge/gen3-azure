@@ -1,0 +1,103 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fence-{{ .Values.ENV }}
+  labels:
+    {{- include "gen3kubernetes.labels" . | nindent 4 }}
+    component: "fence"
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.fence.replicas }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "gen3kubernetes.selectorLabels" . | nindent 6 }}
+      component: "fence"
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "gen3kubernetes.selectorLabels" . | nindent 8 }}
+        component: "fence"
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "gen3kubernetes.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: fence-{{ .Values.ENV }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.fence.image }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          volumeMounts:
+            - name: fence-config
+              mountPath: /var/www/fence/fence-config.yaml
+              readOnly: true
+            - name: fence-user
+              mountPath: /var/www/fence/user.yaml
+              readOnly: True
+            - name:  fence-crt
+              mountPath: /usr/local/share/ca-certificates
+              readOnly: True
+            - name: fence-jwt
+              mountPath: /fence/keys
+              readOnly: True
+            - name: fence-setup
+              mountPath: /var/www/fence/fence-setup.sh
+              readOnly: True
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          livenessProbe:
+            tcpSocket:
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /_status
+              port: http
+          resources:
+            {{- toYaml .Values.fence.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+        - name: fence-config
+          configMap:
+            defaultMode: 0660
+            name: fence-config-configmap-{{ .Values.ENV }}
+        - name: fence-user
+          configMap:
+            defaultMode: 0660
+            name: fence-users-configmap-{{ .Values.ENV }}
+        - name: fence-crt
+          secret:
+            defaultMode: 0660
+            secretName: revproxy-tls-secrets-{{ .Values.ENV }}
+            items:
+              - key: tls.cacrt
+                path: cdis-ca.crt
+        - name: fence-jwt
+          secret:
+            defaultMode: 0660
+            secretName: fence-jwt-secrets-conf-{{ .Values.ENV }}
+        - name: fence-setup
+          configMap:
+            defaultMode: 0755
+            name: fence-setup-configmap-{{ .Values.ENV }}

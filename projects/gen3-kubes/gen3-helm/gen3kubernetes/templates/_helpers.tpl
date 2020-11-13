@@ -34,6 +34,7 @@ Create chart name and version as used by the chart label.
 Common labels
 */}}
 {{- define "gen3kubernetes.labels" -}}
+environment: {{ .Values.ENV }}
 helm.sh/chart: {{ include "gen3kubernetes.chart" . }}
 {{ include "gen3kubernetes.selectorLabels" . }}
 {{- if .Chart.AppVersion }}
