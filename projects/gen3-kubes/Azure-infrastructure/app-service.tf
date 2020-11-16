@@ -25,6 +25,7 @@ resource "azurerm_function_app" "funcapp" {
     linux_fx_version = "PYTHON|3.8"
     use_32_bit_worker_process = false
     always_on = false
+    min_tls_version = "1.2"
 #    azureStorageAccounts = {
 #      CustomID = {
 #        type = "AzureFiles"
@@ -42,14 +43,15 @@ resource "azurerm_function_app" "funcapp" {
   app_settings = {
     FUNCTIONS_WORKER_RUNTIME = "python"
     FUNCTIONS_EXTENSION_VERSION = "~3"
-    AzureWebJobsStorage = azurerm_storage_account.gen3.primary_connection_string
-    AppInsights_InstrumentationKey = azurerm_application_insights.gen3.instrumentation_key
+    AzureWebJobsStorage = format("@Microsoft.KeyVault(SecretUri=%s)",azurerm_storage_account.gen3.primary_connection_string)
+    APPINSIGHTS_INSTRUMENTATIONKEY = azurerm_application_insights.gen3.instrumentation_key
+    APPINSIGHTS_CONNECTION_STRING = azurerm_application_insights.gen3.connection_string
     COMMONS_URL = "https://gen3playground.optum.com"
     gen3KeyID = format("@Microsoft.KeyVault(SecretUri=%s)", azurerm_key_vault_secret.gen3keyid.id)
     gen3KeySecret = format("@Microsoft.KeyVault(SecretUri=%s)", azurerm_key_vault_secret.gen3KeySecret.id)
     MOUNT_POINT = "/opt/shared"
     RESULTS_FILE = "gen3_hashes.csv"
-    StorageaccountConnectString = format("@Microsoft.KeyVault(SecretUri=%s)",azurerm_key_vault_secret.gen3KeySecret.id)
+    StorageaccountConnectString = format("@Microsoft.KeyVault(SecretUri=%s)",azurerm_storage_account.gen3.primary_connection_string)
     }
 
 }
