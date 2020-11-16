@@ -104,6 +104,29 @@ variable "tags" {
   }
 }
 
+variable "AZ_SUBSCRIPTION_ID" {
+  type        = string
+  description = "The subscription to deploy to"
+  default     = "21a7a4d3-3641-4382-95a8-85ae72399ceb"
+}
+
+variable "AZ_CLIENT_ID" {
+  type        = string
+  description = "The Client Credentials used for deployment, must have contributor role"
+  default     = "bc9ed98e-b121-4bdc-8894-3f21554d4215"
+}
+
+variable "AZ_CLIENT_SECRET" {
+  type        = string
+  description = "The corresponding client secret used for deployment"
+}
+
+variable "AZ_TENANT_ID" {
+  type        = string
+  description = "High level tennant id for the system"
+  default     = "db05faca-c82a-4b9d-b9c5-0f64b6755421"
+}
+
 # "168.183.0.0/16", "149.111.0.0/16", "128.35.0.0/16", "161.249.0.0/16", "198.203.174.0/23", "198.203.176.0/22", "198.203.180.0/23"
 # Use these permitted IP ranges to setup your network profile.
 variable "api_server_authorized_ip_ranges" {

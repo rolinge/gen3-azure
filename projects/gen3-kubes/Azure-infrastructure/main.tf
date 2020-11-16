@@ -7,6 +7,7 @@ resource "azurerm_resource_group" "rg" {
 
 
 data "azurerm_subscription" "current" {}
+data "azurerm_client_config" "current" {}
 
 locals {
   # Part of common tags to be assigned to all resources
@@ -15,22 +16,6 @@ locals {
   }
 }
 
-resource "azurerm_virtual_network" "dce_aks_vnet" {
-  name                = join("_", [var.prefix, var.vnet])
-  location            = azurerm_resource_group.rg.location
-  resource_group_name = azurerm_resource_group.rg.name
-  address_space       = ["10.1.0.0/16"]
-  tags                = merge(var.tags, local.common_tags)
-}
-
-resource "azurerm_subnet" "dce_aks_subnet" {
-  name                 = "dce_aks_subnet"
-  resource_group_name  = azurerm_resource_group.rg.name
-  address_prefixes       = ["10.1.0.0/24"]
-  virtual_network_name = azurerm_virtual_network.dce_aks_vnet.name
-  service_endpoints         = ["Microsoft.Sql", "Microsoft.Storage"]
-
-}
 
 resource "azurerm_kubernetes_cluster" "dce_aks_cluster" {
   name                            = join("_", [var.prefix, var.cluster_name])
@@ -77,17 +62,10 @@ resource "azurerm_kubernetes_cluster" "dce_aks_cluster" {
   tags = merge(var.tags, local.common_tags)
 }
 
-resource "random_string" "aksinsights" {
-  length  = 5
-  special = false
-  upper   = false
-  lower   = true
-  number  = true
-}
 
 resource "azurerm_log_analytics_workspace" "k8" {
   count               = var.enable_log_analytics_workspace ? 1 : 0
-  name                = "loganalytics-${random_string.aksinsights.result}"
+  name                = "loganalytics-${random_string.uid.result}"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
   sku                 = var.log_analytics_workspace_sku
@@ -108,4 +86,10 @@ resource "azurerm_log_analytics_solution" "k8" {
     publisher = "Microsoft"
     product   = "OMSGallery/ContainerInsights"
   }
+}
+resource "random_string" "uid" {
+  length  = 5
+  upper   = false
+  special = false
+  number  = false
 }
