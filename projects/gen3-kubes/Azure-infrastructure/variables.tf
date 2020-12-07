@@ -10,18 +10,23 @@ variable "client_secret" {
   default     = "XDUjUzCdgBc_TTpVaCChDP41-rNYR21~o4"
  }
 
-variable "storage_account_name" {
-  type        = string
-  description = "The name of the storage account"
-  default     = "rolinge-redbox-aks"
-}
-
 variable "agent_count" {
   default = 2
 }
 
-variable "disk_size" {
-  default = 30
+variable "commons_url" {
+  type          = string
+  description   = "The web address of the final site"
+}
+
+variable "functionapp" {
+  type          = string
+  description   = "The local file that has the code for blobindexfunc"
+  default       = "assets/blobindexcode.zip"
+}
+
+variable "k8s_os_disk_size" {
+  default = 128
 }
 
 variable "max_count" {
@@ -99,7 +104,7 @@ variable "log_retention_in_days" {
 variable "tags" {
   default = {
     environment = "nonprod"
-    costcenter  = "dcermo"
+    costcenter  = "clinical"
     asset       = "aks"
   }
 }

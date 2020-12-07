@@ -2,12 +2,13 @@ resource "azurerm_app_service_plan" "appplan1" {
   name                = format("appsvcplangen3%s%s",var.environment,random_string.uid.result)
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
-  kind                = "FunctionApp"
+  kind                = "linux"
+#  kind                = "FunctionApp"
   reserved            = true
 
   sku {
-    tier = "Standard"
-    size = "Y1"
+    tier = "PremiumV2"
+    size = "P1v2"
   }
 }
 
@@ -20,20 +21,14 @@ resource "azurerm_function_app" "funcapp" {
   storage_account_name       = azurerm_storage_account.gen3.name
   storage_account_access_key = azurerm_storage_account.gen3.primary_access_key
   os_type                    = "linux"
+  https_only                  = true
+  version                     = "~3"
+  tags = merge(var.tags, local.common_tags)
 
   site_config {
-    linux_fx_version = "PYTHON|3.8"
+    linux_fx_version = "DOCKER|docker.io/rmolinger/blobtriggerdocker:test06"
     use_32_bit_worker_process = false
-    always_on = false
-    min_tls_version = "1.2"
-#    azureStorageAccounts = {
-#      CustomID = {
-#        type = "AzureFiles"
-#        accountName = "blobolingertriggertest22"
-#        shareName = "blobolingertriggertest22"
-#        mountPath = "/opt/shared"
-#        }
-#      }
+    always_on = true
   }
 
   identity {
@@ -41,17 +36,26 @@ resource "azurerm_function_app" "funcapp" {
   }
 
   app_settings = {
+    FUNCTION_APP_EDIT_MODE                    = "readOnly"
+    WEBSITES_ENABLE_APP_SERVICE_STORAGE       = false
+    APPINSIGHTS_INSTRUMENTATIONKEY=azurerm_application_insights.gen3.instrumentation_key
+    APPLICATIONINSIGHTS_CONNECTION_STRING=azurerm_application_insights.gen3.connection_string
     FUNCTIONS_WORKER_RUNTIME = "python"
     FUNCTIONS_EXTENSION_VERSION = "~3"
-    AzureWebJobsStorage = format("@Microsoft.KeyVault(SecretUri=%s)",azurerm_storage_account.gen3.primary_connection_string)
-    APPINSIGHTS_INSTRUMENTATIONKEY = azurerm_application_insights.gen3.instrumentation_key
-    APPINSIGHTS_CONNECTION_STRING = azurerm_application_insights.gen3.connection_string
-    COMMONS_URL = "https://gen3playground.optum.com"
+    #AzureWebJobsStorage = ""
+    COMMONS_URL = var.commons_url
     gen3KeyID = format("@Microsoft.KeyVault(SecretUri=%s)", azurerm_key_vault_secret.gen3keyid.id)
     gen3KeySecret = format("@Microsoft.KeyVault(SecretUri=%s)", azurerm_key_vault_secret.gen3KeySecret.id)
     MOUNT_POINT = "/opt/shared"
     RESULTS_FILE = "gen3_hashes.csv"
-    StorageaccountConnectString = format("@Microsoft.KeyVault(SecretUri=%s)",azurerm_storage_account.gen3.primary_connection_string)
+    StorageaccountConnectString = format("@Microsoft.KeyVault(SecretUri=%s)",azurerm_key_vault_secret.StorageaccountConnectString.id)
+    HASH = base64encode(filesha256(var.functionapp))
+    WEBSITE_RUN_FROM_PACKAGE = format("https://%s.blob.core.windows.net/%s/%s%s",
+                                        azurerm_storage_account.gen3.name,
+                                        azurerm_storage_container.functioncode.name,
+                                        azurerm_storage_blob.appcode.name,
+                                        data.azurerm_storage_account_sas.gen3sas.sas
+                                        )
     }
 
 }

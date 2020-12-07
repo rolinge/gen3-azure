@@ -1,8 +1,4 @@
 
-data "azurerm_application_insights" "gen3" {
-  name                = format("appinsghtsgen3%s%s",var.environment,random_string.uid.result)
-  resource_group_name = azurerm_resource_group.rg.name
-}
 resource "azurerm_application_insights" "gen3" {
   name                = format("appinsghtsgen3%s%s",var.environment,random_string.uid.result)
   location            = azurerm_resource_group.rg.location
@@ -11,6 +7,10 @@ resource "azurerm_application_insights" "gen3" {
   retention_in_days   = "90"
 }
 
+data "azurerm_application_insights" "gen3" {
+  name                = format("appinsghtsgen3%s%s",var.environment,random_string.uid.result)
+  resource_group_name = azurerm_resource_group.rg.name
+}
 output "instrumentation_key" {
   value = azurerm_application_insights.gen3.instrumentation_key
 }

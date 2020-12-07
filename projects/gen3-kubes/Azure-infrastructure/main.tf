@@ -34,7 +34,7 @@ resource "azurerm_kubernetes_cluster" "dce_aks_cluster" {
     min_count           = var.min_count
     type                = "VirtualMachineScaleSets"
     vnet_subnet_id      = azurerm_subnet.dce_aks_subnet.id
-    os_disk_size_gb     = var.disk_size
+    os_disk_size_gb     = var.k8s_os_disk_size
   }
   service_principal {
     client_id     =  var.client_id
@@ -81,7 +81,7 @@ resource "azurerm_log_analytics_solution" "k8" {
   resource_group_name   = azurerm_resource_group.rg.name
   workspace_resource_id = azurerm_log_analytics_workspace.k8[0].id
   workspace_name        = azurerm_log_analytics_workspace.k8[0].name
-
+  tags = merge(var.tags, local.common_tags)
   plan {
     publisher = "Microsoft"
     product   = "OMSGallery/ContainerInsights"

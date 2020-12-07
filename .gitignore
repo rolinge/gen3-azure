@@ -24,3 +24,7 @@ node_modules
 **/.terraform/*
 **/barista-kubernetes/*
 .auto.tfvars
+
+.python_packages
+__pycache__
+.venv

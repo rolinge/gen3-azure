@@ -1,0 +1,13 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage" : "DefaultEndpointsProtocol=https;AccountName=azgen3blobstorage;AccountKey=0yzBB7W6H7Tz1wtmGHukXUuVA91YiYGn5anpPFgq4NoeccZ1rcqMgyaRCYwSYoZpUqMT0YJx1dWXTDjUQMltZQ==;EndpointSuffix=core.windows.net",
+    "FUNCTIONS_WORKER_RUNTIME" : "python",
+    "gen3KeyID": "9160a4e2-7368-4c4d-b9e3-4cfae4d47d92",
+    "gen3KeySecret": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImtpZCI6ImZlbmNlX2tleV8yMDIwLTA5LTIyVDE2OjM2OjAwWiJ9.eyJwdXIiOiJhcGlfa2V5IiwiYXVkIjpbImRhdGEiLCJ1c2VyIiwiZmVuY2UiLCJvcGVuaWQiXSwic3ViIjoiMyIsImlzcyI6Imh0dHBzOi8vZ2VuM3BsYXlncm91bmQub3B0dW0uY29tL3VzZXIiLCJpYXQiOjE2MDUyMzQ5NzksImV4cCI6MTYwNzgyNjk3OSwianRpIjoiOTE2MGE0ZTItNzM2OC00YzRkLWI5ZTMtNGNmYWU0ZDQ3ZDkyIiwiYXpwIjoiIn0.NVCUxlO0bzFbfe5W1jjo8rqfe_8zjkUig3bcMXBvMrV9vDFWGAMTOvyXQ4wfY0ue41yDNt81oil5_TYE38iVaiVWsgZP9Iz_vsgC8Mstx4agBCXs9NbLdOt_QzuaH0Mp17E0KAegbq0hxCU2j2dYjQKFBv7XlN9w-77fWsjHx9QDqpV2gs0t4NKv3JS9WOYBsEBRH5RZOs4AzvgT03qPGEVmwWk-km5WP8g4O6x5IhUWv5dMYocNJCNLFgTmC_V3VOxu6q4Ovs4eX0ly_nNIT4aI7YXDtTfG3HLqpOT6pW_Agao3XXjMAo66KjsqT-98A0jp2vOV72djyHe8xEvOWA" ,
+    "StorageaccountConnectString" : "DefaultEndpointsProtocol=https;AccountName=azgen3blobstorage;AccountKey=0yzBB7W6H7Tz1wtmGHukXUuVA91YiYGn5anpPFgq4NoeccZ1rcqMgyaRCYwSYoZpUqMT0YJx1dWXTDjUQMltZQ==;EndpointSuffix=core.windows.net",
+    "COMMONS_URL":  "https://gen3playground.optum.com",
+    "RESULTS_FILE": "gen3_hashes.csv",
+    "MOUNT_POINT": "/opt/shared"
+  }
+}

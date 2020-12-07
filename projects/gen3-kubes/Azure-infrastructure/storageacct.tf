@@ -10,9 +10,7 @@ resource "azurerm_storage_account" "gen3" {
   min_tls_version           = "TLS1_2"
   account_kind              = "StorageV2"
 
-  tags = {
-    environment = var.environment
-  }
+  tags = merge(var.tags, local.common_tags)
 }
 
 
@@ -30,4 +28,51 @@ resource "azurerm_storage_share" "gen3" {
       expiry      = "2052-07-02T10:38:21.0000000Z"
     }
   }
+}
+resource "azurerm_storage_container" "gen3" {
+  name                  = "azgen3blobstorage"
+  storage_account_name  = azurerm_storage_account.gen3.name
+  container_access_type = "private"
+}
+resource "azurerm_storage_container" "functioncode" {
+  name                  = "azgen3functioncode"
+  storage_account_name  = azurerm_storage_account.gen3.name
+  container_access_type = "private"
+}
+
+resource "azurerm_storage_blob" "appcode" {
+    name = "functionapp.zip"
+    storage_account_name = azurerm_storage_account.gen3.name
+    storage_container_name = azurerm_storage_container.functioncode.name
+    type = "Block"
+    source = var.functionapp
+}
+
+
+data "azurerm_storage_account_sas" "gen3sas" {
+    connection_string = "${azurerm_storage_account.gen3.primary_connection_string}"
+    https_only = true
+    start = "2020-12-02"
+    expiry = "2021-02-28"
+    resource_types {
+        object = true
+        container = false
+        service = false
+    }
+    services {
+        blob = true
+        queue = false
+        table = false
+        file = false
+    }
+    permissions {
+        read = true
+        write = false
+        delete = false
+        list = false
+        add = false
+        create = false
+        update = false
+        process = false
+    }
 }

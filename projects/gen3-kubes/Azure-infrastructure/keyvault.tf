@@ -37,9 +37,7 @@ resource "azurerm_key_vault" "keyvault1" {
   #  name  = "Randy Olinger"
   #  phone = "9522054278"
   #}
-  tags = {
-    environment = var.environment
-  }
+  tags = merge(var.tags, local.common_tags)
 }
 
 
@@ -50,9 +48,9 @@ resource "azurerm_key_vault_access_policy" "randyolinger" {
   object_id = "be2b3c36-2c8b-4905-a81b-cc3c9c58e66e"
 
   key_permissions = [
-    "get",  "list", "delete", "recover",  "backup", "restore",
-    "create", "decrypt", "encrypt", "import", "sign",
-    "unwrapKey", "update", "verify" , "wrapKey"
+  "Get",  "List", "Delete", "Recover",  "Backup", "Restore",
+  "Create", "Decrypt", "Encrypt", "Import", "Sign",
+  "UnwrapKey", "Update", "Verify" , "WrapKey"
   ]
   secret_permissions = [
   "get",  "list", "delete", "recover",  "backup", "restore",  "set"
@@ -61,6 +59,12 @@ resource "azurerm_key_vault_access_policy" "randyolinger" {
   "get",  "list", "delete", "recover",  "backup", "restore",
   "regeneratekey", "getsas", "listsas", "deletesas", "set", "setsas",
   "update"
+  ]
+  certificate_permissions = [
+  "Get",  "List", "Delete", "Recover",  "Backup", "Restore",
+  "Update" , "Create", "Import", "ManageContacts",  "ManageIssuers",
+  "GetIssuers","ListIssuers","SetIssuers",
+  "DeleteIssuers","Purge"
   ]
 }
 
@@ -71,9 +75,9 @@ resource "azurerm_key_vault_access_policy" "serviceaccount" {
   object_id = "bc9ed98e-b121-4bdc-8894-3f21554d4215"
 
   key_permissions = [
-    "get",  "list", "delete", "recover",  "backup", "restore",
-    "create", "decrypt", "encrypt", "import", "sign",
-    "unwrapKey", "update", "verify" , "wrapKey"
+  "Get",  "List", "Delete", "Recover",  "Backup", "Restore",
+  "Create", "Decrypt", "Encrypt", "Import", "Sign",
+  "UnwrapKey", "Update", "Verify" , "WrapKey"
   ]
   secret_permissions = [
   "get",  "list", "delete", "recover",  "backup", "restore",  "set"
@@ -82,6 +86,12 @@ resource "azurerm_key_vault_access_policy" "serviceaccount" {
   "get",  "list", "delete", "recover",  "backup", "restore",
   "regeneratekey", "getsas", "listsas", "deletesas", "set", "setsas",
   "update"
+  ]
+  certificate_permissions = [
+  "Get",  "List", "Delete", "Recover",  "Backup", "Restore",
+  "Update" , "Create", "Import", "ManageContacts",  "ManageIssuers",
+  "GetIssuers","ListIssuers","SetIssuers",
+  "DeleteIssuers","Purge"
   ]
 }
 
@@ -94,9 +104,9 @@ resource "azurerm_key_vault_access_policy" "carlosgarcia" {
   object_id = "8d1aadf7-0913-4e23-a653-72ff9de2c226"
 
   key_permissions = [
-    "get",  "list", "delete", "recover",  "backup", "restore",
-    "create", "decrypt", "encrypt", "import", "sign",
-    "unwrapKey", "update", "verify" , "wrapKey"
+    "Get",  "List", "Delete", "Recover",  "Backup", "Restore",
+    "Create", "Decrypt", "Encrypt", "Import", "Sign",
+    "UnwrapKey", "Update", "Verify" , "WrapKey"
   ]
   secret_permissions = [
   "get",  "list", "delete", "recover",  "backup", "restore",  "set"
@@ -105,6 +115,12 @@ resource "azurerm_key_vault_access_policy" "carlosgarcia" {
   "get",  "list", "delete", "recover",  "backup", "restore",
   "regeneratekey", "getsas", "listsas", "deletesas", "set", "setsas",
   "update"
+  ]
+  certificate_permissions = [
+  "Get",  "List", "Delete", "Recover",  "Backup", "Restore",
+  "Update" , "Create", "Import", "ManageContacts",  "ManageIssuers",
+  "GetIssuers","ListIssuers","SetIssuers",
+  "DeleteIssuers","Purge"
   ]
 }
 resource "azurerm_key_vault_access_policy" "functionapp" {
@@ -124,31 +140,24 @@ resource "azurerm_key_vault_access_policy" "functionapp" {
 
 resource "azurerm_key_vault_secret" "gen3keyid" {
   name         = "gen3keyid"
-  value        = "NothingForNow"
+  value        = "9160a4e2-7368-4c4d-b9e3-4cfae4d47d92"
   key_vault_id = azurerm_key_vault.keyvault1.id
 
-  tags = {
-    environment = var.environment
-  }
+  tags = merge(var.tags, local.common_tags)
 }
 resource "azurerm_key_vault_secret" "gen3KeySecret" {
   name         = "gen3KeySecret"
-  value        = "SecretSauce"
+  value        = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImtpZCI6ImZlbmNlX2tleV8yMDIwLTA5LTIyVDE2OjM2OjAwWiJ9.eyJwdXIiOiJhcGlfa2V5IiwiYXVkIjpbImRhdGEiLCJ1c2VyIiwiZmVuY2UiLCJvcGVuaWQiXSwic3ViIjoiMyIsImlzcyI6Imh0dHBzOi8vZ2VuM3BsYXlncm91bmQub3B0dW0uY29tL3VzZXIiLCJpYXQiOjE2MDUyMzQ5NzksImV4cCI6MTYwNzgyNjk3OSwianRpIjoiOTE2MGE0ZTItNzM2OC00YzRkLWI5ZTMtNGNmYWU0ZDQ3ZDkyIiwiYXpwIjoiIn0.NVCUxlO0bzFbfe5W1jjo8rqfe_8zjkUig3bcMXBvMrV9vDFWGAMTOvyXQ4wfY0ue41yDNt81oil5_TYE38iVaiVWsgZP9Iz_vsgC8Mstx4agBCXs9NbLdOt_QzuaH0Mp17E0KAegbq0hxCU2j2dYjQKFBv7XlN9w-77fWsjHx9QDqpV2gs0t4NKv3JS9WOYBsEBRH5RZOs4AzvgT03qPGEVmwWk-km5WP8g4O6x5IhUWv5dMYocNJCNLFgTmC_V3VOxu6q4Ovs4eX0ly_nNIT4aI7YXDtTfG3HLqpOT6pW_Agao3XXjMAo66KjsqT-98A0jp2vOV72djyHe8xEvOWA"
   key_vault_id = azurerm_key_vault.keyvault1.id
 
-  tags = {
-    environment = var.environment
-  }
+  tags = merge(var.tags, local.common_tags)
 }
 
 resource "azurerm_key_vault_secret" "StorageaccountConnectString" {
   name         = "StorageaccountConnectString"
   value        = azurerm_storage_account.gen3.primary_connection_string
   key_vault_id = azurerm_key_vault.keyvault1.id
-
-  tags = {
-    environment = var.environment
-  }
+  tags = merge(var.tags, local.common_tags)
 }
 
 data "azurerm_key_vault" "keyvault1" {

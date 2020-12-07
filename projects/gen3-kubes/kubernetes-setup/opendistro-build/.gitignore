@@ -1,0 +1,8 @@
+Thumbs.db
+.DS_Store
+
+.idea/
+*.iml
+
+__pycache__
+.pytest_cache

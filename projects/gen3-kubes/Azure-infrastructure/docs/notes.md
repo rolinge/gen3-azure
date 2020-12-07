@@ -1,8 +1,4 @@
-## Manual Steps
-- Create the file share, currently there is no way to do this in Terraform so Az command line is used
-  ```
-  az webapp config storage-account add --resource-group {RG} --subscription={SUBSCRIPTION} --storage-type AzureFiles --account-name {STGACCTNAME} --share-name {SHARENAME} --mount-path /opt/shared -n {FUNCTIONAPPNAME} --custom-id CustomID --access-key {STGACCT_KEY}
-  ```
+## Erata
 
 
 Apply complete! Resources: 7 added, 0 changed, 0 destroyed.
