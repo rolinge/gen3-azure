@@ -1,6 +1,7 @@
 apiVersion: v2
 name: gen3kubernetes
-description: A Helm chart for deploying Gen3 Data Commons on Kubernetes
+description: "A Helm chart for deploying Gen3 Data Commons on Kubernetes"
+icon: "https://gen3.org/img/logos/gen3_new_logo_white.svg"  
 
 # A chart can be either an 'application' or a 'library' chart.
 #
