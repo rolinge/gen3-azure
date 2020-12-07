@@ -76,11 +76,13 @@ fence:
     - "rjwswenson@gmail.com"
     - "carlos.andrew.garcia@gmail.com"
     - "optumogs@gmail.com"
+  regularUsers:
     - "randy.olinger@optum.com"
     - "carlos.garcia@optum.com"
   service:
     type: ClusterIP
-    port: 80
+    httpPort: 80
+    httpsPort: 443
 arborist:
   replicas: 1
   image: "quay.io/cdis/arborist:2020.05"

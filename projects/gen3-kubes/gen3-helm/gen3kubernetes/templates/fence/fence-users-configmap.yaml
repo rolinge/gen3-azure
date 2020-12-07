@@ -8,115 +8,186 @@ metadata:
   name: fence-users-configmap-{{ .Values.ENV }}
 data:
   user.yaml: |
-    cloud_providers: {}
-    groups: {}
-    #
-    # Define information used for role-based access control.
-    # The information in the `rbac` section is sent to arborist to populate its
-    # access control model.
-    # see https://github.com/uc-cdis/fence/blob/88327870a5c35b13154a11408548cecb60a4945c/ua.yaml#L25
-    #
-    rbac:
-        policies:
-            - id: 'data_upload'
-              description: 'upload raw data files to S3'
-              resource_paths: ['/data_file']
-              role_ids: ['file_uploader']
-            - id: 'workspace'
-              description: 'be able to use workspace'
-              resource_paths: ['/workspace']
-              role_ids: ['workspace_user']
-            - id: 'services.sheepdog-admin'
-              description: 'CRUD access to programs and projects'
-              role_ids:  ['sheepdog_admin']
-              resource_paths:
-                - '/services/sheepdog/submission/program'
-                - '/services/sheepdog/submission/project'
-                - '/programs'
-        resources:
-            - name: 'data_file'
-              description: 'data files, stored in S3'
-            - name: programs
+    authz:
+      # policies automatically given to anyone, even if they are not authenticated
+      anonymous_policies:
+        - open_data_reader
+
+      # policies automatically given to authenticated users (in addition to their other policies)
+      all_users_policies: []
+
+      # each group can contain multiple policies and multiple users
+      groups:
+        - name: 'adminUsers'
+          policies:
+            - 'optumdev02_creator'
+            - 'optumdev02_reader'
+            - 'data_upload'
+            - 'workspace'
+            - 'services.sheepdog-admin'
+            - 'indexd_admin'
+            - 'optumdev02_indexd_admin'
+          projects:
+            - auth_id: 'optumdev02'
+              resource: '/programs/optumdev02/projects/optumprototype01'
+              privilege: ['create', 'read', 'update', 'delete', 'upload', 'read-storage']
+          users:
+          {{- range .Values.fence.adminUsers }}
+            - {{ . | quote }}
+          {{- end }}
+        - name: 'regularUsers'
+          policies:
+            - 'optumdev02_reader'
+            - 'data_upload'
+            - 'workspace'
+          projects:
+            - auth_id: 'optumdev02'
+              resource: '/programs/optumdev02/projects/optumprototype01'
+              privilege: ['create', 'read', 'update', 'delete', 'upload', 'read-storage']
+          users:
+          {{- range .Values.fence.regularUsers }}
+            - {{ . | quote }}
+          {{- end }}
+      resources:
+        - name: 'data_file'
+          description: 'data files, stored in Azure or AWS S3'
+        - name: 'programs'
+          subresources:
+            - name: 'optumdev02'
               subresources:
-              - name: QA
-                subresources:
-                - name: projects
+                - name: 'projects'
                   subresources:
-                  - name: test
-              - name: DEV
-                subresources:
-                - name: projects
-                  subresources:
-                  - name: test
-              - name: jnkns
-                subresources:
-                - name: projects
-                  subresources:
-                  - name: jenkins
-              - name: optumdev02
-                subresources:
-                - name: projects
-                  subresources:
-                  - name: optumprototype01
-            - name: workspace
-              description: jupyter notebooks
-            - name: services
+                    - name: 'optumprototype01'
+            - name: QA
               subresources:
-                - name: sheepdog
+                - name: projects
                   subresources:
-                    - name: submission
-                      subresources:
-                        - name: program
-                        - name: project
-        roles:
-            - id: 'file_uploader'
-              description: 'can upload data files'
-              permissions:
-                  - id: 'file_upload'
-                    action:
-                        service: 'fence'
-                        method: 'file_upload'
-            - id: workspace_user
-              permissions:
-              - action: {method: access, service: jupyterhub}
-                id: workspace_access
-                 # Sheepdog admin role
-            - id: sheepdog_admin
-              description: sheepdog admin role for program project crud
-              permissions:
-                - id: sheepdog_admin_action
-                  action:
-                    service: sheepdog
-                    method: '*'
+                    - name: test
+
+        - name: 'workspace'
+          description: 'jupyter notebooks'
+        - name: 'services'
+          subresources:
+            - name: 'sheepdog'
+              subresources:
+                - name: 'submission'
+                  subresources:
+                    - name: 'program'
+                    - name: 'project'
+        - name: 'open'
+      # each policy can contain multiple roles and multiple resources
+      policies:
+        - id: 'open_data_reader'
+          role_ids:
+            - 'reader'
+            - 'storage_reader'
+          resource_paths: ['/open']
+        - id: 'optumdev02_creator'
+          description: 'Full access to optumdev02'
+          role_ids:
+            - 'creator'
+            - 'storage_reader'
+            - 'indexd_admin'
+          resource_paths: ['/programs/optumdev02','/programs/optumdev02/projects/optumprototype01']
+        - id: 'optumdev02_reader'
+          description: 'Read access to optumdev02'
+          role_ids:
+            - 'reader'
+            - 'storage_reader'
+          resource_paths: ['/programs/optumdev02','/programs/optumdev02/projects/optumprototype01']
+        - id: 'optumdev02_indexd_admin'
+          description: 'Admin access to optumdev02'
+          role_ids:
+            - 'indexd_admin'
+          resource_paths: ['/programs/optumdev02','/programs/optumdev02/projects/optumprototype01']
+        - id: 'indexd_admin'
+          description: 'Admin access to all indexd'
+          role_ids:
+            - 'indexd_admin'
+          resource_paths:
+            - '/programs'
+        - id: 'indexd_update'
+          description: 'update access to all indexd'
+          role_ids:
+            - 'indexd_update'
+          resource_paths:
+            - '/programs'
+        - id: 'data_upload'
+          description: 'upload raw data files to blob storage'
+          resource_paths: ['/data_file']
+          role_ids: ['file_uploader']
+        - id: 'workspace'
+          description: 'be able to use workspace'
+          resource_paths: ['/workspace']
+          role_ids: ['workspace_user']
+        - id: 'services.sheepdog-admin'
+          description: 'CRUD access to programs and projects'
+          role_ids:  ['sheepdog_admin']
+          resource_paths:
+            - '/services/sheepdog/submission/program'
+            - '/services/sheepdog/submission/project'
+            - '/programs'
+
+      # currently existing methods are `read`, `create`, `update`,
+      # `delete`, `read-storage` and `write-storage`
+      roles:
+        - id: 'reader'
+          permissions:
+            - id: 'reader'
+              action:
+                method: 'read'
+                service: '*'
+        - id: 'storage_reader'
+          permissions:
+            - id: 'storage_reader'
+              action:
+                method: 'read-storage'
+                service: '*'
+        - id: 'creator'
+          permissions:
+            - id: 'creator'
+              action:
+                method: 'create'
+                service: '*'
+        - id: 'indexd_admin'
+          permissions:
+            - id: 'indexd_admin'
+              action:
+                method: '*'
+                service: 'indexd'
+        - id: 'indexd_update'
+          permissions:
+            - id: 'update'
+              action:
+                method: '*'
+                service: 'indexd'
+        - id: 'file_uploader'
+          description: 'can upload data files'
+          permissions:
+            - id: 'file_upload'
+              action:
+                service: '*'
+                method: 'file_upload'
+        - id: 'workspace_user'
+          permissions:
+            - id: 'workspace_access'
+              action:
+                method: 'access'
+                service: 'jupyterhub'
+        - id: 'sheepdog_admin'
+          description: 'sheepdog admin role for program project crud'
+          permissions:
+            - id: 'sheepdog_admin_action'
+              action:
+                service: 'sheepdog'
+                method: '*'
+
     users:
-      cdis:
-        admin: True
-      # Give yourself permissions to DEV, QA, and jnkns (JENKINS - for gen3 qa tests)
-      # programs - these wont exist until you create them.
-      # For program or project auth_id field use value from dbgap_accession_number.
-      # Also, grant yourself the data_upload policy for DEV.
-      # The integration test suite assumes this user exists - you can
-      # delete it if you dont want to run the test suite:
-      #    https://github.com/uc-cdis/gen3-qa
-      cdis.autotest@gmail.com:
-        admin: True
-        projects:
-        - auth_id: QA
-          privilege: ['create', 'read', 'update', 'delete', 'upload', 'read-storage']
-          resource: /programs/QA
-      # Give some optum employees  permissions to DEV, QA, and jnkns (JENKINS - for gen3 qa tests)
-      # programs - these wont exist until you create them.
-      # For program or project auth_id field use value from dbgap_accession_number.
-      # Also, grant yourself the data_upload policy for DEV.
       {{- range .Values.fence.adminUsers }}
       {{ . | quote }}:
         admin: True
-        policies: ['data_upload', 'workspace','services.sheepdog-admin']
-        projects:
-        - auth_id: test
-          privilege: ['create', 'read', 'update', 'delete', 'upload', 'read-storage']
-          resource: /programs/DEV/projects/test
-        - auth_id: optumdev02
-          privilege: ['create', 'read', 'update', 'delete', 'upload', 'read-storage']
-          resource: /programs/optumdev02/projects/optumprototype01
-        {{- end }}
+      {{- end }}
+      {{- range .Values.fence.regularUsers }}
+      {{ . | quote }}:
+        admin: False
+      {{- end }}
