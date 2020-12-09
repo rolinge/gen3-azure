@@ -32,26 +32,26 @@ spec:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
         - name: fence-{{ .Values.ENV }}
+          env:
+            - name: FENCE_DB_PW
+              valueFrom:
+                secretKeyRef:
+                  key: fenceDatabasePassword
+                  name: database-secrets-{{ .Values.ENV }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.fence.image }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           volumeMounts:
             - name: fence-config
-              mountPath: /var/www/fence/fence-config.yaml
-              readOnly: true
-            - name: fence-user
-              mountPath: /var/www/fence/user.yaml
-              readOnly: True
-            - name:  fence-crt
+              mountPath: /var/www/fence/
+              readOnly: False
+            - name:  fence-cacrt
               mountPath: /usr/local/share/ca-certificates
               readOnly: True
             - name: fence-jwt
               mountPath: /fence/keys
-              readOnly: True
-            - name: fence-setup
-              mountPath: /var/www/fence/fence-setup.sh
-              readOnly: True
+              readOnly: False
           ports:
             - name: http
               containerPort: 80
@@ -80,24 +80,13 @@ spec:
       volumes:
         - name: fence-config
           configMap:
-            defaultMode: 0660
+            defaultMode: 0664
             name: fence-config-configmap-{{ .Values.ENV }}
-        - name: fence-user
+        - name: fence-cacrt
           configMap:
-            defaultMode: 0660
-            name: fence-users-configmap-{{ .Values.ENV }}
-        - name: fence-crt
-          secret:
-            defaultMode: 0660
-            secretName: revproxy-tls-secrets-{{ .Values.ENV }}
-            items:
-              - key: tls.cacrt
-                path: cdis-ca.crt
+            defaultMode: 0664
+            name: fence-cacerts-configmap-{{ .Values.ENV }}
         - name: fence-jwt
           secret:
-            defaultMode: 0660
+            defaultMode: 0664
             secretName: fence-jwt-secrets-conf-{{ .Values.ENV }}
-        - name: fence-setup
-          configMap:
-            defaultMode: 0755
-            name: fence-setup-configmap-{{ .Values.ENV }}

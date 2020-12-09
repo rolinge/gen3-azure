@@ -30,7 +30,7 @@ variable "k8s_os_disk_size" {
 }
 
 variable "max_count" {
-  default = 4
+  default = 16
 }
 
 variable "POSTGRES_PASSWORD" {
@@ -72,13 +72,20 @@ variable "location" {
 
 # az aks get-versions --location centralus --output table
 variable aks_k8s_version {
-  default = "1.18.8"
+  default = "1.19.3"
 }
 
-variable "agents_size" {
+variable "k8_agents_regular" {
   default     = "Standard_D2s_v3"
   description = "The default virtual machine size for the Kubernetes agents"
 }
+variable "k8_agents_big" {
+  default     = "Standard_D4s_v3"
+  description = "The default virtual machine size for the Kubernetes agents"
+}
+
+Standard_D4s_v3
+
 
 variable "public_ssh_key" {
   description = "A custom ssh key to control access to the AKS cluster"
@@ -98,7 +105,7 @@ variable "log_analytics_workspace_sku" {
 
 variable "log_retention_in_days" {
   description = "The retention period for the logs in days"
-  default     = "7"
+  default     = "30"
 }
 
 variable "tags" {
@@ -137,5 +144,5 @@ variable "AZ_TENANT_ID" {
 variable "api_server_authorized_ip_ranges" {
   description = "The IP ranges to whitelist for incoming traffic to the masters"
   type        = list
-  default     = ["168.183.0.0/16", "149.111.0.0/16", "128.35.0.0/16", "161.249.0.0/16", "198.203.174.0/23", "198.203.176.0/22", "198.203.180.0/23"]
+  default     = ["168.183.0.0/16", "149.111.0.0/16", "128.35.0.0/16", "161.249.0.0/16", "198.203.174.0/23", "198.203.176.0/22", "198.203.180.0/23","75.73.11.0/24"]
 }

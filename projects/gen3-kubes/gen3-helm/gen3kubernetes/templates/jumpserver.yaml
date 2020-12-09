@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ include "gen3kubernetes.fullname" . }}-jumpserver-{{ .Values.ENV }}"
+  labels:
+    {{- include "gen3kubernetes.labels" . | nindent 4 }}
+spec:
+  restartPolicy: 'Never'
+  containers:
+    - name: jump
+      image: centos:7
+      command: ['sleep']
+      args: ['60000000']
+      env:
+        - name: "DBHOST"
+          value: {{ quote .Values.fence.database.servername }}
+        - name: "DBUSER"
+          value: {{ quote .Values.fence.database.username }}
+        - name:  "DBPASS"
+          value: {{ quote .Values.fence.database.db_password }}
+        - name: "DBFENCE"
+          value: {{ quote .Values.fence.database.databasename }}
+#        - name:  "DBCONNECT"
+#          value: "echo $DBPASS && psql -h {{  .Values.fence.database.servername }} -U {{  .Values.fence.database.username }} {{  .Values.fence.database.databasename }}"
+      resources:
+        limits:
+          cpu: '200m'
+          memory: '720Mi'
+        requests:
+          cpu: '100m'
+          memory: '512Mi'

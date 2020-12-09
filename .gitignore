@@ -5,6 +5,13 @@
 # Thumbnails
 ._*
 
+# Certificates
+**/*.pem
+**/*.crt
+**/*.pfx
+**/*.key
+**/*.cacrt
+
 default.profraw
 
 .idea
