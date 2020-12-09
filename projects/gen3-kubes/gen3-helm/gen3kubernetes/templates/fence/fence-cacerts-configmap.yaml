@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  labels:
+    component: fence-setup
+    environment: {{ .Values.ENV }}
+    {{- include "gen3kubernetes.labels" . | nindent 4 }}
+  name: fence-cacerts-configmap-{{ .Values.ENV }}
+data:
+  {{- $files := .Files }}
+  {{- range .Values.fence.cacrtFiles }}
+  {{ . | quote }}: |
+{{ $files.Get . | indent 4 }}
+  {{- end }}

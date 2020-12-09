@@ -1,0 +1,12 @@
+# AzureIndexTrigger
+
+The purpose of this code is to create a docker container, hosted as an Azure function, that will update the metadata
+on a blob that is uploaded via the gen3 client. Specific fields (size, hashes, urls) need to be filled in AFTER a file
+is uploaded by the client.  The function is triggered by an eventGrid resource in Azure that fires off the function
+after a blob is finished uploading.
+
+## Dependancies
+This code runs in a Azure functionapp that is hosted in an application_Service , all provisioned by Terraform.  The function itself is deployed va VS Code, but it is just a docker container that is uploaded and built in Azure.  In the future we will move the container build into a Jenkins workflow to manage updates and releases.
+
+## Extra Steps
+-  At this point there is a requirement to map a file share volume into the function after it is created in Azure.  Sadly, this is not yet supported by terraform, so it must be done manually.  In a future version this requirement should go away as there is no reason for this procedure to store any data.  There is a commandscript named mapstorage.ksh that can be used for this purpose.

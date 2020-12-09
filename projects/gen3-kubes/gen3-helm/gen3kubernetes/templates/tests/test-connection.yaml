@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ include "gen3kubernetes.fullname" . }}-test-connection"
+  labels:
+    {{- include "gen3kubernetes.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": test
+spec:
+  containers:
+    - name: wget
+      image: busybox
+      command: ['wget']
+      args: ['{{ include "gen3kubernetes.fullname" . }}:{{ .Values.fence.service.httpPort }}']
+  restartPolicy: Never

@@ -1,0 +1,51 @@
+---
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: admin-manage-namespaces
+  namespace: default
+rules:
+  - apiGroups: ["", "extensions", "apps"]
+    resources: ["namespaces", "roles", "rolebindings", "clusterroles", "clusterrolebindings", "secrets", \
+                "storageclasses", "pods", "pods/logs", "deployments", "services", "endpoints", "nodes", "ingress"]
+    verbs: ["*"]
+---
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: user-view-namespaces
+  namespace: default
+rules:
+  - apiGroups: ["", "extensions", "apps"]
+    resources: ["namespaces", "roles", "rolebindings", "clusterroles", "clusterrolebindings", \
+                "storageclasses", "pods", "pods/logs", "deployments", "services", "endpoints", "nodes", "ingress"]
+    verbs: ["get", "watch", "list"]
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: admin-manage-namespaces
+  namespace: default
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: admin-manage-namespaces
+subjects:
+  - kind: User
+    name: rolinge2@entid.optumhub.net
+  - kind: User
+    name: cgarc139@entid.optumhub.net
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: user-view-namespaces
+  namespace: default
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: user-view-namespaces
+subjects:
+
+  - kind: Group
+    name: c1a150d8-6037-46d0-b603-bcb11b80f612

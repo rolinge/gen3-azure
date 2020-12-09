@@ -5,6 +5,13 @@
 # Thumbnails
 ._*
 
+# Certificates
+**/*.pem
+**/*.crt
+**/*.pfx
+**/*.key
+**/*.cacrt
+
 default.profraw
 
 .idea
@@ -22,3 +29,9 @@ node_modules
 .local/*
 .ensime
 **/.terraform/*
+**/barista-kubernetes/*
+.auto.tfvars
+
+.python_packages
+__pycache__
+.venv

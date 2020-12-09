@@ -1,0 +1,245 @@
+# Default values for gen3kubernetes.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+#global tag for lables, etc
+ENV: gen3k8dev
+fence:
+  database:
+    servername: "10.1.0.97"
+    username: "fence_gen3dev_user"
+    port: "5432"
+    databasename: "fence_db"
+    db_password: "b65a802fdf7a101c619e35354e791eeb"
+  defaultIDPProvider: google
+  enabledIDPProviders:
+    - name: "google"
+      loginButtonText: "Google Login"
+    - name: "microsoft"
+      loginButtonText: "Microsoft Login"
+    - name: "okta"
+      loginButtonText: "Okta Login"
+  replicas: 1
+  image: "quay.io/cdis/fence:2020.12"
+  base_url: 'https://gen3k8dev.optum.com/user'
+  resources:
+    limits:
+      cpu: '500m'
+      memory: '256Mi'
+    requests:
+      cpu: '200m'
+      memory: '128Mi'
+  googleOauth:
+    client_id: '459263570125-3hl550dfsjej6v16m7go20i7ovkol8pn.apps.googleusercontent.com'
+    client_secret: 'qxRkPreusEWF60lhM4-tH7O7'
+  microsoftOauth:
+    client_id: '9db77a3b-3f63-4093-a9e8-96a9d6cc711b'
+    client_secret: 'a-7H-z1041Ki7T5_v6jtGi5vtRCTq-_D.I'
+  oktaOauth:
+    client_id: ""
+  defaultLoginURLSuffix: 'login/microsoft'
+  amazonStorageCreds:
+    - name: 'CREDS1'
+      accesskeyid: 'stgaccvprh'
+      secretkey: 'V6c8rNTDPxAozgf3M6ewHd+7A9XnTw8MNSfsQ63QLY1+nzloas6rSp0GsZuOK+Q+oT7gi5Cpdj8TEvqaC5xvOQ=='
+    - name: 'CREDS2'
+      accesskeyid: 'AKIAU2FCYYEUXZPLWKZF'
+      secretkey: '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'
+  amazonBuckets:
+    - name: 'bucket1'
+      credentialname: 'CREDS1'
+      endpoint_url: 'https://minio-app-service-bfncrxya.azurewebsites.net'
+      region: 'us-east-1'
+    - name: 'gen3bucket88997'
+      credentialname: 'CREDS2'
+      region: 'us-east-1'
+  azCredentials:
+    - name: 'CREDA'
+      az_stgacctname: 'stgaccvprh'
+      az_secret_access_key: 'V6c8rNTDPxAozgf3M6ewHd+7A9XnTw8MNSfsQ63QLY1+nzloas6rSp0GsZuOK+Q+oT7gi5Cpdj8TEvqaC5xvOQ=='
+    - name: 'CREDB'
+      az_stgacctname:  'azgen3blobstorage'
+      az_secret_access_key: '0yzBB7W6H7Tz1wtmGHukXUuVA91YiYGn5anpPFgq4NoeccZ1rcqMgyaRCYwSYoZpUqMT0YJx1dWXTDjUQMltZQ=='
+  azureBlobstores:
+    - name: 'container1'
+      credentialname: 'CREDA'
+    - name: 'azgen3blobstorage'
+      credentialname: 'CREDB'
+
+  dataUploadBucket: 'gen3bucket88997'
+  adminUsers:
+    - "randyolinger@gmail.com"
+    - "rjwswenson@gmail.com"
+    - "carlos.andrew.garcia@gmail.com"
+    - "optumogs@gmail.com"
+  regularUsers:
+    - "randy.olinger@optum.com"
+    - "carlos.garcia@optum.com"
+  service:
+    type: ClusterIP
+    httpPort: 80
+    httpsPort: 443
+  cacrtFiles:
+    - "gen3k8dev.1.crt"
+    - "gen3k8dev.2.crt"
+    - "gen3k8dev.3.crt"
+  jwt_private_key: |
+    -----BEGIN PRIVATE KEY-----
+    MIIEwAIBADANBgkqhkiG9w0BAQEFAASCBKowggSmAgEAAoIBAQDkS+nTVWUnXgIQ
+    11LICu8p5XOOKk4XliZWcOef8ik5hC2nydh6BgUeMsP/8hUb9q+MpKrpnI0Q1itR
+    rI17HNlF47uN7oMsMBEXUbOQt7dT6ACoKhXUKHHegXX6ILVVSPxJgzgO4U3LkK03
+    DF8V0XtE0O7ireOaecyObl1S4I61gxyWGllyCnvQoRVHF07ZbPK46xQD9Hs9lyIq
+    SVq/Y4K4qchY26g4ZQ78lpPCCF3sd4wwI9DIGOTigKLgI+G6MxUSRo3z8C452Djv
+    4BFHBdrbu6fTmxn5WumdN1cjksA7cyUYCEQ/zr3bVlIPEi0C3TlM6J485VDl/e+z
+    NZDxE+CrAgMBAAECggEBALjXFfy72WikXrvP+wBoife8BXGHoy7JrUSzqXYBFYuy
+    D10YuiMiGKa4p6TlFl5Lvxr6gD8hN734CZ7ZPLv/QZOqrUJfaOkwCcZ9qgt0FATl
+    hRKi8IWUMY3b9++K6AajT1Ed4xd5KAm3m+dEJwB9WXcAS0pRTETYdNylUv41PpaK
+    h+MwyBBF5NSGnRYQuLpSqTD8jRfaXOzsfUXQmElgQ0ywTVEQPyoWHaB2CQzWdRbv
+    ChwPBOfJHh4wsEO2C+sLTcQ0/DL4wC6yahF6iqnfBNR0bmcsl1696RkZ+ricEPY8
+    8pbefY9Kp4GvFd2bFjJfArCY8OhqtqeniKjUeOkOJnECgYEA9h1bG+g6G2SJZFhN
+    1fEpT5tO4r0RA4ZBnlPVIaxOcBLgJGMsTsN/Olse1so4Mm0gFiT17icoRRde5XKj
+    DPp6E2PSyafQgLF48OpEFpDNJRcSUx+SPchO5XbXS0E1g41SSV1iUGX5l8z5ooHZ
+    oRh3nDR5FpqFmrskGZGGzYSVVgcCgYEA7XdYPW1W92s3l8ixfZAQmIhFvHt9BP3t
+    +rQQth4DF+RiGw+9VurVGbcmnuDBFD79whU1dv07vimaJhRwzkJsYRWY7GipQjfb
+    eJiP3noAykji8QLBuXLMn1nC0zPgPDI+fw9kGG6BN47TwffqegnY3e34x+Z6niOu
+    RPChgbwuVz0CgYEAn+7bsfrrJ7nhfo/TpN+elNi8HqP2Vm/8XELmEYfDQRlDBuJb
+    fKOWHfnwxGuMsVgwrbM/DY/sn1lclYY1Zs2uXsNTyy9+UuMBUK0rqe5XIW8ovVOa
+    2QM+IedkaMbrW52Oh5ZjuRNLatYMswnmvsUDlUKUHZg0kiRihSsIiq1JzikCgYEA
+    pJtm8mW5tBaBWdjHmCdmKaXE2WusdOpkrbVmJCfXsxcgHmwhrn9oKsQ3pEhd7t/f
+    XUsAXbQaVq5V6XGf5IpMwFuNPssqEPnRS95NVEW0CITPs4taqGd4ijlZgLfkBzY4
+    9jDADOOE9PMvvLRSuDfdObG9Eyyj8L0BD07SVbERWm0CgYEA36QYn6P84onE9lQ8
+    JpXhzhf/fdywKF1aXABhK5qhoGSHUxLiQ9G2VIXO4JYshZj0O0wa7nJctKgl0Hs5
+    fv6xmI5lSSi/Mzcw5FwB+zd9XwjuCx7/TvE5Q4yzj30ihC2gmtDEE/X0Wcy+o2Dc
+    D8OEKlWXGVIdG6KbKLcdbNoOFjo=
+    -----END PRIVATE KEY-----
+  jwt_public_key: |
+    -----BEGIN PUBLIC KEY-----
+    MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA5Evp01VlJ14CENdSyArv
+    KeVzjipOF5YmVnDnn/IpOYQtp8nYegYFHjLD//IVG/avjKSq6ZyNENYrUayNexzZ
+    ReO7je6DLDARF1GzkLe3U+gAqCoV1Chx3oF1+iC1VUj8SYM4DuFNy5CtNwxfFdF7
+    RNDu4q3jmnnMjm5dUuCOtYMclhpZcgp70KEVRxdO2WzyuOsUA/R7PZciKklav2OC
+    uKnIWNuoOGUO/JaTwghd7HeMMCPQyBjk4oCi4CPhujMVEkaN8/AuOdg47+ARRwXa
+    27un05sZ+VrpnTdXI5LAO3MlGAhEP86921ZSDxItAt05TOiePOVQ5f3vszWQ8RPg
+    qwIDAQAB
+    -----END PUBLIC KEY-----
+arborist:
+  database:
+    servername: "10.1.0.97"
+    username: "arborist_gen3dev_user"
+    port: "5432"
+    databasename: "arborist_db"
+    db_password: "E98CF2-8DC7HGES"
+  replicas: 1
+  image: "quay.io/cdis/arborist:2020.12"
+  resources:
+    limits:
+      cpu: 500m
+      memory: 256Mi
+    requests:
+      cpu: 200m
+      memory: 128Mi
+  service:
+    type: ClusterIP
+    port: 80
+
+image:
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: "gen3dev"
+
+podAnnotations: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: false
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: chart-example.local
+      paths: []
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+# tell revproxy where to find the certificates, relative to the template.
+revproxy:
+  crtFile: "gen3k8dev.crt"
+  keyFile: "gen3k8dev.npp.key"
+  cacrtFile: "gen3k8dev.cacrt"
+
+peregrine:
+  database:
+    servername: "10.1.0.97"
+    username: "peregrine_gen3dev_user"
+    port: "5432"
+    databasename: "metadata_db"
+    db_password: "8ACB-0053084C2A97"
+sheepdog:
+  database:
+    servername: "10.1.0.97"
+    username: "sheepdog_gen3dev_user"
+    port: "5432"
+    databasename: "metadata_db"
+    db_password: "E24B9254-7019-4081"
+indexd:
+  database:
+    servername: "10.1.0.97"
+    username: "indexd_gen3dev_user"
+    port: "5432"
+    databasename: "indexd_db"
+    db_password: "D7E-2A715381173D"

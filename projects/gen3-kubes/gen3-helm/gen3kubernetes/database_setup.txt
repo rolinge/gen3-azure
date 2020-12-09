@@ -1,0 +1,16 @@
+
+#POSTGRES_PASSWORD = "hhey77834kefiu&wb@"
+
+
+CREATE USER fence_gen3dev_user with  createdb login password 'b65a802fdf7a101c619e35354e791eeb' ;
+CREATE USER arborist_gen3dev_user with  createdb login password 'E98CF2-8DC7HGES';
+CREATE USER peregrine_gen3dev_user with  createdb login password '8ACB-0053084C2A97';
+CREATE USER sheepdog_gen3dev_user with  createdb login password 'E24B9254-7019-4081';
+CREATE USER indexd_gen3dev_user with  createdb login password 'D7E-2A715381173D';
+
+
+grant all on database fence_db to fence_gen3dev_user;
+grant all on database arborist_db to arborist_gen3dev_user;
+grant all on database indexd_db to indexd_gen3dev_user;
+grant all on database metadata_db to sheepdog_gen3dev_user;
+grant all on database metadata_db to peregrine_gen3dev_user;

@@ -1,0 +1,403 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  labels:
+    component: fence-config
+    environment: {{ .Values.ENV }}
+    {{- include "gen3kubernetes.labels" . | nindent 4 }}
+  name: fence-config-configmap-{{ .Values.ENV }}
+data:
+  fence-config.yaml: |
+    APP_NAME: 'Gen3 Data Commons'
+    BASE_URL: '{{ .Values.fence.base_url }}'
+    DB: 'postgresql://{{ .Values.fence.database.username }}:{{ .Values.fence.database.db_password }}@{{ .Values.fence.database.servername }}:{{ .Values.fence.database.port }}/{{ .Values.fence.database.databasename }}'
+    DEBUG: true
+    MOCK_AUTH: false
+    MOCK_GOOGLE_AUTH: false
+    MOCK_STORAGE: true
+    AUTHLIB_INSECURE_TRANSPORT: false
+
+    SESSION_COOKIE_SECURE: true
+
+    ENABLE_CSRF_PROTECTION: true
+
+    OPENID_CONNECT:
+      # These Google values must be obtained from Google's Cloud Console
+      # Follow: https://developers.google.com/identity/protocols/OpenIDConnect
+      #
+      # You'll need to obtain a Client ID and Client Secret. Set the redirect URIs
+      # in Google to be '{{ .Values.fence.base_url }}/login/google/login', but expand BASE_URL to
+      # whatever you set it to above.
+      {{- if .Values.fence.googleOauth.client_id }}
+      google:
+        client_id: '{{ .Values.fence.googleOauth.client_id }}'
+        client_secret: '{{ .Values.fence.googleOauth.client_secret }}'
+        redirect_url: '{{ .Values.fence.base_url }}/login/google/login/'
+      {{- end }}
+      {{- if .Values.fence.microsoftOauth.client_id }}
+      microsoft:
+        client_id: '{{ .Values.fence.microsoftOauth.client_id }}'
+        client_secret: '{{ .Values.fence.microsoftOauth.client_secret }}'
+        redirect_url: '{{ .Values.fence.base_url }}/login/microsoft/login/'
+      {{- end }}
+      {{- if .Values.fence.oktaOauth.client_id }}
+      okta:
+        client_id: '{{ .Values.fence.oktaOauth.client_id }}'
+        client_secret: '{{ .Values.fence.oktaOauth.client_secret }}'
+        redirect_url: '{{ .Values.fence.base_url }}/login/okta/login/'
+        discovery_url: '{{ .Values.fence.oktaOauth.discovery_url }}'
+      {{- end }}
+    #
+    DEFAULT_LOGIN_URL: '{{ .Values.fence.base_url }}/{{ .Values.fence.defaultLoginURLSuffix }}'
+    #
+    ENABLED_IDENTITY_PROVIDERS:
+      # ID for which of the providers to default to
+      default: {{ .Values.fence.defaultIDPProvider  | quote }}
+      providers:
+      {{- range .Values.fence.enabledIDPProviders }}
+        {{ .name  }}:
+          name: {{ .loginButtonText | quote }}
+      {{- end }}
+    OAUTH2_JWT_ALG: 'RS256'
+    OAUTH2_JWT_ENABLED: true
+    OAUTH2_JWT_ISS: '{{ .Values.fence.base_url }}'
+    OAUTH2_PROVIDER_ERROR_URI: '/api/oauth2/errors'
+
+    APPLICATION_ROOT: '/user'
+    ACCESS_TOKEN_COOKIE_NAME: "access_token"
+
+    SESSION_COOKIE_NAME: "fence"
+
+    OAUTH2_TOKEN_EXPIRES_IN:
+      "authorization_code": 1200
+      "implicit": 1200
+    ACCESS_TOKEN_EXPIRES_IN: 1200
+    REFRESH_TOKEN_EXPIRES_IN: 2592000
+    SESSION_TIMEOUT: 1800
+    SESSION_LIFETIME: 28800
+    GOOGLE_SERVICE_ACCOUNT_KEY_FOR_URL_SIGNING_EXPIRES_IN: 2592000
+    GOOGLE_USER_SERVICE_ACCOUNT_ACCESS_EXPIRES_IN: 604800
+    GOOGLE_ACCOUNT_ACCESS_EXPIRES_IN: 86400
+    MAX_PRESIGNED_URL_TTL: 3600
+    MAX_API_KEY_TTL: 2592000
+    MAX_ACCESS_TOKEN_TTL: 3600
+
+    SUPPORT_EMAIL_FOR_ERRORS: null
+    SHIBBOLETH_HEADER: 'persistent_id'
+    SSO_URL: 'https://auth.nih.gov/affwebservices/public/saml2sso?SPID={{ .Values.fence.base_url }}/shibboleth&RelayState='
+    ITRUST_GLOBAL_LOGOUT: 'https://auth.nih.gov/siteminderagent/smlogout.asp?mode=nih&AppReturnUrl='
+    dbGaP:
+      info:
+        host: ''
+        username: ''
+        password: ''
+        port: 22
+        proxy: ''
+        proxy_user: ''
+      protocol: 'sftp'
+      decrypt_key: ''
+      parse_consent_code: true
+
+    STORAGE_CREDENTIALS: []
+    AWS_CREDENTIALS:
+      {{- range .Values.fence.amazonStorageCreds }}
+      {{ .name | quote }}:
+        aws_access_key_id: {{ .accesskeyid | quote }}
+        aws_secret_access_key: {{ .secretkey | quote }}
+      {{- end }}
+    S3_BUCKETS:
+      {{- range .Values.fence.amazonBuckets }}
+      {{ .name | quote }}:
+        cred: {{ .credentialname | quote }}
+        {{- if .endpoint_url }}
+        endpoint_url: {{ .endpoint_url | quote }}
+        {{- end }}
+        region: {{ .region | quote }}
+      {{- end }}
+    AZ_CREDENTIALS:
+      {{- range .Values.fence.azCredentials }}
+      {{ .name | quote }}:
+        az_stgacctname: {{ .az_stgacctname | quote }}
+        az_secret_access_key: {{ .az_secret_access_key | quote }}
+      {{- end }}
+    AZ_CONTAINERS:
+      {{- range .Values.fence.azureBlobstores }}
+      {{ .name | quote }}:
+        cred: {{ .credentialname | quote }}
+      {{- end }}
+
+    DATA_UPLOAD_BUCKET: {{ .Values.fence.dataUploadBucket}}
+
+    HTTP_PROXY:
+      host: null
+      port: 3128
+    INDEXD: http://indexd-service-{{ .Values.ENV }}
+
+    INDEXD_USERNAME: 'indexd_client'
+    INDEXD_PASSWORD: 'indexd_client_pass'
+    ARBORIST: http://arborist-service-{{ .Values.ENV }}
+    CIRRUS_CFG:
+      GOOGLE_API_KEY: ''
+      GOOGLE_PROJECT_ID: ''
+      GOOGLE_APPLICATION_CREDENTIALS: ''
+      GOOGLE_STORAGE_CREDS: ''
+      GOOGLE_ADMIN_EMAIL: ''
+      GOOGLE_IDENTITY_DOMAIN: ''
+      GOOGLE_CLOUD_IDENTITY_ADMIN_EMAIL: ''
+
+    GOOGLE_GROUP_PREFIX: ''
+
+    GUN_MAIL:
+      'datacommons.io':
+        smtp_hostname: 'smtp.mailgun.org'
+        api_key: ''
+        default_login: 'postmaster@mailgun.example.com'
+        api_url: 'https://api.mailgun.net/v3/mailgun.example.com'
+        smtp_password: ''
+
+    EMAIL_SERVER: 'localhost'
+    SEND_FROM: 'example@gmail.com'
+    SEND_TO: 'example@gmail.com'
+
+    WHITE_LISTED_GOOGLE_PARENT_ORGS: []
+    WHITE_LISTED_SERVICE_ACCOUNT_EMAILS: []
+    REMOVE_SERVICE_ACCOUNT_EMAIL_NOTIFICATION:
+      enable: false
+      domain: 'example.com'
+      from: 'do-not-reply@example.com'
+      subject: 'User service account removal notification'
+      content: >
+        Service accounts were removed from access control data because some users or
+        service accounts of GCP Project {} are not authorized to access the data sets
+        associated to the service accounts, or do not adhere to the security policies.
+      admin:
+        - 'admin@example.edu'
+
+    GOOGLE_MANAGED_SERVICE_ACCOUNT_DOMAINS:
+      - 'dataflow-service-producer-prod.iam.gserviceaccount.com'
+      - 'cloudbuild.gserviceaccount.com'
+      - 'cloud-ml.google.com.iam.gserviceaccount.com'
+      - 'container-engine-robot.iam.gserviceaccount.com'
+      - 'dataflow-service-producer-prod.iam.gserviceaccount.com'
+      - 'sourcerepo-service-accounts.iam.gserviceaccount.com'
+      - 'dataproc-accounts.iam.gserviceaccount.com'
+      - 'gae-api-prod.google.com.iam.gserviceaccount.com'
+      - 'genomics-api.google.com.iam.gserviceaccount.com'
+      - 'containerregistry.iam.gserviceaccount.com'
+      - 'container-analysis.iam.gserviceaccount.com'
+      - 'cloudservices.gserviceaccount.com'
+      - 'stackdriver-service.iam.gserviceaccount.com'
+      - 'appspot.gserviceaccount.com'
+      - 'partnercontent.gserviceaccount.com'
+      - 'trifacta-gcloud-prod.iam.gserviceaccount.com'
+      - 'gcf-admin-robot.iam.gserviceaccount.com'
+      - 'compute-system.iam.gserviceaccount.com'
+      - 'gcp-sa-websecurityscanner.iam.gserviceaccount.com'
+      - 'storage-transfer-service.iam.gserviceaccount.com'
+  fence-setup.yaml: |
+    #!/bin/bash
+    # entrypoint script for fence to sync user.yaml before running
+
+    sleep 2
+    until (echo > /dev/tcp/postgres/5432) >/dev/null 2>&1; do
+      echo "Postgres is unavailable - sleeping"
+      sleep 2
+    done
+
+    echo "postgres is ready"
+
+    update-ca-certificates
+
+    until curl -f -s -o /dev/null http://arborist-service-{{ .Values.ENV }}/policy; do
+        echo "arborist not ready, waiting..."
+        sleep 10
+    done
+
+    fence-create sync --yaml user.yaml --arborist http://arborist-service
+
+    cd /fence
+    /dockerrun.sh
+  user.yaml: |
+    authz:
+      # policies automatically given to anyone, even if they are not authenticated
+      anonymous_policies:
+        - open_data_reader
+
+      # policies automatically given to authenticated users (in addition to their other policies)
+      all_users_policies: []
+
+      # each group can contain multiple policies and multiple users
+      groups:
+        - name: 'adminUsers'
+          policies:
+            - 'optumdev02_creator'
+            - 'optumdev02_reader'
+            - 'data_upload'
+            - 'workspace'
+            - 'services.sheepdog-admin'
+            - 'indexd_admin'
+            - 'optumdev02_indexd_admin'
+          projects:
+            - auth_id: 'optumdev02'
+              resource: '/programs/optumdev02/projects/optumprototype01'
+              privilege: ['create', 'read', 'update', 'delete', 'upload', 'read-storage']
+          users:
+          {{- range .Values.fence.adminUsers }}
+            - {{ . | quote }}
+          {{- end }}
+        - name: 'regularUsers'
+          policies:
+            - 'optumdev02_reader'
+            - 'data_upload'
+            - 'workspace'
+          projects:
+            - auth_id: 'optumdev02'
+              resource: '/programs/optumdev02/projects/optumprototype01'
+              privilege: ['create', 'read', 'update', 'delete', 'upload', 'read-storage']
+          users:
+          {{- range .Values.fence.regularUsers }}
+            - {{ . | quote }}
+          {{- end }}
+      resources:
+        - name: 'data_file'
+          description: 'data files, stored in Azure or AWS S3'
+        - name: 'programs'
+          subresources:
+            - name: 'optumdev02'
+              subresources:
+                - name: 'projects'
+                  subresources:
+                    - name: 'optumprototype01'
+            - name: QA
+              subresources:
+                - name: projects
+                  subresources:
+                    - name: test
+
+        - name: 'workspace'
+          description: 'jupyter notebooks'
+        - name: 'services'
+          subresources:
+            - name: 'sheepdog'
+              subresources:
+                - name: 'submission'
+                  subresources:
+                    - name: 'program'
+                    - name: 'project'
+        - name: 'open'
+      # each policy can contain multiple roles and multiple resources
+      policies:
+        - id: 'open_data_reader'
+          role_ids:
+            - 'reader'
+            - 'storage_reader'
+          resource_paths: ['/open']
+        - id: 'optumdev02_creator'
+          description: 'Full access to optumdev02'
+          role_ids:
+            - 'creator'
+            - 'storage_reader'
+            - 'indexd_admin'
+          resource_paths: ['/programs/optumdev02','/programs/optumdev02/projects/optumprototype01']
+        - id: 'optumdev02_reader'
+          description: 'Read access to optumdev02'
+          role_ids:
+            - 'reader'
+            - 'storage_reader'
+          resource_paths: ['/programs/optumdev02','/programs/optumdev02/projects/optumprototype01']
+        - id: 'optumdev02_indexd_admin'
+          description: 'Admin access to optumdev02'
+          role_ids:
+            - 'indexd_admin'
+          resource_paths: ['/programs/optumdev02','/programs/optumdev02/projects/optumprototype01']
+        - id: 'indexd_admin'
+          description: 'Admin access to all indexd'
+          role_ids:
+            - 'indexd_admin'
+          resource_paths:
+            - '/programs'
+        - id: 'indexd_update'
+          description: 'update access to all indexd'
+          role_ids:
+            - 'indexd_update'
+          resource_paths:
+            - '/programs'
+        - id: 'data_upload'
+          description: 'upload raw data files to blob storage'
+          resource_paths: ['/data_file']
+          role_ids: ['file_uploader']
+        - id: 'workspace'
+          description: 'be able to use workspace'
+          resource_paths: ['/workspace']
+          role_ids: ['workspace_user']
+        - id: 'services.sheepdog-admin'
+          description: 'CRUD access to programs and projects'
+          role_ids:  ['sheepdog_admin']
+          resource_paths:
+            - '/services/sheepdog/submission/program'
+            - '/services/sheepdog/submission/project'
+            - '/programs'
+
+      # currently existing methods are `read`, `create`, `update`,
+      # `delete`, `read-storage` and `write-storage`
+      roles:
+        - id: 'reader'
+          permissions:
+            - id: 'reader'
+              action:
+                method: 'read'
+                service: '*'
+        - id: 'storage_reader'
+          permissions:
+            - id: 'storage_reader'
+              action:
+                method: 'read-storage'
+                service: '*'
+        - id: 'creator'
+          permissions:
+            - id: 'creator'
+              action:
+                method: 'create'
+                service: '*'
+        - id: 'indexd_admin'
+          permissions:
+            - id: 'indexd_admin'
+              action:
+                method: '*'
+                service: 'indexd'
+        - id: 'indexd_update'
+          permissions:
+            - id: 'update'
+              action:
+                method: '*'
+                service: 'indexd'
+        - id: 'file_uploader'
+          description: 'can upload data files'
+          permissions:
+            - id: 'file_upload'
+              action:
+                service: '*'
+                method: 'file_upload'
+        - id: 'workspace_user'
+          permissions:
+            - id: 'workspace_access'
+              action:
+                method: 'access'
+                service: 'jupyterhub'
+        - id: 'sheepdog_admin'
+          description: 'sheepdog admin role for program project crud'
+          permissions:
+            - id: 'sheepdog_admin_action'
+              action:
+                service: 'sheepdog'
+                method: '*'
+
+    users:
+      {{- range .Values.fence.adminUsers }}
+      {{ . | quote }}:
+        admin: True
+      {{- end }}
+      {{- range .Values.fence.regularUsers }}
+      {{ . | quote }}:
+        admin: False
+      {{- end }}

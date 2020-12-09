@@ -1,0 +1,92 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fence-{{ .Values.ENV }}
+  labels:
+    {{- include "gen3kubernetes.labels" . | nindent 4 }}
+    component: "fence"
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.fence.replicas }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "gen3kubernetes.selectorLabels" . | nindent 6 }}
+      component: "fence"
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "gen3kubernetes.selectorLabels" . | nindent 8 }}
+        component: "fence"
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "gen3kubernetes.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: fence-{{ .Values.ENV }}
+          env:
+            - name: FENCE_DB_PW
+              valueFrom:
+                secretKeyRef:
+                  key: fenceDatabasePassword
+                  name: database-secrets-{{ .Values.ENV }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.fence.image }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          volumeMounts:
+            - name: fence-config
+              mountPath: /var/www/fence/
+              readOnly: False
+            - name:  fence-cacrt
+              mountPath: /usr/local/share/ca-certificates
+              readOnly: True
+            - name: fence-jwt
+              mountPath: /fence/keys
+              readOnly: False
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          livenessProbe:
+            tcpSocket:
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /_status
+              port: http
+          resources:
+            {{- toYaml .Values.fence.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+        - name: fence-config
+          configMap:
+            defaultMode: 0664
+            name: fence-config-configmap-{{ .Values.ENV }}
+        - name: fence-cacrt
+          configMap:
+            defaultMode: 0664
+            name: fence-cacerts-configmap-{{ .Values.ENV }}
+        - name: fence-jwt
+          secret:
+            defaultMode: 0664
+            secretName: fence-jwt-secrets-conf-{{ .Values.ENV }}
