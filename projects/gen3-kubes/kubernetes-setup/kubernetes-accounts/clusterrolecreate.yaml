@@ -6,8 +6,10 @@ metadata:
   namespace: default
 rules:
   - apiGroups: ["", "extensions", "apps"]
-    resources: ["namespaces", "roles", "rolebindings", "clusterroles", "clusterrolebindings", "secrets", \
-                "storageclasses", "pods", "pods/logs", "deployments", "services", "endpoints", "nodes", "ingress"]
+    resources: ["namespaces", "roles", "persistentvolumeclaims", "persistentvolumes", \
+                "rolebindings", "clusterroles", "clusterrolebindings", "secrets", \
+                "storageclasses", "pods", "pods/logs", "deployments", "services", "endpoints", \
+                "nodes", "ingress", "statefulsets", "replicasets", "configmaps"]
     verbs: ["*"]
 ---
 kind: ClusterRole
@@ -17,8 +19,10 @@ metadata:
   namespace: default
 rules:
   - apiGroups: ["", "extensions", "apps"]
-    resources: ["namespaces", "roles", "rolebindings", "clusterroles", "clusterrolebindings", \
-                "storageclasses", "pods", "pods/logs", "deployments", "services", "endpoints", "nodes", "ingress"]
+    resources: ["namespaces", "roles",  "persistentvolumeclaims", \
+                "persistentvolumes", "rolebindings", "clusterroles", "clusterrolebindings", \
+                "storageclasses", "pods", "pods/logs", "deployments", "services", "endpoints", \
+                "nodes", "ingress", "statefulsets", "replicasets", "configmaps"]
     verbs: ["get", "watch", "list"]
 ---
 kind: ClusterRoleBinding

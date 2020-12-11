@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  labels:
+    {{- include "gen3kubernetes.labels" . | nindent 4 }}
+    component: revproxy-nginx-configmap
+  name: arborist-config-configmap-{{ .Values.ENV }}
+data:
+  arborist_setup.sh: |
+    #!/bin/bash
+    # entrypoint script for arborist to setup db
+
+    sleep 2
+    until (echo test | nc $PGHOST $PGPORT -w 2   && echo "Postgres port is open") >/dev/null 2>&1; do
+      echo "Postgres is unavailable - sleeping"
+    done
+
+    echo "postgres is ready"
+
+    update-ca-certificates
+
+    ./migrations/latest
+    ./bin/arborist

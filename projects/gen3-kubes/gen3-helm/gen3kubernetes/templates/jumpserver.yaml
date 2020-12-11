@@ -20,8 +20,8 @@ spec:
           value: {{ quote .Values.fence.database.db_password }}
         - name: "DBFENCE"
           value: {{ quote .Values.fence.database.databasename }}
-#        - name:  "DBCONNECT"
-#          value: "echo $DBPASS && psql -h {{  .Values.fence.database.servername }} -U {{  .Values.fence.database.username }} {{  .Values.fence.database.databasename }}"
+        - name:  "FENCECONNECT"
+          value: "echo $DBPASS | psql -h {{  .Values.fence.database.servername }} -U {{  .Values.fence.database.username }}@{{  .Values.fence.database.servername }} {{  .Values.fence.database.databasename }}"
       resources:
         limits:
           cpu: '200m'

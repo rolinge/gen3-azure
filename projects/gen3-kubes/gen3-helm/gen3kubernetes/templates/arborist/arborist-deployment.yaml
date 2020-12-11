@@ -1,0 +1,91 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: arborist-{{ .Values.ENV }}
+  labels:
+    {{- include "gen3kubernetes.labels" . | nindent 4 }}
+    component: "arborist"
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.arborist.replicas }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "gen3kubernetes.selectorLabels" . | nindent 6 }}
+      component: "arborist"
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "gen3kubernetes.selectorLabels" . | nindent 8 }}
+        component: "arborist"
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "gen3kubernetes.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: "arborist-{{ .Values.ENV }}"
+          env:
+            - name: "JWKS_ENDPOINT"
+              value: "http://service-fence-{{ .Values.ENV }}/.well-known/jwks"
+            - name: "PGDATABASE"
+              value: {{ .Values.arborist.database.databasename | quote }}
+            - name: "PGUSER"
+              value: "{{ .Values.arborist.database.username }}@{{ .Values.arborist.database.servername }}"
+            - name: "PGPASSWORD"
+              valueFrom:
+                secretKeyRef:
+                  key: "arboristDatabasePassword"
+                  name: "database-secrets-{{ .Values.ENV }}"
+            - name: "PGHOST"
+              value: {{ .Values.arborist.database.servername | quote }}
+            - name: "PGPORT"
+              value: {{ .Values.arborist.database.port | quote }}
+            - name: "PGSSLMODE"
+              value: "disable"
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.arborist.image }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["bash" , "-c", "/go/src/github.com/uc-cdis/arborist/setup/arborist_setup.sh"]
+          volumeMounts:
+            - name: arborist-config
+              mountPath: /go/src/github.com/uc-cdis/arborist/setup
+              readOnly: False
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          livenessProbe:
+            tcpSocket:
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+          resources:
+            {{- toYaml .Values.arborist.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+        - name: arborist-config
+          configMap:
+            defaultMode: 0775
+            name: arborist-config-configmap-{{ .Values.ENV }}

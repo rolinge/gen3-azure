@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    {{- include "gen3kubernetes.labels" . | nindent 4 }}
+    component: "service-arborist"
+  name: service-arborist-{{ .Values.ENV }}
+spec:
+  type: ClusterIP
+  ports:
+  - name: http
+    port: {{ .Values.arborist.serviceport }}
+    protocol: TCP
+  selector:
+    {{- include "gen3kubernetes.selectorLabels" . | nindent 4 }}
+    component: "arborist"
+  sessionAffinity: None
+  type: ClusterIP
+status:
+  loadBalancer: {}
