@@ -27,6 +27,7 @@ resource "azurerm_kubernetes_cluster" "dce_aks_cluster" {
 
   default_node_pool {
     name                = "nodepool"
+
     vm_size             = var.k8_agents_regular
     enable_auto_scaling = true
     max_count           = var.max_count
@@ -69,11 +70,13 @@ resource "azurerm_kubernetes_cluster" "dce_aks_cluster" {
       }
     }
   }
+
   tags = merge(var.tags, local.common_tags)
 }
 
 
 resource "azurerm_kubernetes_cluster_node_pool" "gen3-2ndpool" {
+
   name                  = format("g3large%s",random_string.uid.result)
   kubernetes_cluster_id = azurerm_kubernetes_cluster.dce_aks_cluster.id
   vm_size               = var.k8_agents_big

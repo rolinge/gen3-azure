@@ -5,3 +5,4 @@ resource_group_name = "k8s-gen3"
 POSTGRES_PASSWORD = "hhey77834kefiu&wb@"
 commons_url = "https://myapp.com"
 max_count = 5
+
