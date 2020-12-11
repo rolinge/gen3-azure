@@ -1,0 +1,45 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  labels:
+    {{- include "gen3kubernetes.labels" . | nindent 4 }}
+    component: indexd-configmap
+  name: indexd-config-configmap-{{ .Values.ENV }}
+data:
+  local_settings.py: |
+{{ .Files.Get  .Values.indexd.local_settings  | indent 4}}
+
+  creds.json: |
+    {
+      "db_host": "{{ .Values.indexd.database.servername }}",
+      "db_username": "{{ .Values.indexd.database.username }}" ,
+      "db_password": "{{ .Values.indexd.database.db_password }}",
+      "db_database": "{{ .Values.indexd.database.databasename }}",
+      "fence_database": "{{ .Values.fence.database.databasename }}"
+    }
+
+  config_helper.py: |
+{{ .Files.Get  .Values.indexd.config_helper  | indent 4}}
+
+  indexd_setup.sh: |
+    #!/bin/bash
+    # entrypoint bash script for indexd to healthcheck postgres to make sure that
+    # postgres is ready before indexd tries to access its database
+    #
+    # K8S can only put files in subdirs as mounts, so copy them to the normal place
+
+    for i in local_settings.py creds.json config_helper.py indexd_setup.sh
+      do cp setup/$i .
+    done
+
+    sleep 2
+    until (echo test | nc {{ .Values.indexd.database.servername }} {{ .Values.indexd.database.port }} -w 2 \
+                && echo "Postgres port is open") >/dev/null 2>&1; do
+      echo "Postgres is unavailable - sleeping"
+    done
+
+    echo "postgres is ready"
+
+    python /indexd/bin/index_admin.py create --username {{ .Values.indexd.username | quote }} \
+                                             --password {{ .Values.indexd.password | quote }}
+    /dockerrun.sh

@@ -3,17 +3,17 @@ kind: Service
 metadata:
   labels:
     {{- include "gen3kubernetes.labels" . | nindent 4 }}
-    component: "service-portal"
-  name: service-portal-{{ .Values.ENV }}
+    component: "service-revproxy"
+  name: service-revproxy-{{ .Values.ENV }}
 spec:
   type: ClusterIP
   ports:
   - name: http
-    port: {{ .Values.portal.serviceport }}
+    port: {{ .Values.revproxy.serviceport }}
     protocol: TCP
   selector:
     {{- include "gen3kubernetes.selectorLabels" . | nindent 4 }}
-    component: "portal"
+    component: "revproxy"
   sessionAffinity: None
   type: ClusterIP
 status:

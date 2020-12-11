@@ -1,18 +1,18 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: indexd-{{ .Values.ENV }}
+  name: revproxy-{{ .Values.ENV }}
   labels:
     {{- include "gen3kubernetes.labels" . | nindent 4 }}
-    component: "indexd"
+    component: "revproxy"
 spec:
   {{- if not .Values.autoscaling.enabled }}
-  replicas: {{ .Values.indexd.replicas }}
+  replicas: {{ .Values.revproxy.replicas }}
   {{- end }}
   selector:
     matchLabels:
       {{- include "gen3kubernetes.selectorLabels" . | nindent 6 }}
-      component: "indexd"
+      component: "revproxy"
   template:
     metadata:
       {{- with .Values.podAnnotations }}
@@ -21,7 +21,7 @@ spec:
       {{- end }}
       labels:
         {{- include "gen3kubernetes.selectorLabels" . | nindent 8 }}
-        component: "indexd"
+        component: "revproxy"
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
@@ -31,29 +31,35 @@ spec:
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
-        - name: "indexd-{{ .Values.ENV }}"
+        - name: revproxy-{{ .Values.ENV }}
+          #command: ['sleep']
+          #args: ['60000000']
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.indexd.image }}"
+          image: "{{ .Values.revproxy.image }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          command: ["bash" , "setup/indexd_setup.sh"]
           volumeMounts:
-            - name: indexd-config
-              mountPath: /var/www/indexd/setup
+            - name: nginx-config
+              mountPath: /etc/nginx/conf.d
+              readOnly: False
+            - name:  nginx-certificates
+              mountPath: /etc/nginx/ssl/
               readOnly: True
           ports:
             - name: http
               containerPort: 80
               protocol: TCP
+            - name: https
+              containerPort: 443
+              protocol: TCP
           livenessProbe:
             tcpSocket:
               port: http
           readinessProbe:
-            httpGet:
-              path: /_status
+            tcpSocket:
               port: http
           resources:
-            {{- toYaml .Values.indexd.resources | nindent 12 }}
+            {{- toYaml .Values.revproxy.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
@@ -67,7 +73,11 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       volumes:
-        - name: indexd-config
+        - name: nginx-config
           configMap:
-            defaultMode: 0775
-            name: indexd-config-configmap-{{ .Values.ENV }}
+            defaultMode: 0664
+            name: revproxy-nginx-configmap-{{ .Values.ENV }}
+        - name: nginx-certificates
+          secret:
+            defaultMode: 0664
+            secretName: revproxy-tls-secrets-{{ .Values.ENV }}

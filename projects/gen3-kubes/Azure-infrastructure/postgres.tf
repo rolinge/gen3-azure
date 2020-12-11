@@ -12,8 +12,10 @@ resource "azurerm_postgresql_server" "g3DATA" {
   administrator_login             = "postgres"
   administrator_login_password    = var.POSTGRES_PASSWORD
   auto_grow_enabled               = true
-  public_network_access_enabled    = false
-  
+
+  public_network_access_enabled    = true
+
+
   tags = merge(var.tags, local.common_tags)
 
 }
@@ -38,6 +40,19 @@ resource "azurerm_postgresql_virtual_network_rule" "g3DATA" {
     azurerm_subnet.dce_aks_subnet
   ]
 }
+
+
+resource "azurerm_postgresql_virtual_network_rule" "g3DATA2" {
+  name                = "postgres-${var.cluster_name}-2"
+  resource_group_name = azurerm_resource_group.rg.name
+  server_name         = azurerm_postgresql_server.g3DATA.name
+  subnet_id           = azurerm_subnet.dce_aks_subnet2.id
+    depends_on = [
+    azurerm_postgresql_server.g3DATA,
+    azurerm_subnet.dce_aks_subnet2
+  ]
+}
+
 
 resource "azurerm_postgresql_database" "fence_db" {
   name                = "fence_db"

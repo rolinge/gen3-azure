@@ -27,7 +27,7 @@ resource "azurerm_kubernetes_cluster" "dce_aks_cluster" {
 
   default_node_pool {
     name                = "nodepool"
-    node_count          = var.agent_count
+
     vm_size             = var.k8_agents_regular
     enable_auto_scaling = true
     max_count           = var.max_count
@@ -76,14 +76,18 @@ resource "azurerm_kubernetes_cluster" "dce_aks_cluster" {
 
 
 resource "azurerm_kubernetes_cluster_node_pool" "gen3-2ndpool" {
-  name                  = format("gen34way%s%s",var.environment,random_string.uid.result)
+
+  name                  = format("g3large%s",random_string.uid.result)
   kubernetes_cluster_id = azurerm_kubernetes_cluster.dce_aks_cluster.id
   vm_size               = var.k8_agents_big
-  node_count            = 1
+  enable_auto_scaling = true
+  max_count           = var.max_count
+  min_count           = 0
+  vnet_subnet_id      = azurerm_subnet.dce_aks_subnet2.id
+  os_disk_size_gb     = var.k8s_os_disk_size
+  os_type              = "Linux"
 
-  tags = {
-    Environment = "Production"
-  }
+  tags = merge(var.tags, local.common_tags)
 }
 
 

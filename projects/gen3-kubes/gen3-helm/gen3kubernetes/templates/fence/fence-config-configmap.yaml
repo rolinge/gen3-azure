@@ -133,9 +133,11 @@ data:
       port: 3128
     INDEXD: http://indexd-service-{{ .Values.ENV }}
 
-    INDEXD_USERNAME: 'indexd_client'
-    INDEXD_PASSWORD: 'indexd_client_pass'
-    ARBORIST: http://arborist-service-{{ .Values.ENV }}
+
+    INDEXD_USERNAME: {{ .Values.indexd.username | quote }}
+    INDEXD_PASSWORD: {{ .Values.indexd.password | quote }}
+    ARBORIST: http://service-arborist-{{ .Values.ENV }}
+
     CIRRUS_CFG:
       GOOGLE_API_KEY: ''
       GOOGLE_PROJECT_ID: ''
