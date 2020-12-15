@@ -32,6 +32,7 @@ spec:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
         - name: fence-{{ .Values.ENV }}
+          command: ["bash" , "-c" ,"/var/www/fence/fence-setup.sh"]
           env:
             - name: FENCE_DB_PW
               valueFrom:
@@ -80,7 +81,7 @@ spec:
       volumes:
         - name: fence-config
           configMap:
-            defaultMode: 0664
+            defaultMode: 0774
             name: fence-config-configmap-{{ .Values.ENV }}
         - name: fence-cacrt
           configMap:
