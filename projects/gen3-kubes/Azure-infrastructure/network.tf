@@ -15,6 +15,7 @@ resource "azurerm_subnet" "dce_aks_subnet" {
 
 }
 
+
 resource "azurerm_subnet" "dce_aks_subnet2" {
   name                 = "dce_aks_subnet2"
   resource_group_name  = azurerm_resource_group.rg.name
@@ -23,3 +24,4 @@ resource "azurerm_subnet" "dce_aks_subnet2" {
   service_endpoints         = ["Microsoft.Sql", "Microsoft.Storage"]
 
 }
+
