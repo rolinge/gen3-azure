@@ -75,8 +75,8 @@ spec:
             httpGet:
               path: /status
               port: http
-              initialDelaySeconds: 30
-              periodSeconds: 10
+            initialDelaySeconds: 30
+            periodSeconds: 10
           resources:
             {{- toYaml .Values.peregrine.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}
@@ -96,10 +96,3 @@ spec:
           configMap:
             defaultMode: 0775
             name: peregrine-config-configmap-{{ .Values.ENV }}
-volumes:
-- ./Secrets/peregrine_settings.py:/var/www/peregrine/wsgi.py
-- ./Secrets/peregrine_creds.json:/var/www/peregrine/creds.json
-- ./Secrets/config_helper.py:/var/www/peregrine/config_helper.py
-- ./Secrets/TLS/service.crt:/usr/local/share/ca-certificates/cdis-ca.crt
-- ./scripts/peregrine_setup.sh:/peregrine_setup.sh
-- ./datadictionary/gdcdictionary/schemas:/schemas_dir

@@ -20,7 +20,7 @@ data:
     }
 
   config_helper.py: |
-{{ .Files.Get  .Values.indexd.config_helper  | indent 4}}
+{{ .Files.Get  .Values.config_helper  | indent 4}}
 
   indexd_setup.sh: |
     #!/bin/bash

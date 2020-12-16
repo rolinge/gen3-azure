@@ -3,6 +3,8 @@
 # Declare variables to be passed into your templates.
 
 replicaCount: 1
+config_helper: "config_helper.py"
+
 #global tag for lables, etc
 ENV: gen3k8dev
 fence:
@@ -273,7 +275,6 @@ indexd:
     db_password: "D7E-2A715381173D"
   username: "indexd_client_gen3k8dev"
   password:  "indexd_client_pass_gen3k8dev"
-  config_helper: "config_helper.py"
   local_settings: "indexd_settings.py"
   replicas: 1
   serviceport: 80
