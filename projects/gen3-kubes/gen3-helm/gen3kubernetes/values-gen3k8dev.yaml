@@ -239,6 +239,7 @@ peregrine:
   bagitbucket: "noIdeaWhatThisIs"
   s3access: "notSureThisIsUsed"
   s3secret: "notSureThisIsUsed"
+  schemas: config_schemas.tar.gz.b64
   resources:
     limits:
       cpu: 500m
@@ -256,6 +257,9 @@ sheepdog:
   replicas: 1
   serviceport: 80
   image: "quay.io/cdis/sheepdog:2020.12"
+  s3access: "notSureThisIsUsed"
+  s3secret: "notSureThisIsUsed"
+  schemas: config_schemas.tar.gz.b64
   resources:
     limits:
       cpu: 500m

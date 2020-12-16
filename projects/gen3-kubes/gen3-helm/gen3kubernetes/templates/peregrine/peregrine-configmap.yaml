@@ -10,6 +10,23 @@ data:
     #!/bin/bash
     # entrypoint script for peregrine to setup db
 
+    #move the setup files to proper destination..
+    echo "Moving the setup files"
+    for i in wsgi.py creds.json config_helper.py
+      do cp setup/$i ./$i
+    done
+
+
+    echo "setting up schemas dir"
+    if [ -f setup/peregrine_shemas.tar.gz.base64 ] ;
+      then
+        curdir=$PWD
+        mkdir /schemas_dir \
+        && cd /schemas_dir \
+        && base64 -d /var/www/peregrine/setup/peregrine_shemas.tar.gz.base64 | gunzip -c | tar xf -
+        cd $curdir
+      fi
+
     sleep 2
     until (echo test | nc $PGHOST $PGPORT -w 2   && echo "Postgres port is open") >/dev/null 2>&1; do
       echo "Postgres is unavailable - sleeping"
@@ -49,15 +66,15 @@ data:
 
     config["FAKE_AUTH"] = False
     config["PSQLGRAPH"] = {
-        'host': '{{ .Values.indexd.database.servername }}' ),
-        'user': '{{ .Values.indexd.database.username }}',
-        'password': '{{ .Values.indexd.database.db_password }}',
-        'database': '{{ .Values.indexd.database.databasename }}',
+        'host': '{{ .Values.peregrine.database.servername }}' ,
+        'user': '{{ .Values.peregrine.database.username }}@{{ .Values.peregrine.database.servername }}',
+        'password': '{{ .Values.peregrine.database.db_password }}',
+        'database': '{{ .Values.peregrine.database.databasename }}',
     }
 
     config['HMAC_ENCRYPTION_KEY'] = {{ .Values.peregrine.hmac_key | quote }}
     config['FLASK_SECRET_KEY'] = {{ .Values.peregrine.gdcapi_secret_key | quote }}
-    config['PSQL_USER_DB_CONNECTION'] = 'postgresql://{{ .Values.fence.database.username }}:{{ .Values.fence.database.db_password }}@{{ .Values.fence.database.servername }}:{{ .Values.fence.database.port }}/{{ .Values.fence.database.databasename }}'
+    config['PSQL_USER_DB_CONNECTION'] = 'postgresql://{{ .Values.fence.database.username }}@{{ .Values.fence.database.servername }}:{{ .Values.fence.database.db_password }}@{{ .Values.fence.database.servername }}:{{ .Values.fence.database.port }}/{{ .Values.fence.database.databasename }}'
 
     if environ.get('DICTIONARY_URL'):
         config['DICTIONARY_URL'] = environ.get('DICTIONARY_URL')
@@ -65,15 +82,15 @@ data:
         config['PATH_TO_SCHEMA_DIR'] = environ.get('PATH_TO_SCHEMA_DIR')
 
     config['SUBMISSION'] = {
-        'bucket': {{ .Values.peregrine.bagitbucket | quote }} )
+        'bucket': {{ .Values.peregrine.bagitbucket | quote }}
     }
 
-     config['STORAGE'] = {
-         "s3":
-         {
-             "access_key": {{ .Values.peregrine.s3access | quote  }} ,
-             'secret_key': {{ .Values.peregrine.s3secret | quote  }}
-         }
+    config['STORAGE'] = {
+       "s3":
+       {
+           "access_key": {{ .Values.peregrine.s3access | quote  }} ,
+           'secret_key': {{ .Values.peregrine.s3secret | quote  }}
+       }
     }
 
     config['OIDC_ISSUER'] = 'https://{{.Values.portal.externalhostname}}/user'
@@ -92,15 +109,17 @@ data:
     application.debug = (environ.get('GEN3_DEBUG') == "True")
   creds.json: |
     {
-      "fence_host":     '{{ .Values.fence.database.servername }}',
-      "fence_username": '{{ .Values.fence.database.username }}',
-      "fence_password": '{{ .Values.fence.database.db_password }}',
-      "fence_database": '{{ .Values.fence.database.databasename }}',
-      "db_host": '{{ .Values.peregrine.database.servername }}',
-      "db_username": '{{ .Values.peregrine.database.username }}',
-      "db_password": '{{ .Values.peregrine.database.db_password }}',
-      "db_database":'{{ .Values.peregrine.database.databasename }}',
-      "hostname": "{{.Values.portal.externalhostname}}"
+      "fence_host":     {{ .Values.fence.database.servername | quote }},
+      "fence_username": "{{ .Values.fence.database.username }}@{{ .Values.fence.database.servername }}",
+      "fence_password": {{ .Values.fence.database.db_password | quote }},
+      "fence_database": {{ .Values.fence.database.databasename | quote }},
+      "db_host": {{ .Values.peregrine.database.servername | quote }},
+      "db_username": "{{ .Values.peregrine.database.username }}@{{ .Values.peregrine.database.servername}}",
+      "db_password": {{ .Values.peregrine.database.db_password | quote }},
+      "db_database": {{ .Values.peregrine.database.databasename | quote }},
+      "hostname": {{ .Values.portal.externalhostname | quote }}
     }
   config_helper.py: |
 {{ .Files.Get  .Values.config_helper  | indent 4}}
+  peregrine_shemas.tar.gz.base64: |
+{{ .Files.Get  .Values.peregrine.schemas  | indent 4}}
