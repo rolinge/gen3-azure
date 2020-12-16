@@ -33,6 +33,8 @@ spec:
       containers:
         - name: "peregrine-{{ .Values.ENV }}"
           env:
+            - name: PYTHONPATH
+              value: "/usr/local/lib/python3.6/site-packages/:/peregrine/"
             - name: DICTIONARY_URL
               value: "https://s3.amazonaws.com/dictionary-artifacts/datadictionary/develop/schema.json"
             # PATH_TO_SCHEMA_DIR: /schemas_dir
