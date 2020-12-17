@@ -5,12 +5,12 @@ metadata:
   name: admin-manage-namespaces
   namespace: default
 rules:
-  - apiGroups: ["", "extensions", "apps"]
+  - apiGroups: ["", "extensions", "apps","networking.k8s.io"]
 
     resources: ["namespaces", "roles", "persistentvolumeclaims", "persistentvolumes", \
                 "rolebindings", "clusterroles", "clusterrolebindings", "secrets", \
                 "storageclasses", "pods", "pods/logs", "deployments", "services", "endpoints", \
-                "nodes", "ingress", "statefulsets", "replicasets", "configmaps"]
+                "nodes", "ingresses", "statefulsets", "replicasets", "configmaps"]
     verbs: ["*"]
 ---
 kind: ClusterRole
@@ -19,11 +19,11 @@ metadata:
   name: user-view-namespaces
   namespace: default
 rules:
-  - apiGroups: ["", "extensions", "apps"]
+  - apiGroups: ["", "extensions", "apps","networking.k8s.io"]
     resources: ["namespaces", "roles",  "persistentvolumeclaims", \
                 "persistentvolumes", "rolebindings", "clusterroles", "clusterrolebindings", \
                 "storageclasses", "pods", "pods/logs", "deployments", "services", "endpoints", \
-                "nodes", "ingress", "statefulsets", "replicasets", "configmaps"]
+                "nodes", "ingresses", "statefulsets", "replicasets", "configmaps"]
 
     verbs: ["get", "watch", "list"]
 ---

@@ -74,7 +74,7 @@ data:
 
     config['HMAC_ENCRYPTION_KEY'] = {{ .Values.peregrine.hmac_key | quote }}
     config['FLASK_SECRET_KEY'] = {{ .Values.peregrine.gdcapi_secret_key | quote }}
-    config['PSQL_USER_DB_CONNECTION'] = 'postgresql://{{ .Values.fence.database.username }}@{{ .Values.fence.database.servername }}:{{ .Values.fence.database.db_password }}@{{ .Values.fence.database.servername }}:{{ .Values.fence.database.port }}/{{ .Values.fence.database.databasename }}'
+    config['PSQL_USER_DB_CONNECTION'] = 'postgresql://{{ .Values.fence.database.username }}:{{ .Values.fence.database.db_password }}@{{ .Values.fence.database.servername }}:{{ .Values.fence.database.port }}/{{ .Values.fence.database.databasename }}'
 
     if environ.get('DICTIONARY_URL'):
         config['DICTIONARY_URL'] = environ.get('DICTIONARY_URL')

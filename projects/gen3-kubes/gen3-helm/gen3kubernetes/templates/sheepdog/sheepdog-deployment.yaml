@@ -72,9 +72,9 @@ spec:
             - name: http
               containerPort: 80
               protocol: TCP
-          #livenessProbe:
-          #  tcpSocket:
-          #    port: http
+          livenessProbe:
+            tcpSocket:
+              port: http
           readinessProbe:
             httpGet:
               path: /_status

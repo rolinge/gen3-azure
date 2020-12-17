@@ -294,14 +294,16 @@ indexd:
     type: "ClusterIP"
     port: 80
 portal:
-  replicas: 2
+  replicas: 1
   serviceport: 80
-  image: "quay.io/cdis/nginx:1.15.5-ctds"
+  image: "quay.io/cdis/data-portal:2020.12"
   externalhostname: "gen3k8dev.optum.com"
+  gitops: "optum4c.png"
+  gitopslogo: "optum4c.png"
   resources:
     limits:
-      cpu: '500m'
-      memory: '1024Mi'
+      cpu: '2000m'
+      memory: '4096Mi'
     requests:
-      cpu: '200m'
-      memory: '512Mi'
+      cpu: '2000m'
+      memory: '2048Mi'
