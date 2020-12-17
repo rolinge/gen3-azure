@@ -30,28 +30,29 @@ rules:
 kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: admin-manage-namespaces
+  name: "admin-manage-namespaces"
   namespace: default
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: admin-manage-namespaces
+  name: "admin-manage-namespaces"
 subjects:
   - kind: User
-    name: rolinge2@entid.optumhub.net
+    name: "rolinge2@entid.optumhub.net"
   - kind: User
-    name: cgarc139@entid.optumhub.net
+    name: "cgarc139@entid.optumhub.net"
 ---
 kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: user-view-namespaces
+  name: "user-view-namespaces"
   namespace: default
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: user-view-namespaces
+  name: "user-view-namespaces"
 subjects:
-
   - kind: Group
-    name: c1a150d8-6037-46d0-b603-bcb11b80f612
+    name: "c1a150d8-6037-46d0-b603-bcb11b80f612"
+  - kind: Group
+    name: "26a01eec-7c1d-46f3-ba32-d2eb1081f37f"
