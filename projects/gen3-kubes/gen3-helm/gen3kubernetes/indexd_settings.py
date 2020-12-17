@@ -20,6 +20,7 @@ pgport = 5432
 usr = f"{user_short}@{pghost}"
 arb = conf_data.get('arborist_url', '{{arborist_url}}')
 
+
 index_config = conf_data.get('index_config')
 
 CONFIG={}

@@ -4,6 +4,7 @@ metadata:
   labels:
     {{- include "gen3kubernetes.labels" . | nindent 4 }}
     component: arborist-configmap
+
   name: arborist-config-configmap-{{ .Values.ENV }}
 data:
   arborist_setup.sh: |

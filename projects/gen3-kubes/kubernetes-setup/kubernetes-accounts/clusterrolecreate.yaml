@@ -24,7 +24,6 @@ rules:
                 "persistentvolumes", "rolebindings", "clusterroles", "clusterrolebindings", \
                 "storageclasses", "pods", "pods/logs", "deployments", "services", "endpoints", \
                 "nodes", "ingresses", "statefulsets", "replicasets", "configmaps"]
-
     verbs: ["get", "watch", "list"]
 ---
 kind: ClusterRoleBinding

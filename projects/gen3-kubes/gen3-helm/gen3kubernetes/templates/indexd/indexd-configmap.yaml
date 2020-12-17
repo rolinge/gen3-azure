@@ -11,6 +11,7 @@ data:
 
   creds.json: |
     {
+
       "db_host": {{ .Values.indexd.database.servername | quote }},
       "db_username": {{ .Values.indexd.database.username | quote }} ,
       "db_password": {{ .Values.indexd.database.db_password | quote }},
@@ -22,6 +23,7 @@ data:
   config_helper.py: |
 {{ .Files.Get  .Values.config_helper  | indent 4}}
 
+
   indexd_setup.sh: |
     #!/bin/bash
     # entrypoint bash script for indexd to healthcheck postgres to make sure that
@@ -32,6 +34,7 @@ data:
     echo "PATH=$PATH"
 
     echo "Python = $(which python)"
+
 
     for i in local_settings.py creds.json config_helper.py indexd_setup.sh
       do cp setup/$i .
@@ -45,7 +48,6 @@ data:
 
     echo "postgres is ready"
 
-
     python /indexd/bin/index_admin.py create --username {{ .Values.indexd.username | quote }} \
                                              --password {{ .Values.indexd.password | quote }}
-    /dockerrun.sh --debug=True
+    /dockerrun.sh
