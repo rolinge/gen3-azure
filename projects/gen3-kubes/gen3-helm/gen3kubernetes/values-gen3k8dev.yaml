@@ -3,6 +3,8 @@
 # Declare variables to be passed into your templates.
 
 replicaCount: 1
+config_helper: "config_helper.py"
+
 #global tag for lables, etc
 ENV: gen3k8dev
 fence:
@@ -224,6 +226,7 @@ revproxy:
       memory: '128Mi'
 
 peregrine:
+  image: "quay.io/cdis/peregrine:2020.12"
   database:
     servername: "postgres-k8sgen3rmo.postgres.database.azure.com"
     username: "peregrine_gen3dev_user"
@@ -231,6 +234,19 @@ peregrine:
     databasename: "metadata_db"
     db_password: "8ACB-0053084C2A97"
   serviceport: 80
+  gdcapi_secret_key: "1JMWnHdApSGMJ8OIqA0IwWUEo8nJ1NJqwDQbjrz5L5v1QtW2ke"
+  hmac_key: "1JMWnHdApSGMJ8OIqA0IwWUEo8nJ1NJqwDQbjrz5L5v1QtW2ke"
+  bagitbucket: "noIdeaWhatThisIs"
+  s3access: "notSureThisIsUsed"
+  s3secret: "notSureThisIsUsed"
+  schemas: config_schemas.tar.gz.b64
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 200m
+      memory: 256Mi
 sheepdog:
   database:
     servername: "postgres-k8sgen3rmo.postgres.database.azure.com"
@@ -241,6 +257,9 @@ sheepdog:
   replicas: 1
   serviceport: 80
   image: "quay.io/cdis/sheepdog:2020.12"
+  s3access: "notSureThisIsUsed"
+  s3secret: "notSureThisIsUsed"
+  schemas: config_schemas.tar.gz.b64
   resources:
     limits:
       cpu: 500m
@@ -260,7 +279,6 @@ indexd:
     db_password: "D7E-2A715381173D"
   username: "indexd_client_gen3k8dev"
   password:  "indexd_client_pass_gen3k8dev"
-  config_helper: "config_helper.py"
   local_settings: "indexd_settings.py"
   replicas: 1
   serviceport: 80
@@ -276,13 +294,16 @@ indexd:
     type: "ClusterIP"
     port: 80
 portal:
-  replicas: 2
+  replicas: 1
   serviceport: 80
-  image: "quay.io/cdis/nginx:1.15.5-ctds"
+  image: "quay.io/cdis/data-portal:2020.12"
+  externalhostname: "gen3k8dev.optum.com"
+  gitops: "optum4c.png"
+  gitopslogo: "optum4c.png"
   resources:
     limits:
-      cpu: '500m'
-      memory: '1024Mi'
+      cpu: '2000m'
+      memory: '4096Mi'
     requests:
-      cpu: '200m'
-      memory: '512Mi'
+      cpu: '2000m'
+      memory: '2048Mi'

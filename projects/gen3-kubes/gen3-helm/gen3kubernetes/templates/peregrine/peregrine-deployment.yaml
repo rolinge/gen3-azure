@@ -1,0 +1,106 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: peregrine-{{ .Values.ENV }}
+  labels:
+    {{- include "gen3kubernetes.labels" . | nindent 4 }}
+    component: "peregrine"
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.peregrine.replicas }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "gen3kubernetes.selectorLabels" . | nindent 6 }}
+      component: "peregrine"
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "gen3kubernetes.selectorLabels" . | nindent 8 }}
+        component: "peregrine"
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "gen3kubernetes.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: "peregrine-{{ .Values.ENV }}"
+          env:
+            - name: PYTHONPATH
+              value: "/usr/local/lib/python3.6/site-packages/:/peregrine/"
+            - name: DICTIONARY_URL
+              value: "https://s3.amazonaws.com/dictionary-artifacts/datadictionary/develop/schema.json"
+            # PATH_TO_SCHEMA_DIR: /schemas_dir
+            - name: REQUESTS_CA_BUNDLE
+              value: "/etc/ssl/certs/ca-certificates.crt"
+            - name: "PGDATABASE"
+              value: {{ .Values.peregrine.database.databasename | quote }}
+            - name: "PGUSER"
+              value: "{{ .Values.peregrine.database.username }}@{{ .Values.peregrine.database.servername }}"
+            - name: "PGPASSWORD"
+              valueFrom:
+                secretKeyRef:
+                  key: "peregrineDatabasePassword"
+                  name: "database-secrets-{{ .Values.ENV }}"
+            - name: "PGHOST"
+              value: {{ .Values.peregrine.database.servername | quote }}
+            - name: "PGPORT"
+              value: {{ .Values.peregrine.database.port | quote }}
+            - name: "PGSSLMODE"
+              value: "disable"
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.peregrine.image }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["bash" , "-c", "setup/peregrine_setup.sh"]
+          #command: ["sleep" , "60000000"]
+          volumeMounts:
+            - name: peregrine-config
+              mountPath: /var/www/peregrine/setup
+              readOnly: False
+            - name:  peregrine-cacrt
+              mountPath: /usr/local/share/ca-certificates
+              readOnly: True
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          livenessProbe:
+            tcpSocket:
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /_status
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          resources:
+            {{- toYaml .Values.peregrine.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+        - name: peregrine-config
+          configMap:
+            defaultMode: 0775
+            name: peregrine-config-configmap-{{ .Values.ENV }}
+        - name: peregrine-cacrt
+          configMap:
+            defaultMode: 0664
+            name: fence-cacerts-configmap-{{ .Values.ENV }}

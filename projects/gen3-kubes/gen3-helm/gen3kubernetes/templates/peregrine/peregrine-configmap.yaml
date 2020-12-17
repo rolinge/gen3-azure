@@ -1,0 +1,125 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  labels:
+    {{- include "gen3kubernetes.labels" . | nindent 4 }}
+    component: peregrine-configmap
+  name: peregrine-config-configmap-{{ .Values.ENV }}
+data:
+  peregrine_setup.sh: |
+    #!/bin/bash
+    # entrypoint script for peregrine to setup db
+
+    #move the setup files to proper destination..
+    echo "Moving the setup files"
+    for i in wsgi.py creds.json config_helper.py
+      do cp setup/$i ./$i
+    done
+
+
+    echo "setting up schemas dir"
+    if [ -f setup/peregrine_shemas.tar.gz.base64 ] ;
+      then
+        curdir=$PWD
+        mkdir /schemas_dir \
+        && cd /schemas_dir \
+        && base64 -d /var/www/peregrine/setup/peregrine_shemas.tar.gz.base64 | gunzip -c | tar xf -
+        cd $curdir
+      fi
+
+    sleep 2
+    until (echo test | nc $PGHOST $PGPORT -w 2   && echo "Postgres port is open") >/dev/null 2>&1; do
+      echo "Postgres is unavailable - sleeping"
+    done
+
+    echo "postgres is ready"
+
+    update-ca-certificates
+    /dockerrun.sh
+  wsgi.py: |
+    from peregrine.api import app, app_init
+    from os import environ
+    import config_helper
+
+    APP_NAME='peregrine'
+    def load_json(file_name):
+      return config_helper.load_json(file_name, APP_NAME)
+
+    conf_data = load_json('creds.json')
+    config = app.config
+
+    config["AUTH"] = 'https://auth.service.consul:5000/v3/'
+    config["AUTH_ADMIN_CREDS"] = None
+    config["INTERNAL_AUTH"] = None
+
+    # SIGNPOST is deprecated, replaced by INDEX_CLIENT (peregrine>=1.3.0)
+    config['SIGNPOST'] = {
+        'host': 'http://service-indexd-{{ .Values.ENV }}',
+        'version': 'v0',
+        'auth': ('{{ .Values.indexd.username }}', '{{ .Values.indexd.password }}'),
+    }
+    config['INDEX_CLIENT'] = {
+        'host': 'http://service-indexd-{{ .Values.ENV }}',
+        'version': 'v0',
+        'auth': ('{{ .Values.indexd.username }}', '{{ .Values.indexd.password }}'),
+    }
+
+    config["FAKE_AUTH"] = False
+    config["PSQLGRAPH"] = {
+        'host': '{{ .Values.peregrine.database.servername }}' ,
+        'user': '{{ .Values.peregrine.database.username }}@{{ .Values.peregrine.database.servername }}',
+        'password': '{{ .Values.peregrine.database.db_password }}',
+        'database': '{{ .Values.peregrine.database.databasename }}',
+    }
+
+    config['HMAC_ENCRYPTION_KEY'] = {{ .Values.peregrine.hmac_key | quote }}
+    config['FLASK_SECRET_KEY'] = {{ .Values.peregrine.gdcapi_secret_key | quote }}
+    config['PSQL_USER_DB_CONNECTION'] = 'postgresql://{{ .Values.fence.database.username }}:{{ .Values.fence.database.db_password }}@{{ .Values.fence.database.servername }}:{{ .Values.fence.database.port }}/{{ .Values.fence.database.databasename }}'
+
+    if environ.get('DICTIONARY_URL'):
+        config['DICTIONARY_URL'] = environ.get('DICTIONARY_URL')
+    else:
+        config['PATH_TO_SCHEMA_DIR'] = environ.get('PATH_TO_SCHEMA_DIR')
+
+    config['SUBMISSION'] = {
+        'bucket': {{ .Values.peregrine.bagitbucket | quote }}
+    }
+
+    config['STORAGE'] = {
+       "s3":
+       {
+           "access_key": {{ .Values.peregrine.s3access | quote  }} ,
+           'secret_key': {{ .Values.peregrine.s3secret | quote  }}
+       }
+    }
+
+    config['OIDC_ISSUER'] = 'https://{{.Values.portal.externalhostname}}/user'
+
+    config['OAUTH2'] = {
+    }
+
+    config['USER_API'] = 'http://service-fence-{{ .Values.ENV }}/'
+    # option to force authutils to prioritize USER_API setting over the issuer from
+    # token when redirecting, used during local docker compose setup when the
+    # services are on different containers but the hostname is still localhost
+    config['FORCE_ISSUER'] = True
+
+    app_init(app)
+    application = app
+    application.debug = (environ.get('GEN3_DEBUG') == "True")
+  creds.json: |
+    {
+      "fence_host":     {{ .Values.fence.database.servername | quote }},
+      "fence_username": "{{ .Values.fence.database.username }}@{{ .Values.fence.database.servername }}",
+      "fence_password": {{ .Values.fence.database.db_password | quote }},
+      "fence_database": {{ .Values.fence.database.databasename | quote }},
+      "db_host": {{ .Values.peregrine.database.servername | quote }},
+      "db_username": "{{ .Values.peregrine.database.username }}@{{ .Values.peregrine.database.servername}}",
+      "db_password": {{ .Values.peregrine.database.db_password | quote }},
+      "db_database": {{ .Values.peregrine.database.databasename | quote }},
+      "hostname": {{ .Values.portal.externalhostname | quote }}
+    }
+  config_helper.py: |
+{{ .Files.Get  .Values.config_helper  | indent 4}}
+  peregrine_shemas.tar.gz.base64: |
+{{ .Files.Get  .Values.peregrine.schemas  | indent 4}}

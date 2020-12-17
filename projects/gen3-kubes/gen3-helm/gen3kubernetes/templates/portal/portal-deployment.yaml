@@ -1,0 +1,106 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: portal-{{ .Values.ENV }}
+  labels:
+    {{- include "gen3kubernetes.labels" . | nindent 4 }}
+    component: "portal"
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.portal.replicas }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "gen3kubernetes.selectorLabels" . | nindent 6 }}
+      component: "portal"
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "gen3kubernetes.selectorLabels" . | nindent 8 }}
+        component: "portal"
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "gen3kubernetes.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: "portal-{{ .Values.ENV }}"
+          env:
+            - name: PYTHONPATH
+              value: "/usr/local/lib/python3.6/site-packages/:/portal/"
+            - name: REQUESTS_CA_BUNDLE
+              value: "/etc/ssl/certs/ca-certificates.crt"
+            - name: "NODE_ENV"
+              value: "dev"
+            - name: "APP"
+              value: "gitops"
+            - name: "GDC_SUBPATH"
+              value: "http://service-revproxy-{{ .Values.ENV }}/api/v0/submission/"
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.portal.image }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          #command: ["bash" , "-c", "setup/waitForContainers.sh"]
+          command: ["sleep" , "60000000"]
+          volumeMounts:
+            - name: portal-config
+              mountPath: /data-portal/setup
+              readOnly: False
+            - name:  portal-cacrt
+              mountPath: /usr/local/share/ca-certificates
+              readOnly: True
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          #livenessProbe:
+          #  tcpSocket:
+          #    port: http
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 300
+            periodSeconds: 10
+          resources:
+            {{- toYaml .Values.portal.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+        - name: portal-config
+          configMap:
+            defaultMode: 0775
+            name: portal-config-configmap-{{ .Values.ENV }}
+        - name: portal-cacrt
+          configMap:
+            defaultMode: 0664
+            name: fence-cacerts-configmap-{{ .Values.ENV }}
+
+
+
+
+
+
+
+
+
+
+#      - ./Secrets/gitops-logo.png:/data-portal/custom/logo/gitops-logo.png
+#      - ./Secrets/gitops.png:/data-portal/custom/createdby/gitops.png

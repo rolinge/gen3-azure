@@ -1,3 +1,9 @@
+Arborist needs to have some tables and indexes defined due to the initialization requiring privs that we don't want
+to grant to the application id.  (CREATE EXTENSION IF NOT EXISTS ltree;)   Since this is part of the arborist init, it
+fails and has to have manual intervention.  Looking for a solution.
+
+
+
 1. Get the application URL by running these commands:
 {{- if .Values.ingress.enabled }}
 {{- range $host := .Values.ingress.hosts }}

@@ -32,6 +32,7 @@ spec:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
         - name: fence-{{ .Values.ENV }}
+          command: ["bash" , "-c" ,"/var/www/fence/fence-setup.sh"]
           env:
             - name: FENCE_DB_PW
               valueFrom:
@@ -59,10 +60,14 @@ spec:
           livenessProbe:
             tcpSocket:
               port: http
+            initialDelaySeconds: 30
+            periodSeconds: 10
           readinessProbe:
             httpGet:
               path: /_status
               port: http
+            initialDelaySeconds: 30
+            periodSeconds: 10
           resources:
             {{- toYaml .Values.fence.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}
@@ -80,7 +85,7 @@ spec:
       volumes:
         - name: fence-config
           configMap:
-            defaultMode: 0664
+            defaultMode: 0774
             name: fence-config-configmap-{{ .Values.ENV }}
         - name: fence-cacrt
           configMap:

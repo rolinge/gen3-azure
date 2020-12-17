@@ -196,26 +196,25 @@ data:
       - 'compute-system.iam.gserviceaccount.com'
       - 'gcp-sa-websecurityscanner.iam.gserviceaccount.com'
       - 'storage-transfer-service.iam.gserviceaccount.com'
-  fence-setup.yaml: |
+  fence-setup.sh: |
     #!/bin/bash
     # entrypoint script for fence to sync user.yaml before running
 
     sleep 2
-    until (echo > /dev/tcp/postgres/5432) >/dev/null 2>&1; do
+    until (echo test | nc {{ .Values.fence.database.servername }} {{ .Values.fence.database.port }} -w 2 \
+                && echo "Postgres port is open") >/dev/null 2>&1; do
       echo "Postgres is unavailable - sleeping"
-      sleep 2
     done
-
     echo "postgres is ready"
 
     update-ca-certificates
 
-    until curl -f -s -o /dev/null http://arborist-service-{{ .Values.ENV }}/policy; do
+    until curl -f -s -o /dev/null http://service-arborist-{{ .Values.ENV }}/policy; do
         echo "arborist not ready, waiting..."
         sleep 10
     done
 
-    fence-create sync --yaml user.yaml --arborist http://arborist-service
+    fence-create sync --yaml user.yaml --arborist http://service-arborist-{{ .Values.ENV }}
 
     cd /fence
     /dockerrun.sh

@@ -11,15 +11,18 @@ data:
 
   creds.json: |
     {
-      "db_host": "{{ .Values.indexd.database.servername }}",
-      "db_username": "{{ .Values.indexd.database.username }}" ,
-      "db_password": "{{ .Values.indexd.database.db_password }}",
-      "db_database": "{{ .Values.indexd.database.databasename }}",
-      "fence_database": "{{ .Values.fence.database.databasename }}"
+
+      "db_host": {{ .Values.indexd.database.servername | quote }},
+      "db_username": {{ .Values.indexd.database.username | quote }} ,
+      "db_password": {{ .Values.indexd.database.db_password | quote }},
+      "db_database": {{ .Values.indexd.database.databasename | quote }},
+      "fence_database": {{ .Values.fence.database.databasename | quote }},
+      "arborist_url": "http://service-arborist-{{ .Values.ENV }}"
     }
 
   config_helper.py: |
-{{ .Files.Get  .Values.indexd.config_helper  | indent 4}}
+{{ .Files.Get  .Values.config_helper  | indent 4}}
+
 
   indexd_setup.sh: |
     #!/bin/bash
@@ -27,6 +30,11 @@ data:
     # postgres is ready before indexd tries to access its database
     #
     # K8S can only put files in subdirs as mounts, so copy them to the normal place
+
+    echo "PATH=$PATH"
+
+    echo "Python = $(which python)"
+
 
     for i in local_settings.py creds.json config_helper.py indexd_setup.sh
       do cp setup/$i .

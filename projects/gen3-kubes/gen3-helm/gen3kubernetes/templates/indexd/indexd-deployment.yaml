@@ -32,11 +32,15 @@ spec:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
         - name: "indexd-{{ .Values.ENV }}"
+          env:
+            - name: PYTHONPATH
+              value: "/usr/local/lib/python3.6/site-packages/:/indexd/"
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.indexd.image }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          command: ["bash" , "setup/indexd_setup.sh"]
+          command: ["bash" , "-c", "setup/indexd_setup.sh"]
+          #command: ["sleep" , "60000000"]
           volumeMounts:
             - name: indexd-config
               mountPath: /var/www/indexd/setup
@@ -48,10 +52,15 @@ spec:
           livenessProbe:
             tcpSocket:
               port: http
+            initialDelaySeconds: 30
+            periodSeconds: 10
+
           readinessProbe:
             httpGet:
               path: /_status
               port: http
+            initialDelaySeconds: 30
+            periodSeconds: 10
           resources:
             {{- toYaml .Values.indexd.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}

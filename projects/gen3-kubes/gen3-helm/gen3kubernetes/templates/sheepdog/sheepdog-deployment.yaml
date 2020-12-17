@@ -1,0 +1,106 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sheepdog-{{ .Values.ENV }}
+  labels:
+    {{- include "gen3kubernetes.labels" . | nindent 4 }}
+    component: "sheepdog"
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.sheepdog.replicas }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "gen3kubernetes.selectorLabels" . | nindent 6 }}
+      component: "sheepdog"
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "gen3kubernetes.selectorLabels" . | nindent 8 }}
+        component: "sheepdog"
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "gen3kubernetes.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: "sheepdog-{{ .Values.ENV }}"
+          env:
+            - name: PYTHONPATH
+              value: "/usr/local/lib/python3.6/site-packages/:/sheepdog/"
+            - name: DICTIONARY_URL
+              value: "https://s3.amazonaws.com/dictionary-artifacts/datadictionary/develop/schema.json"
+            # PATH_TO_SCHEMA_DIR: /schemas_dir
+            - name: REQUESTS_CA_BUNDLE
+              value: "/etc/ssl/certs/ca-certificates.crt"
+            - name: "PGDATABASE"
+              value: {{ .Values.sheepdog.database.databasename | quote }}
+            - name: "PGUSER"
+              value: "{{ .Values.sheepdog.database.username }}@{{ .Values.sheepdog.database.servername }}"
+            - name: "PGPASSWORD"
+              valueFrom:
+                secretKeyRef:
+                  key: "sheepdogDatabasePassword"
+                  name: "database-secrets-{{ .Values.ENV }}"
+            - name: "PGHOST"
+              value: {{ .Values.sheepdog.database.servername | quote }}
+            - name: "PGPORT"
+              value: {{ .Values.sheepdog.database.port | quote }}
+            - name: "PGSSLMODE"
+              value: "disable"
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.sheepdog.image }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["bash" , "-c", "setup/sheepdog_setup.sh"]
+          #command: ["sleep" , "60000000"]
+          volumeMounts:
+            - name: sheepdog-config
+              mountPath: /var/www/sheepdog/setup
+              readOnly: False
+            - name:  sheepdog-cacrt
+              mountPath: /usr/local/share/ca-certificates
+              readOnly: True
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          livenessProbe:
+            tcpSocket:
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /_status
+              port: http
+            initialDelaySeconds: 20
+            periodSeconds: 10
+          resources:
+            {{- toYaml .Values.sheepdog.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+        - name: sheepdog-config
+          configMap:
+            defaultMode: 0775
+            name: sheepdog-config-configmap-{{ .Values.ENV }}
+        - name: sheepdog-cacrt
+          configMap:
+            defaultMode: 0664
+            name: fence-cacerts-configmap-{{ .Values.ENV }}
