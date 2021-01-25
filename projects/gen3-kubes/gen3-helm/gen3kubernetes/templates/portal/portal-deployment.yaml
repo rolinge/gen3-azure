@@ -47,8 +47,8 @@ spec:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.portal.image }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          #command: ["bash" , "-c", "setup/waitForContainers.sh"]
-          command: ["sleep" , "60000000"]
+          command: ["bash" , "-c", "setup/waitForContainers.sh"]
+          #command: ["sleep" , "60000000"]
           volumeMounts:
             - name: portal-config
               mountPath: /data-portal/setup
@@ -60,15 +60,17 @@ spec:
             - name: http
               containerPort: 80
               protocol: TCP
-          #livenessProbe:
-          #  tcpSocket:
-          #    port: http
+          livenessProbe:
+            tcpSocket:
+              port: http
+            initialDelaySeconds: 300
+            periodSeconds: 30
           readinessProbe:
             httpGet:
               path: /
               port: http
             initialDelaySeconds: 300
-            periodSeconds: 10
+            periodSeconds: 30
           resources:
             {{- toYaml .Values.portal.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}

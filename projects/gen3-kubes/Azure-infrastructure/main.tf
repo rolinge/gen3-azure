@@ -61,6 +61,8 @@ resource "azurerm_kubernetes_cluster" "dce_aks_cluster" {
     network_policy     = "azure"
   }
 
+  addon_profile {
+
   dynamic addon_profile {
     for_each = var.enable_log_analytics_workspace ? ["log_analytics"] : []
     content {
@@ -70,7 +72,6 @@ resource "azurerm_kubernetes_cluster" "dce_aks_cluster" {
       }
     }
   }
-
   tags = merge(var.tags, local.common_tags)
 }
 

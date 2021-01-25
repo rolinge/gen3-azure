@@ -8,9 +8,10 @@ apiVersion: extensions/v1beta1
 {{- end }}
 kind: Ingress
 metadata:
-  name: {{ $fullName }}
+  name: gen3-ingress-{{ .Values.ENV }}
   labels:
     {{- include "gen3kubernetes.labels" . | nindent 4 }}
+    component: "ingress"
   {{- with .Values.ingress.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
@@ -34,8 +35,8 @@ spec:
           {{- range .paths }}
           - path: {{ . }}
             backend:
-              serviceName: {{ $fullName }}
-              servicePort: {{ $svcPort }}
+              serviceName: service-revproxy-{{ $.Values.ENV }}
+              servicePort: {{ $.Values.revproxy.serviceport }}
           {{- end }}
     {{- end }}
   {{- end }}

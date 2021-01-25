@@ -6,11 +6,20 @@ metadata:
   namespace: default
 rules:
   - apiGroups: ["", "extensions", "apps","networking.k8s.io"]
-
     resources: ["namespaces", "roles", "persistentvolumeclaims", "persistentvolumes", \
                 "rolebindings", "clusterroles", "clusterrolebindings", "secrets", \
                 "storageclasses", "pods", "pods/logs", "deployments", "services", "endpoints", \
-                "nodes", "ingresses", "statefulsets", "replicasets", "configmaps"]
+                "nodes", "ingresses", "statefulsets", "replicasets", "configmaps" ,\
+                "networkpolicies", ]
+    verbs: ["*"]
+  - apiGroups: ["policy"]
+    resources: ["poddisruptionbudgets", "podsecuritypolicies"]
+    verbs: ["*"]
+  - apiGroups: ["rbac.authorization.k8s.io"]
+    resources: ["clusterrolebindings", "clusterroles", "rolebindings","roles" ]
+    verbs: ["*"]
+  - apiGroups: ["admissionregistration.k8s.io"]
+    resources: ["mutatingwebhookconfigurations", "validatingwebhookconfigurations" ]
     verbs: ["*"]
 ---
 kind: ClusterRole
@@ -24,6 +33,9 @@ rules:
                 "persistentvolumes", "rolebindings", "clusterroles", "clusterrolebindings", \
                 "storageclasses", "pods", "pods/logs", "deployments", "services", "endpoints", \
                 "nodes", "ingresses", "statefulsets", "replicasets", "configmaps"]
+    verbs: ["get", "watch", "list"]
+  - apiGroups: ["policy"]
+    resources: ["poddisruptionbudgets", "podsecuritypolicies"]
     verbs: ["get", "watch", "list"]
 ---
 kind: ClusterRoleBinding

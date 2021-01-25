@@ -3,17 +3,14 @@
 # Declare variables to be passed into your templates.
 
 replicaCount: 1
-config_helper: "config_helper.py"
-
 #global tag for lables, etc
 ENV: gen3k8dev
 fence:
-  serviceport: 80
   database:
-    servername: "postgres-k8sgen3rmo.postgres.database.azure.com"
-    username: "fence_gen3dev_user@postgres-k8sgen3rmo.postgres.database.azure.com"
+    servername: "10.1.0.97"
+    username: "fence_gen3dev_user"
     port: "5432"
-    databasename: "fence_db"
+    databasename: "ogsfence_db"
     db_password: "b65a802fdf7a101c619e35354e791eeb"
   defaultIDPProvider: google
   enabledIDPProviders:
@@ -25,13 +22,13 @@ fence:
       loginButtonText: "Okta Login"
   replicas: 1
   image: "quay.io/cdis/fence:2020.12"
-  base_url: 'https://k8sgen3dev.optum.com/user'
+  base_url: 'https://gen3k8dev.optum.com/user'
   resources:
     limits:
-      cpu: '500m'
+      cpu: '200m'
       memory: '256Mi'
     requests:
-      cpu: '200m'
+      cpu: '100m'
       memory: '128Mi'
   googleOauth:
     client_id: '459263570125-3hl550dfsjej6v16m7go20i7ovkol8pn.apps.googleusercontent.com'
@@ -128,13 +125,12 @@ fence:
     -----END PUBLIC KEY-----
 arborist:
   database:
-    servername: "postgres-k8sgen3rmo.postgres.database.azure.com"
+    servername: "10.1.0.97"
     username: "arborist_gen3dev_user"
     port: "5432"
-    databasename: "arborist_db"
+    databasename: "ogsarborist_db"
     db_password: "E98CF2-8DC7HGES"
   replicas: 1
-  serviceport: 80
   image: "quay.io/cdis/arborist:2020.12"
   resources:
     limits:
@@ -183,23 +179,29 @@ service:
   port: 80
 
 ingress:
-  enabled: true
-  annotations:
-    kubernetes.io/ingress.class: nginx
-    nginx.ingress.kubernetes.io/ssl-redirect: "false"
-    nginx.ingress.kubernetes.io/use-regex: "true"
-    nginx.ingress.kubernetes.io/rewrite-target: /$1
+  enabled: false
+  annotations: {}
     # kubernetes.io/ingress.class: nginx
     # kubernetes.io/tls-acme: "true"
   hosts:
-    - host: k8sgen3dev.optum.com
-      paths: ["/(.*)"]
-
+    - host: chart-example.local
+      paths: []
   tls: []
   #  - secretName: chart-example-tls
   #    hosts:
   #      - chart-example.local
 
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
 
 autoscaling:
   enabled: false
@@ -216,99 +218,28 @@ affinity: {}
 
 # tell revproxy where to find the certificates, relative to the template.
 revproxy:
-  replicas: 2
-  serviceport: 80
-  image: "quay.io/cdis/nginx:1.17.6-ctds-1.0.1"
   crtFile: "gen3k8dev.crt"
   keyFile: "gen3k8dev.npp.key"
   cacrtFile: "gen3k8dev.cacrt"
-  resources:
-    limits:
-      cpu: '100m'
-      memory: '256Mi'
-    requests:
-      cpu: '50m'
-      memory: '128Mi'
 
 peregrine:
-  image: "quay.io/cdis/peregrine:2020.12"
   database:
-    servername: "postgres-k8sgen3rmo.postgres.database.azure.com"
+    servername: "10.1.0.97"
     username: "peregrine_gen3dev_user"
     port: "5432"
-    databasename: "metadata_db"
+    databasename: "ogsmetadata_db"
     db_password: "8ACB-0053084C2A97"
-  serviceport: 80
-  gdcapi_secret_key: "1JMWnHdApSGMJ8OIqA0IwWUEo8nJ1NJqwDQbjrz5L5v1QtW2ke"
-  hmac_key: "1JMWnHdApSGMJ8OIqA0IwWUEo8nJ1NJqwDQbjrz5L5v1QtW2ke"
-  bagitbucket: "noIdeaWhatThisIs"
-  s3access: "notSureThisIsUsed"
-  s3secret: "notSureThisIsUsed"
-  schemas: config_schemas.tar.gz.b64
-  resources:
-    limits:
-      cpu: 500m
-      memory: 512Mi
-    requests:
-      cpu: 200m
-      memory: 256Mi
 sheepdog:
   database:
-    servername: "postgres-k8sgen3rmo.postgres.database.azure.com"
+    servername: "10.1.0.97"
     username: "sheepdog_gen3dev_user"
     port: "5432"
-    databasename: "metadata_db"
+    databasename: "ogsmetadata_db"
     db_password: "E24B9254-7019-4081"
-  replicas: 1
-  serviceport: 80
-  image: "quay.io/cdis/sheepdog:2020.12"
-  s3access: "notSureThisIsUsed"
-  s3secret: "notSureThisIsUsed"
-  schemas: config_schemas.tar.gz.b64
-  resources:
-    limits:
-      cpu: 500m
-      memory: 512Mi
-    requests:
-      cpu: 200m
-      memory: 256Mi
-  service:
-    type: ClusterIP
-    port: 80
 indexd:
   database:
-    servername: "postgres-k8sgen3rmo.postgres.database.azure.com"
+    servername: "10.1.0.97"
     username: "indexd_gen3dev_user"
     port: "5432"
-    databasename: "indexd_db"
+    databasename: "ogsindexd_db"
     db_password: "D7E-2A715381173D"
-  username: "indexd_client_gen3k8dev"
-  password:  "indexd_client_pass_gen3k8dev"
-  local_settings: "indexd_settings.py"
-  replicas: 1
-  serviceport: 80
-  image: "quay.io/cdis/indexd:2020.12"
-  resources:
-    limits:
-      cpu: 1
-      memory: "2000Mi"
-    requests:
-      cpu: "500m"
-      memory: "1000Mi"
-  service:
-    type: "ClusterIP"
-    port: 80
-portal:
-  replicas: 1
-  serviceport: 80
-  image: "quay.io/cdis/data-portal:2020.12"
-  externalhostname: "gen3k8dev.optum.com"
-  gitops: "optum4c.png"
-  gitopslogo: "optum4c.png"
-  resources:
-    limits:
-      cpu: '2000m'
-      memory: '4096Mi'
-    requests:
-      cpu: '2000m'
-      memory: '2048Mi'
