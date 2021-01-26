@@ -1,5 +1,5 @@
-resource "azurerm_storage_account" "gen3hdinsights" {
-  name                            = "hdinsights-${var.cluster_name}"
+resource "azurerm_storage_account" "gen3hdinsightsstorage" {
+  name                            = "hdinsightsstorage-${var.cluster_name}"
   location                        = azurerm_resource_group.rg.location
   resource_group_name             = azurerm_resource_group.rg.name
   account_tier                    = "Standard"
@@ -7,18 +7,18 @@ resource "azurerm_storage_account" "gen3hdinsights" {
 }
 
 
-resource "azurerm_storage_container" "example" {
-  name                  = "hdinsight"
-  storage_account_name  = azurerm_storage_account.example.name
+resource "azurerm_storage_container" "gen3hdinsightcontainer" {
+  name                  = "hdinsights"
+  storage_account_name  = azurerm_storage_account.gen3hdinsightsstorage.name
   container_access_type = "private"
 }
 
-resource "azurerm_hdinsight_spark_cluster" "example" {
-  name                = "example-hdicluster"
-  resource_group_name = azurerm_resource_group.example.name
-  location            = azurerm_resource_group.example.location
-  cluster_version     = "3.6"
-  tier                = "Standard"
+resource "azurerm_hdinsight_spark_cluster" "gen3spark" {
+  name                          = "hdinsights-${var.cluster_name}"
+  location                      = azurerm_resource_group.rg.location
+  resource_group_name           = azurerm_resource_group.rg.name
+  cluster_version               = "3.6"
+  tier                          = "Standard"
 
   component_version {
     spark = "2.3"
@@ -26,8 +26,8 @@ resource "azurerm_hdinsight_spark_cluster" "example" {
 
   gateway {
     enabled  = true
-    username = "acctestusrgw"
-    password = "TerrAform123!"
+    username = "sparkadmin"
+    password = ""
   }
 
   storage_account {
