@@ -1,0 +1,38 @@
+# I suspect we will need to use stateful sets here.
+# Begs the question, can we use an Azure service instead of creating our own hadoop cluster?
+#     Pro - Using Azure services is one less hassle to worry about.  Scaling, configuration management, monitoring, uptime, etc.
+#     Con - A small cluster requires at least 5 servers running full time, so figure $250 per month?  Hmm, maybe not that bad.
+
+
+# Alternative - Use an existing helm chart to create hadoop in short term.
+# helm install --name hadoop $(stable/hadoop/tools/calc_resources.sh 50) stable/hadoop
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  # spark-service: - from the docker-compose.yaml file...
+  #   image: "quay.io/cdis/gen3-spark:2020.05"
+  #   container_name: spark-service
+  #   command: bash -c "python run_config.py && hdfs namenode -format -force && hdfs --daemon start namenode && hdfs --daemon start datanode && yarn --daemon start resourcemanager && yarn --daemon start nodemanager && hdfs dfsadmin -safemode leave &&  hdfs dfs -mkdir /result && while true; do sleep 5; done"
+  #   expose:
+  #     - 22
+  #     - 8030
+  #     - 8031
+  #     - 8032
+  #     - 9000
+  #   networks:
+  #     - devnet
+  #   environment:
+  #     - HADOOP_URL=hdfs://0.0.0.0:9000
+  #     - HADOOP_HOST=0.0.0.0

@@ -25,7 +25,7 @@ fence:
       loginButtonText: "Okta Login"
   replicas: 1
   image: "quay.io/cdis/fence:2020.12"
-  base_url: 'https://k8sgen3dev.optum.com/user'
+  base_url: 'https://k8sgen3dev.optum.com/gen3/user'
   resources:
     limits:
       cpu: '500m'
