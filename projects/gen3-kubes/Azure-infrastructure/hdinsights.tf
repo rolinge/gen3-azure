@@ -1,5 +1,5 @@
 resource "azurerm_storage_account" "gen3hdinsightsstorage" {
-  name                            = "hdinsightsstorage-${var.cluster_name}"
+  name                            = "hdstg${var.cluster_name}"
   location                        = azurerm_resource_group.rg.location
   resource_group_name             = azurerm_resource_group.rg.name
   account_tier                    = "Standard"
@@ -25,26 +25,26 @@ resource "azurerm_hdinsight_spark_cluster" "gen3spark" {
   }
 
   gateway {
-    enabled  = true
+    #enabled  = true
     username = var.hdinsight_gw_username
     password = var.hdinsight_gw_password
   }
 
   storage_account {
-    storage_container_id = azurerm_storage_container.gen3hdinsightsstorage.id
+    storage_container_id = azurerm_storage_container.gen3hdinsightcontainer.id
     storage_account_key  = azurerm_storage_account.gen3hdinsightsstorage.primary_access_key
     is_default           = true
   }
 
   roles {
     head_node {
-      vm_size  = "Standard_A1"
+      vm_size  = "STANDARD_A4_V2"
       username = var.hdinsight_node_username
       ssh_keys = [file(var.sshKeyPath_hdinsights)]
     }
 
     worker_node {
-      vm_size  = "Standard_A2"
+      vm_size  = "STANDARD_A4_V2"
       username = var.hdinsight_node_username
       ssh_keys = [file(var.sshKeyPath_hdinsights)]
       target_instance_count = 3
@@ -57,4 +57,3 @@ resource "azurerm_hdinsight_spark_cluster" "gen3spark" {
     }
   }
 }
-

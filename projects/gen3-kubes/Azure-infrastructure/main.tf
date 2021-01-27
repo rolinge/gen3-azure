@@ -60,21 +60,21 @@ resource "azurerm_kubernetes_cluster" "dce_aks_cluster" {
     network_plugin     = "azure"
     network_policy     = "azure"
   }
-
-  addon_profile {
-
-  dynamic addon_profile {
-    for_each = var.enable_log_analytics_workspace ? ["log_analytics"] : []
-    content {
-      oms_agent {
-        enabled                    = true
-        log_analytics_workspace_id = azurerm_log_analytics_workspace.k8[0].id
-      }
-    }
-  }
   tags = merge(var.tags, local.common_tags)
-}
 
+#  addon_profile {
+#
+#    dynamic addon_profile {
+#      for_each = var.enable_log_analytics_workspace ? ["log_analytics"] : []
+#      content {
+#        oms_agent {
+#          enabled                    = true
+#          log_analytics_workspace_id = azurerm_log_analytics_workspace.k8[0].id
+#        }
+#      }
+#    }
+#  }
+}
 
 resource "azurerm_kubernetes_cluster_node_pool" "gen3-2ndpool" {
 
