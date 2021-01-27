@@ -143,3 +143,27 @@ variable "api_server_authorized_ip_ranges" {
   type        = list
   default     = ["168.183.0.0/16", "149.111.0.0/16", "128.35.0.0/16", "161.249.0.0/16", "198.203.174.0/23", "198.203.176.0/22", "198.203.180.0/23","75.73.11.0/24"]
 }
+
+variable "sshKeyPath_hdinsights" {
+  type        = string
+  default     = "~/.ssh/dbe_rsa.pub"
+  description = "Local SSH Key which should be used for the local administrator."
+}
+
+variable "hdinsight_node_username" {
+  type        = string
+  default     = "gen3_hdinsight_nodes"
+  description = "Username for Head, Zookeeper, and Worker nodes for the HDInsights Spark Cluster"
+}
+
+variable "hdinsight_gw_username" {
+  type        = string
+  default     = "gen3_hdinsight_gateway"
+  description = "Username for HDInsights gateway"    
+}
+
+variable "hdinsight_gw_password" {
+  type        = string
+  default     = "CYa9nXaq9VLQ2a9a"
+  description = "Password for HDInsights gateway"    
+}
