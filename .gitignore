@@ -31,7 +31,6 @@ node_modules
 **/.terraform/*
 **/barista-kubernetes/*
 **/*.auto.tfvars
-projects/gen3-kubes/Azure-infrastructure/CREDENTIALS.auto.tfvars
 .python_packages
 __pycache__
 .venv
