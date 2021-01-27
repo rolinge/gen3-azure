@@ -31,23 +31,24 @@ resource "azurerm_hdinsight_spark_cluster" "gen3spark" {
   }
 
   storage_account {
-    storage_container_id = azurerm_storage_container.example.id
-    storage_account_key  = azurerm_storage_account.example.primary_access_key
+    storage_container_id = azurerm_storage_container.gen3hdinsightsstorage.id
+    storage_account_key  = azurerm_storage_account.gen3hdinsightsstorage.primary_access_key
     is_default           = true
   }
 
   roles {
     head_node {
-      vm_size  = "Standard_A3"
-      username = "acctestusrvm"
-      password = "AccTestvdSC4daf986!"
+      vm_size  = "Standard_A1"                            # A1 has 1.75 GB memory, A0 has 0.75 GB mem. (both A1 A0 have 1 cpu)
+      username = "acctestusrvm"                           #(required, local admin user name goes here)
+      password = "AccTestvdSC4daf986!"                    #(optional, local admin password goes here)
     }
 
     worker_node {
-      vm_size               = "Standard_A3"
-      username              = "acctestusrvm"
-      password              = "AccTestvdSC4daf986!"
-      target_instance_count = 3
+      # Standard_A2 2-cpus 3.5-GB, if we need more mem we need to bump it back up to A3
+      vm_size               = "Standard_A2"
+      username              = "acctestusrvm"              #(required, local admin user name goes here)
+      password              = "AccTestvdSC4daf986!"       #(optional, local admin password goes here) 
+      target_instance_count = 3 #optional
     }
 
     zookeeper_node {
