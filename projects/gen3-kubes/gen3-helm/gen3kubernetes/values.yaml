@@ -19,20 +19,21 @@ fence:
   enabledIDPProviders:
     - name: "google"
       loginButtonText: "Google Login"
-    - name: "microsoft"
-      loginButtonText: "Microsoft Login"
-    - name: "okta"
-      loginButtonText: "Okta Login"
+    # - name: "microsoft"
+    #   loginButtonText: "Microsoft Login"
+    # - name: "okta"
+    #   loginButtonText: "Okta Login"
   replicas: 1
-  image: "quay.io/cdis/fence:2020.12"
+#  image: "quay.io/cdis/fence:2020.12"
+  image: "cginmn/fence:latest"
   base_url: 'https://k8sgen3dev.optum.com/gen3/user'
   resources:
     limits:
       cpu: '500m'
-      memory: '256Mi'
+      memory: '512Mi'
     requests:
-      cpu: '200m'
-      memory: '128Mi'
+      cpu: '500m'
+      memory: '256Mi'
   googleOauth:
     client_id: '459263570125-3hl550dfsjej6v16m7go20i7ovkol8pn.apps.googleusercontent.com'
     client_secret: 'qxRkPreusEWF60lhM4-tH7O7'
@@ -41,7 +42,7 @@ fence:
     client_secret: 'a-7H-z1041Ki7T5_v6jtGi5vtRCTq-_D.I'
   oktaOauth:
     client_id: ""
-  defaultLoginURLSuffix: 'login/microsoft'
+  defaultLoginURLSuffix: 'login/google'
   amazonStorageCreds:
     - name: 'CREDS1'
       accesskeyid: 'stgaccvprh'
@@ -193,7 +194,7 @@ ingress:
     # kubernetes.io/tls-acme: "true"
   hosts:
     - host: k8sgen3dev.optum.com
-      paths: ["/(.*)"]
+      paths: ["/gen3/(.*)"]
 
   tls: []
   #  - secretName: chart-example-tls

@@ -159,11 +159,10 @@ variable "hdinsight_node_username" {
 variable "hdinsight_gw_username" {
   type        = string
   default     = "gen3_hdinsight_gateway"
-  description = "Username for HDInsights gateway"    
+  description = "Username for HDInsights gateway"
 }
 
 variable "hdinsight_gw_password" {
   type        = string
-  default     = "CYa9nXaq9VLQ2a9a"
   description = "Password for HDInsights gateway"    
 }

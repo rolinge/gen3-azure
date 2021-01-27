@@ -64,15 +64,15 @@ data:
           set $csrf_check "ok-tokenauth";
         }
 
-        location / {
+        location /gen3 {
                  proxy_pass http://service-portal-{{ .Values.ENV }}/;
          }
 
-        location /user/ {
+        location /gen3/user/ {
                 proxy_pass http://service-fence-{{ .Values.ENV }}/;
         }
 
-        location /api/ {
+        location /gen3/api/ {
                 proxy_pass http://service-sheepdog-{{ .Values.ENV }}/;
         }
         #
@@ -86,25 +86,25 @@ data:
         #     proxy_pass http://pidgin-service;
         # }
         #
-        location /index/ {
+        location /gen3/index/ {
                 proxy_pass http://service-indexd-{{ .Values.ENV }}/;
         }
-        location /peregrine/_status {
+        location /gen3/peregrine/_status {
             proxy_pass http://service-peregrine-{{ .Values.ENV }}/_status;
         }
-        # location /pidgin/_status {
+        # location /gen3/pidgin/_status {
         #     proxy_pass http://pidgin-service/_status;
         # }
         #
-        location /api/v0/submission/getschema {
+        location /gen3/api/v0/submission/getschema {
             proxy_pass http://service-peregrine-{{ .Values.ENV }}/v0/submission/getschema;
         }
 
-    #        location /guppy/ {
+    #        location /gen3/guppy/ {
     #                proxy_pass http://service-guppy-{{ .Values.ENV }}/;
     #        }
 
-         location /api/v0/submission/graphql {
+         location /gen3/api/v0/submission/graphql {
                  if ($cookie_csrftoken = "") {
                          add_header Set-Cookie "csrftoken=$request_id$request_length$request_time$time_iso8601;Path=/";
                  }
@@ -121,7 +121,7 @@ data:
                  proxy_pass http://service-peregrine-{{ .Values.ENV }}/v0/submission/graphql;
          }
 
-         location /api/search {
+         location /gen3/api/search {
              if ($csrf_check !~ ^ok-\S.+$) {
                return 403 "failed csrf check";
              }
@@ -148,7 +148,7 @@ data:
         # workspace AuthZ-proxy uses arborist to provide authorization to workpace services
         # that don't implement our authn or authz i.e. shiny, jupyter.
         #
-        location = /gen3-authz {
+        location = /gen3/gen3-authz {
             internal;
             error_page 400 =403 @errorworkspace;
             error_page 500 =403 @errorworkspace;
@@ -162,7 +162,7 @@ data:
             client_max_body_size 0;
         }
 
-          # location /lw-workspace/ {
+          # location /gen3/lw-workspace/ {
           #     set $authz_resource "/workspace";
           #     set $authz_method "access";
           #     set $authz_service "jupyterhub";
