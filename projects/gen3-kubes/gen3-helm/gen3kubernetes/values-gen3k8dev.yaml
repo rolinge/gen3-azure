@@ -26,7 +26,7 @@ fence:
   replicas: 1
 #  image: "quay.io/cdis/fence:2020.12"
   image: "cginmn/fence:latest"
-  base_url: 'https://k8sgen3dev.optum.com/gen3/user'
+  base_url: 'https://k8sgen3dev.optum.com/user'
   resources:
     limits:
       cpu: '500m'
@@ -194,7 +194,7 @@ ingress:
     # kubernetes.io/tls-acme: "true"
   hosts:
     - host: k8sgen3dev.optum.com
-      paths: ["/gen3/(.*)"]
+      paths: ["/(.*)"]
 
   tls: []
   #  - secretName: chart-example-tls
