@@ -30,8 +30,7 @@ node_modules
 .ensime
 **/.terraform/*
 **/barista-kubernetes/*
-.auto.tfvars
-
+**/*.auto.tfvars
 .python_packages
 __pycache__
 .venv
