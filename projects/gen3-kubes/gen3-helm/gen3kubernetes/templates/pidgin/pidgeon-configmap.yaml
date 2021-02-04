@@ -1,0 +1,35 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  labels:
+    {{- include "gen3kubernetes.labels" . | nindent 4 }}
+    component: pidgin-configmap
+  name: pidgin-config-startup-{{ .Values.ENV }}
+data:
+  waitForContainers.sh: |
+    #!/bin/bash
+    # entrypoint script for data-portal to healthcheck sheepdog and peregrine to
+    # make sure they are ready before dataportal attempts to get information from
+    # them
+
+    echo "
+    config[\"API_URL\"] = \"http://service-peregrine-{{ .Values.ENV }}/v0/submission/graphql/\"
+    config[\"API_HEALTH_URL\"] = \"http://service-peregrine-{{ .Values.ENV }}/_status\"
+    application = app
+    " >> /pidgin/wsgi.py
+
+    sleep 10   # wait for services to have a chance to start.
+
+    until curl -f -s -o /dev/null http://service-sheepdog-{{ .Values.ENV }}/v0/submission/_dictionary/_all; do
+        echo "sheepdog not ready, waiting..."
+        sleep 10
+    done
+
+    until curl -f -s -o /dev/null http://service-peregrine-{{ .Values.ENV }}/v0/submission/getschema ; do
+        echo "peregrine not ready, waiting..."
+        sleep 10
+    done
+
+    echo "both services are ready"
+    /dockerrun.sh
+    

@@ -3,17 +3,17 @@ kind: Service
 metadata:
   labels:
     {{- include "gen3kubernetes.labels" . | nindent 4 }}
-    component: "service-tube"
-  name: service-tube-{{ .Values.ENV }}
+    component: "service-pidgin"
+  name: service-pidgin-{{ .Values.ENV }}
 spec:
   type: ClusterIP
   ports:
   - name: http
-    port: {{ .Values.tube.serviceport }}
+    port: {{ .Values.pidgin.serviceport }}
     protocol: TCP
   selector:
     {{- include "gen3kubernetes.selectorLabels" . | nindent 4 }}
-    component: "tube"
+    component: "pidgin"
   sessionAffinity: None
   type: ClusterIP
 status:

@@ -117,13 +117,13 @@ data:
     AZ_CREDENTIALS:
       {{- range .Values.fence.azCredentials }}
       {{ .name | quote }}:
-        az_stgacctname: {{ .az_stgacctname | quote }}
-        az_secret_access_key: {{ .az_secret_access_key | quote }}
+        "az_stgacctname": {{ .az_stgacctname | quote }}
+        "az_connection_string": {{ .az_connection_string | quote }}
       {{- end }}
     AZ_CONTAINERS:
       {{- range .Values.fence.azureBlobstores }}
       {{ .name | quote }}:
-        cred: {{ .credentialname | quote }}
+        "cred": {{ .credentialname | quote }}
       {{- end }}
 
     DATA_UPLOAD_BUCKET: {{ .Values.fence.dataUploadBucket}}
@@ -131,7 +131,7 @@ data:
     HTTP_PROXY:
       host: null
       port: 3128
-    INDEXD: http://indexd-service-{{ .Values.ENV }}
+    INDEXD: http://service-indexd-{{ .Values.ENV }}
 
 
     INDEXD_USERNAME: {{ .Values.indexd.username | quote }}
@@ -206,7 +206,7 @@ data:
       echo "Postgres is unavailable - sleeping"
     done
     echo "postgres is ready"
-
+    cat /usr/local/share/ca-certificates/*.crt >> /usr/local/lib/python3.6/site-packages/certifi/cacert.pem
     update-ca-certificates
 
     until curl -f -s -o /dev/null http://service-arborist-{{ .Values.ENV }}/policy; do
@@ -397,8 +397,18 @@ data:
       {{- range .Values.fence.adminUsers }}
       {{ . | quote }}:
         admin: True
+        policies: [ 'optumdev02_creator', 'optumdev02_reader' , 'data_upload' , 'workspace' , 'services.sheepdog-admin' , 'indexd_admin', 'optumdev02_indexd_admin','indexd_update']
+        projects:
+          - auth_id: 'optumdev02'
+            resource: '/programs/optumdev02/projects/optumprototype01'
+            privilege: ['create', 'read', 'update', 'delete', 'upload', 'read-storage','file_upload']
       {{- end }}
       {{- range .Values.fence.regularUsers }}
       {{ . | quote }}:
         admin: False
+        policies: [ 'optumdev02_creator', 'optumdev02_reader' , 'data_upload' , 'workspace' , 'services.sheepdog-admin' , 'indexd_admin', 'optumdev02_indexd_admin','indexd_update']
+        projects:
+          - auth_id: 'optumdev02'
+            resource: '/programs/optumdev02/projects/optumprototype01'
+            privilege: ['create', 'read', 'update', 'delete', 'upload', 'read-storage','file_upload']
       {{- end }}

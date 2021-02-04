@@ -3,7 +3,7 @@
 # Declare variables to be passed into your templates.
 
 replicaCount: 1
-config_helper: "config_helper.py"
+config_helper: "assets/config_helper.py"
 
 #global tag for lables, etc
 ENV: gen3k8dev
@@ -25,7 +25,8 @@ fence:
     #   loginButtonText: "Okta Login"
   replicas: 1
 #  image: "quay.io/cdis/fence:2020.12"
-  image: "cginmn/fence:latest"
+#  image: "rmolinger/fence:katie02"
+  image: "dbedevreg.azurecr.io/fence:katie02"
   base_url: 'https://k8sgen3dev.optum.com/user'
   resources:
     limits:
@@ -60,18 +61,12 @@ fence:
       region: 'us-east-1'
   azCredentials:
     - name: 'CREDA'
-      az_stgacctname: 'stgaccvprh'
-      az_secret_access_key: 'V6c8rNTDPxAozgf3M6ewHd+7A9XnTw8MNSfsQ63QLY1+nzloas6rSp0GsZuOK+Q+oT7gi5Cpdj8TEvqaC5xvOQ=='
-    - name: 'CREDB'
-      az_stgacctname:  'azgen3blobstorage'
-      az_secret_access_key: '0yzBB7W6H7Tz1wtmGHukXUuVA91YiYGn5anpPFgq4NoeccZ1rcqMgyaRCYwSYoZpUqMT0YJx1dWXTDjUQMltZQ=='
+      az_stgacctname: 'stgacgen3devklnow'
+      az_connection_string: 'DefaultEndpointsProtocol=https;AccountName=stgacgen3devklnow;AccountKey=KY0cSrSewNiDsYuRzw2jGBc8DWXmhee9vjP/bohCNbjfkrVzg2HkIJ1EKL8I3pfyiIBjzVozPMNx1PfSD8pG6Q==;EndpointSuffix=core.windows.net'
   azureBlobstores:
-    - name: 'container1'
-      credentialname: 'CREDA'
     - name: 'azgen3blobstorage'
-      credentialname: 'CREDB'
-
-  dataUploadBucket: 'gen3bucket88997'
+      credentialname: 'CREDA'
+  dataUploadBucket: 'azgen3blobstorage'
   adminUsers:
     - "randyolinger@gmail.com"
     - "rjwswenson@gmail.com"
@@ -85,9 +80,8 @@ fence:
     httpPort: 80
     httpsPort: 443
   cacrtFiles:
-    - "gen3k8dev.1.crt"
-    - "gen3k8dev.2.crt"
-    - "gen3k8dev.3.crt"
+    - name: "olingerSigningCert.crt"
+      fileLocation: "assets/olingerSigningCert.crt"
   jwt_private_key: |
     -----BEGIN PRIVATE KEY-----
     MIIEwAIBADANBgkqhkiG9w0BAQEFAASCBKowggSmAgEAAoIBAQDkS+nTVWUnXgIQ
@@ -150,10 +144,12 @@ arborist:
 
 image:
   pullPolicy: IfNotPresent
+  #pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
   tag: ""
 
-imagePullSecrets: []
+imagePullSecrets:
+  - name: "registrypullsecret"
 nameOverride: ""
 fullnameOverride: ""
 
@@ -195,11 +191,10 @@ ingress:
   hosts:
     - host: k8sgen3dev.optum.com
       paths: ["/(.*)"]
-
-  tls: []
-  #  - secretName: chart-example-tls
-  #    hosts:
-  #      - chart-example.local
+  tls:
+    - secretName: k8sgen3dev-ingress-tls
+      hosts:
+        - k8sgen3dev.optum.com
 
 
 autoscaling:
@@ -220,9 +215,9 @@ revproxy:
   replicas: 2
   serviceport: 80
   image: "quay.io/cdis/nginx:1.17.6-ctds-1.0.1"
-  crtFile: "gen3k8dev.crt"
-  keyFile: "gen3k8dev.npp.key"
-  cacrtFile: "gen3k8dev.cacrt"
+  crtFile: "assets/gen3k8dev.crt"
+  keyFile: "assets/gen3k8dev.npp.key"
+  cacrtFile: "assets/gen3k8dev.cacrt"
   resources:
     limits:
       cpu: '100m'
@@ -245,7 +240,7 @@ peregrine:
   bagitbucket: "noIdeaWhatThisIs"
   s3access: "notSureThisIsUsed"
   s3secret: "notSureThisIsUsed"
-  schemas: config_schemas.tar.gz.b64
+  schemas: assets/config_schemas.tar.gz.b64
   resources:
     limits:
       cpu: 500m
@@ -253,6 +248,21 @@ peregrine:
     requests:
       cpu: 200m
       memory: 256Mi
+tube:
+  image: "quay.io/cdis/tube:2020.12"
+  serviceport: 80
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 200m
+      memory: 256Mi
+  elastic:
+    url: "https://gen3release-opendistro-es-client-service.gen3elastic.svc.cluster.local:9200"
+    user: admin
+    pass: admin
+
 sheepdog:
   database:
     servername: "postgres-k8sgen3rmo.postgres.database.azure.com"
@@ -265,7 +275,7 @@ sheepdog:
   image: "quay.io/cdis/sheepdog:2020.12"
   s3access: "notSureThisIsUsed"
   s3secret: "notSureThisIsUsed"
-  schemas: config_schemas.tar.gz.b64
+  schemas: assets/config_schemas.tar.gz.b64
   resources:
     limits:
       cpu: 500m
@@ -285,7 +295,7 @@ indexd:
     db_password: "D7E-2A715381173D"
   username: "indexd_client_gen3k8dev"
   password:  "indexd_client_pass_gen3k8dev"
-  local_settings: "indexd_settings.py"
+  local_settings: "assets/indexd_settings.py"
   replicas: 1
   serviceport: 80
   image: "quay.io/cdis/indexd:2020.12"
@@ -304,8 +314,8 @@ portal:
   serviceport: 80
   image: "quay.io/cdis/data-portal:2020.12"
   externalhostname: "gen3k8dev.optum.com"
-  gitops: "optum4c.png"
-  gitopslogo: "optum4c.png"
+  gitops: "assets/optum4c.png"
+  gitopslogo: "assets/optum4c.png"
   resources:
     limits:
       cpu: '2000m'
@@ -313,3 +323,13 @@ portal:
     requests:
       cpu: '2000m'
       memory: '2048Mi'
+pidgin:
+  image: "quay.io/cdis/pidgin:2020.12"
+  serviceport: 80
+  resources:
+    limits:
+      cpu: 250m
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 256Mi

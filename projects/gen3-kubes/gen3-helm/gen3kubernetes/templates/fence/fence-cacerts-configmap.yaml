@@ -9,6 +9,6 @@ metadata:
 data:
   {{- $files := .Files }}
   {{- range .Values.fence.cacrtFiles }}
-  {{ . | quote }}: |
-{{ $files.Get . | indent 4 }}
+  {{ .name | quote }}: |
+{{ $files.Get .fileLocation | indent 4 }}
   {{- end }}
