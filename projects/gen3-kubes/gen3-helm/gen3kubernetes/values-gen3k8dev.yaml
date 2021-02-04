@@ -325,6 +325,7 @@ portal:
       memory: '2048Mi'
 pidgin:
   image: "quay.io/cdis/pidgin:2020.12"
+  replicas: 1
   serviceport: 80
   resources:
     limits:
@@ -333,3 +334,26 @@ pidgin:
     requests:
       cpu: 100m
       memory: 256Mi
+guppy:
+  image: "quay.io/cdis/guppy:2020.12"
+  replicas: 1
+  serviceport: 80
+  resources:
+    limits:
+      cpu: 250m
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 256Mi
+jupyter:
+  image: "dbedevreg.azurecr.io/jupyter-slim:optum02"
+  replicas: 1
+  serviceport: 8888
+  userDirSize: "10Gi"
+  resources:
+    limits:
+      cpu: 2000m
+      memory: 4000Mi
+    requests:
+      cpu: 2000m
+      memory: 3000Mi

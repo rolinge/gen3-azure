@@ -1,0 +1,92 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jupyter-{{ .Values.ENV }}
+  labels:
+    {{- include "gen3kubernetes.labels" . | nindent 4 }}
+    component: "jupyter"
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.jupyter.replicas }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "gen3kubernetes.selectorLabels" . | nindent 6 }}
+      component: "jupyter"
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "gen3kubernetes.selectorLabels" . | nindent 8 }}
+        component: "jupyter"
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "gen3kubernetes.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      volumes:
+        - name: jupyter-userspace
+          persistentVolumeClaim:
+            claimName: pvc-jupyter-{{ .Values.ENV }}
+
+      containers:
+        - name: "jupyter-{{ .Values.ENV }}"
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.jupyter.image }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command:
+            - "start-notebook.sh"
+            - "--NotebookApp.base_url=/lw-workspace/proxy"
+            - "--NotebookApp.password=''"
+            - "--NotebookApp.token=''"
+          #command: ["sleep" , "60000000"]
+          volumeMounts:
+            - name: jupyter-userspace
+              mountPath: /home/jovyan/work
+              readOnly: False
+          ports:
+            - name: http
+              containerPort: {{ .Values.jupyter.serviceport }}
+              protocol: TCP
+          livenessProbe:
+            tcpSocket:
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /lw-workspace/proxy/tree
+              port: http
+            initialDelaySeconds: 20
+            periodSeconds: 10
+          resources:
+            {{- toYaml .Values.jupyter.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-jupyter-{{ .Values.ENV }}
+spec:
+  storageClassName: gen3-azurefile
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: {{ .Values.jupyter.userDirSize }}

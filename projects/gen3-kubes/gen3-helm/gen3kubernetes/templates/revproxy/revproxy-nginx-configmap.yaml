@@ -75,27 +75,27 @@ data:
         location /api/ {
                 proxy_pass http://service-sheepdog-{{ .Values.ENV }}/;
         }
-        #
-        # location /coremetadata/ {
-        #     # redirect to coremetadata landing page if header does not specify otherwise
-        #     if ($http_accept !~ (application/json|x-bibtex|application/vnd\.schemaorg\.ld\+json)) {
-        #       rewrite ^/coremetadata/(.*) /files/$1 redirect;
-        #     }
-        #
-        #     rewrite ^/coremetadata/(.*) /$1 break;
-        #     proxy_pass http://pidgin-service;
-        # }
-        #
+
+        location /coremetadata/ {
+            # redirect to coremetadata landing page if header does not specify otherwise
+            if ($http_accept !~ (application/json|x-bibtex|application/vnd\.schemaorg\.ld\+json)) {
+              rewrite ^/coremetadata/(.*) /files/$1 redirect;
+            }
+
+            rewrite ^/coremetadata/(.*) /$1 break;
+            proxy_pass http://service-pidgin-{{ .Values.ENV }};
+        }
+
         location /index/ {
                 proxy_pass http://service-indexd-{{ .Values.ENV }}/;
         }
         location /peregrine/_status {
             proxy_pass http://service-peregrine-{{ .Values.ENV }}/_status;
         }
-        # location /pidgin/_status {
-        #     proxy_pass http://pidgin-service/_status;
-        # }
-        #
+        location /pidgin/_status {
+            proxy_pass http://service-pidgin-{{ .Values.ENV }}/_status;
+        }
+
         location /api/v0/submission/getschema {
             proxy_pass http://service-peregrine-{{ .Values.ENV }}/v0/submission/getschema;
         }
@@ -162,26 +162,26 @@ data:
             client_max_body_size 0;
         }
 
-          # location /lw-workspace/ {
-          #     set $authz_resource "/workspace";
-          #     set $authz_method "access";
-          #     set $authz_service "jupyterhub";
-          #     auth_request /gen3-authz;
-          #
-          #     error_page 403 = @errorworkspace;
-          #
-          #     #
-          #     # jupyter notebooks use websockets
-          #     # See https://aptro.github.io/server/architecture/2016/06/21/Jupyter-Notebook-Nginx-Setup.html
-          #     #
-          #     proxy_pass http://service-jupyter-{{  .Values.ENV }}:8888/lw-workspace/;
-          #     proxy_http_version 1.1;
-          #     proxy_set_header Host $host;
-          #     #proxy_set_header X-Real-IP $remote_addr;
-          #     #proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-          #     proxy_set_header Upgrade $http_upgrade;
-          #     proxy_set_header Connection $http_connection;
-          #     #client_max_body_size 0;
-          # }
+          location /lw-workspace/ {
+              set $authz_resource "/workspace";
+              set $authz_method "access";
+              set $authz_service "jupyterhub";
+              auth_request /gen3-authz;
+
+              error_page 403 = @errorworkspace;
+
+              #
+              # jupyter notebooks use websockets
+              # See https://aptro.github.io/server/architecture/2016/06/21/Jupyter-Notebook-Nginx-Setup.html
+              #
+              proxy_pass http://service-jupyter-{{  .Values.ENV }}:8888/lw-workspace/;
+              proxy_http_version 1.1;
+              proxy_set_header Host $host;
+              #proxy_set_header X-Real-IP $remote_addr;
+              #proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+              proxy_set_header Upgrade $http_upgrade;
+              proxy_set_header Connection $http_connection;
+              #client_max_body_size 0;
+          }
 
     }
