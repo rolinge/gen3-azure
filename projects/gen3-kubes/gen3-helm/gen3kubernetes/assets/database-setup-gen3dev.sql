@@ -9,6 +9,7 @@ ALTER USER fence_gen3dev_user WITH SUPERUSER;
 CREATE USER peregrine_gen3dev_user;
 ALTER USER peregrine_gen3dev_user WITH PASSWORD 'peregrine_gen3dev9876_pass';
 ALTER USER peregrine_gen3dev_user WITH SUPERUSER;
+GRANT ALL Privileges on ALL TABLES in SCHEMA public TO peregrine_gen3dev_user;
 
 CREATE USER sheepdog_gen3dev_user;
 ALTER USER sheepdog_gen3dev_user WITH PASSWORD 'sheepdog_gen3dev9876_pass';

@@ -121,11 +121,11 @@ def set_prod_defaults(config_file_path):
         "/var/www/fence/fence_google_storage_creds_secret.json",
     )
 
-    print("  INDEXD set as http://indexd-service/")
-    config_file = _replace(config_file, "INDEXD", "http://indexd-service/")
+    print("  INDEXD set as http://service-indexd-gen3k8dev/")
+    config_file = _replace(config_file, "INDEXD", "http://service-indexd-gen3k8dev/")
 
-    print("  ARBORIST set as http://arborist-service/")
-    config_file = _replace(config_file, "ARBORIST", "http://arborist-service/")
+    print("  ARBORIST set as http://service-arborist-gen3k8dev/")
+    config_file = _replace(config_file, "ARBORIST", "http://service-arborist-gen3k8dev/")
 
     print("  HTTP_PROXY/host set as cloud-proxy.internal.io")
     config_file = _replace(config_file, "HTTP_PROXY/host", "cloud-proxy.internal.io")

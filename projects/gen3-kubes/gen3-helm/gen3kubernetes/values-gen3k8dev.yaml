@@ -72,6 +72,8 @@ fence:
     - "rjwswenson@gmail.com"
     - "carlos.andrew.garcia@gmail.com"
     - "optumogs@gmail.com"
+    - "grondahlkatie@gmail.com"
+    - "hammer.jacob.m@gmail.com"
   regularUsers:
     - "randy.olinger@optum.com"
     - "carlos.garcia@optum.com"
@@ -313,7 +315,7 @@ portal:
   replicas: 1
   serviceport: 80
   image: "quay.io/cdis/data-portal:2020.12"
-  externalhostname: "gen3k8dev.optum.com"
+  externalhostname: "k8sgen3dev.optum.com"
   gitops: "assets/optum4c.png"
   gitopslogo: "assets/optum4c.png"
   resources:
