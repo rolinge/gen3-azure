@@ -40,11 +40,17 @@ spec:
             - name: "ES_INDEX_NAME"
               value: "etl"
             - name: "HADOOP_URL"
-              value: "hdfs://hdinsights-k8sgen3rmo.azurehdinsight.net:9000"
+              value: {{ .Values.spark.hadoop_url }}
             - name: "HADOOP_HOST"
-              value: "###spark-service###"
+              value: {{ .Values.spark.hadoop_host }}
             - name: REQUESTS_CA_BUNDLE
               value: "/etc/ssl/certs/ca-certificates.crt"
+            - name: "SPARK_MASTER"
+            - value: {{ .Values.spark.spark_master }}
+
+SPARK_EXECUTOR_MEMORY  "2g"
+SPARK_DRIVER_MEMORY = os.getenv("SPARK_DRIVER_MEMORY", "512m")
+
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.tube.image }}"

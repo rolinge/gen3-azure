@@ -359,3 +359,5 @@ jupyter:
     requests:
       cpu: 2000m
       memory: 3000Mi
+spark:
+  spark_master: https://hdinsights-k8sgen3rmo.azurehdinsight.net

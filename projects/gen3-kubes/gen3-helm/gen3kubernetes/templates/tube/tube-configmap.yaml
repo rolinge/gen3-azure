@@ -102,3 +102,4 @@ data:
             path: slides.samples.cases
   user.yaml: |
     LEFTBLANKINTENTIONALLY
+  settings.py
