@@ -164,5 +164,16 @@ variable "hdinsight_gw_username" {
 
 variable "hdinsight_gw_password" {
   type        = string
-  description = "Password for HDInsights gateway"    
+  description = "Password for HDInsights gateway"
+}
+
+variable "hdi_ssh_username" {
+  type        = string
+  description = "ssh username for HDInsights gateway"
+  default     = "hdiadmin"
+}
+
+variable "hdi_ssh_Password" {
+  type        = string
+  description = "Password for HDInsights gateway"
 }
