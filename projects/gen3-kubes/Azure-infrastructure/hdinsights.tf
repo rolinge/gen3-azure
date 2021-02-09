@@ -4,8 +4,18 @@ resource "azurerm_storage_account" "gen3hdinsightsstorage" {
   resource_group_name             = azurerm_resource_group.rg.name
   account_tier                    = "Standard"
   account_replication_type        = "LRS"
+  account_kind             = "StorageV2"
+  is_hns_enabled           = "true"
 }
 
+resource "azurerm_storage_data_lake_gen2_filesystem" "gen3hdinsights" {
+  name               = "gen3hdinsights-gen2dl"
+  storage_account_id = azurerm_storage_account.gen3hdinsightsstorage.id
+
+  properties = {
+    hello = "aGVsbG8="
+  }
+}
 
 resource "azurerm_storage_container" "gen3hdinsightcontainer" {
   name                  = "hdinsights"
