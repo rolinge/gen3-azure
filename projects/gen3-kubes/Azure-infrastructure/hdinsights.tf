@@ -43,6 +43,7 @@ resource "azurerm_template_deployment" "hdi" {
       "clusterName" = "${var.cluster_name}${random_string.uid.result}"
       "clusterLoginUserName" = var.hdinsight_gw_username
       "clusterLoginPassword" = var.hdinsight_gw_password
+      "clusterVersion" = "4.0"
       "sshUserName" = var.hdi_ssh_username
       "sshPassword" =  var.hdi_ssh_Password
       "existingVirtualNetworkResourceGroup" = azurerm_resource_group.rg.name
@@ -53,6 +54,8 @@ resource "azurerm_template_deployment" "hdi" {
       "newOrExistingAdlsGen2FileSystem" = azurerm_storage_data_lake_gen2_filesystem.gen3hdinsights.name
       "existingHdiUserManagedIdentityResourceGroup" = azurerm_resource_group.rg.name
       "existingHdiUserManagedIdentityName" = "${var.prefix}hdiumi"
+      "headNodeSize" = var.hdiHeadNodeSize
+      "workerNodeSize" = var.hdiWorkerNodeSize
    }
   deployment_mode = "Incremental"
   depends_on =   [

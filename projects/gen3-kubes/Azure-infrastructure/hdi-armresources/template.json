@@ -18,14 +18,14 @@
        },
        "headNodeSize":{
           "type":"string",
-          "defaultValue":"Standard_DS11_v2",
+          "defaultValue":"STANDARD_DS13_V2",
           "metadata":{
              "description":"The VM size of the head nodes."
           }
        },
        "workerNodeSize":{
           "type":"string",
-          "defaultValue":"Standard_DS12_v2",
+          "defaultValue":"STANDARD_DS13_V2",
           "metadata":{
              "description":"The VM size of the worker nodes."
           }

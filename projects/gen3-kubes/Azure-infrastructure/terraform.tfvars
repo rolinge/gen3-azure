@@ -7,3 +7,6 @@ commons_url = "https://myapp.com"
 max_count = 5
 api_server_authorized_ip_ranges = ["168.183.0.0/16", "149.111.0.0/16", "128.35.0.0/16", "161.249.0.0/16", "198.203.174.0/23", "198.203.176.0/22", "198.203.180.0/23"]
 hdi_ssh_Password = "Gen3AnnoysMe3!"
+
+hdiHeadNodeSize = "STANDARD_DS12_V2"
+hdiWorkerNodeSize = "STANDARD_DS13_V2"

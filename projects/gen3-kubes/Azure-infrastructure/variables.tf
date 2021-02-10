@@ -177,3 +177,22 @@ variable "hdi_ssh_Password" {
   type        = string
   description = "Password for HDInsights gateway"
 }
+
+variable "hdiHeadNodeSize" {
+  type        = string
+  description = "HDInsights server head node machine size"
+  default = "STANDARD_DS12_V2"
+# valid sizes (2021) A6,A7,EXTRALARGE,LARGE,STANDARD_D12_V2,STANDARD_D13_V2,STANDARD_D14_V2,STANDARD_D3_V2,
+#                     STANDARD_D4_V2,STANDARD_D5_V2,STANDARD_DS12_V2,STANDARD_DS13_V2,STANDARD_DS14_V2,
+#                     STANDARD_DS3_V2,STANDARD_DS4_V2,STANDARD_DS5_V2,STANDARD_A4_V2,STANDARD_A8_V2,
+#                     STANDARD_A4M_V2,STANDARD_A8M_V2,STANDARD_E16_V3,STANDARD_E2_V3,STANDARD_E20_V3,
+#                     STANDARD_E32_V3,STANDARD_E4_V3,STANDARD_E64_V3,STANDARD_E64I_V3,STANDARD_E8_V3,
+#                     STANDARD_A5,STANDARD_A6,STANDARD_A7,STANDARD_D16A_V4,STANDARD_D32A_V4,STANDARD_D48A_V4,
+#                     STANDARD_D4A_V4,STANDARD_D64A_V4,STANDARD_D8A_V4,STANDARD_D96A_V4
+}
+
+variable "hdiWorkerNodeSize" {
+  type        = string
+  description = "HDInsights worker head node machine size"
+  default = "STANDARD_DS12_V2"
+}
