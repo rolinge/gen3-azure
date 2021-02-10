@@ -1,11 +1,11 @@
 resource "azurerm_storage_account" "gen3hdinsightsstorage" {
-  name                            = "hdstg${var.cluster_name}"
+  name                            = "hdstg${var.cluster_name}${random_string.uid.result}"
   location                        = azurerm_resource_group.rg.location
   resource_group_name             = azurerm_resource_group.rg.name
   account_tier                    = "Standard"
   account_replication_type        = "LRS"
   account_kind             = "StorageV2"
-  is_hns_enabled           = "false"
+  is_hns_enabled           = "true"
 }
 
 resource "azurerm_storage_data_lake_gen2_filesystem" "gen3hdinsights" {
@@ -17,53 +17,48 @@ resource "azurerm_storage_data_lake_gen2_filesystem" "gen3hdinsights" {
   }
 }
 
+resource "azurerm_user_assigned_identity" "hdi-usermanagedidentity" {
+  resource_group_name = azurerm_resource_group.rg.name
+  location            = azurerm_resource_group.rg.location
+
+  name = "${var.prefix}hdiumi"
+}
+resource "azurerm_role_assignment" "stg_auth_hdiuseridentity" {
+  scope                = azurerm_storage_account.gen3hdinsightsstorage.id
+  role_definition_name = "Storage Blob Data Owner"
+  principal_id         = azurerm_user_assigned_identity.hdi-usermanagedidentity.principal_id
+}
+
 resource "azurerm_storage_container" "gen3hdinsightcontainer" {
-  name                  = "hdinsights"
+  name                  = "hdinsights${random_string.uid.result}"
   storage_account_name  = azurerm_storage_account.gen3hdinsightsstorage.name
   container_access_type = "private"
 }
 
-resource "azurerm_hdinsight_spark_cluster" "gen3spark" {
-  name                          = "hdinsights-${var.cluster_name}"
-  location                      = azurerm_resource_group.rg.location
+resource "azurerm_template_deployment" "hdi" {
+  name                          = "hdi-${var.cluster_name}${random_string.uid.result}"
   resource_group_name           = azurerm_resource_group.rg.name
-  cluster_version               = "3.6"
-  tier                          = "Standard"
-
-  component_version {
-    spark = "2.3"
-  }
-
-  gateway {
-    #enabled  = true
-    username = var.hdinsight_gw_username
-    password = var.hdinsight_gw_password
-  }
-
-  storage_account {
-    storage_container_id = azurerm_storage_container.gen3hdinsightcontainer.id
-    storage_account_key  = azurerm_storage_account.gen3hdinsightsstorage.primary_access_key
-    is_default           = true
-  }
-
-  roles {
-    head_node {
-      vm_size  = "STANDARD_A4_V2"
-      username = var.hdinsight_node_username
-      ssh_keys = [file(var.sshKeyPath_hdinsights)]
-    }
-
-    worker_node {
-      vm_size  = "STANDARD_A4_V2"
-      username = var.hdinsight_node_username
-      ssh_keys = [file(var.sshKeyPath_hdinsights)]
-      target_instance_count = 3
-    }
-
-    zookeeper_node {
-      vm_size  = "Medium"
-      username = var.hdinsight_node_username
-      ssh_keys = [file(var.sshKeyPath_hdinsights)]
-    }
-  }
+  template_body = file("./hdi-armresources/template.json")
+  parameters = {
+      "clusterName" = "${var.cluster_name}${random_string.uid.result}"
+      "clusterLoginUserName" = var.hdinsight_gw_username
+      "clusterLoginPassword" = var.hdinsight_gw_password
+      "sshUserName" = var.hdi_ssh_username
+      "sshPassword" =  var.hdi_ssh_Password
+      "existingVirtualNetworkResourceGroup" = azurerm_resource_group.rg.name
+      "existingVirtualNetworkName" =  azurerm_virtual_network.dce_aks_vnet.name
+      "existingVirtualNetworkSubnetName" = azurerm_subnet.dce_aks_subnet2.name
+      "existingAdlsGen2StgAccountResourceGroup" = azurerm_resource_group.rg.name
+      "existingAdlsGen2StgAccountname" =  azurerm_storage_account.gen3hdinsightsstorage.name
+      "newOrExistingAdlsGen2FileSystem" = azurerm_storage_data_lake_gen2_filesystem.gen3hdinsights.name
+      "existingHdiUserManagedIdentityResourceGroup" = azurerm_resource_group.rg.name
+      "existingHdiUserManagedIdentityName" = "${var.prefix}hdiumi"
+   }
+  deployment_mode = "Incremental"
+  depends_on =   [
+    azurerm_virtual_network.dce_aks_vnet,
+    azurerm_subnet.dce_aks_subnet2,
+    azurerm_storage_account.gen3hdinsightsstorage,
+    azurerm_role_assignment.stg_auth_hdiuseridentity
+  ]
 }

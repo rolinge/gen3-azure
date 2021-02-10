@@ -10,23 +10,23 @@ resource "azurerm_key_vault" "keyvault1" {
   soft_delete_retention_days  = 7
   purge_protection_enabled    = false
   sku_name = "standard"
-  access_policy {
-    tenant_id = data.azurerm_client_config.current.tenant_id
-    object_id = data.azurerm_client_config.current.object_id
-    key_permissions = [
-      "get",  "list", "delete", "recover",  "backup", "restore",
-      "create", "decrypt", "encrypt", "import", "sign",
-      "unwrapKey", "update", "verify" , "wrapKey"
-    ]
-    secret_permissions = [
-    "get",  "list", "delete", "recover",  "backup", "restore",  "set"
-    ]
-    storage_permissions = [
-    "get",  "list", "delete", "recover",  "backup", "restore",
-    "regeneratekey", "getsas", "listsas", "deletesas", "set", "setsas",
-    "update"
-    ]
-  }
+#  access_policy {
+#    tenant_id = data.azurerm_client_config.current.tenant_id
+#    object_id = data.azurerm_client_config.current.object_id
+#    key_permissions = [
+#      "get",  "list", "delete", "recover",  "backup", "restore",
+#      "create", "decrypt", "encrypt", "import", "sign",
+#      "unwrapKey", "update", "verify" , "wrapKey"
+#    ]
+#    secret_permissions = [
+#    "get",  "list", "delete", "recover",  "backup", "restore",  "set"
+#    ]
+#    storage_permissions = [
+#    "get",  "list", "delete", "recover",  "backup", "restore",
+#    "regeneratekey", "getsas", "listsas", "deletesas", "set", "setsas",
+#    "update"
+#    ]
+#  }
   network_acls {
     default_action = "Allow"
     bypass         = "AzureServices"

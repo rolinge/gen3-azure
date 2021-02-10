@@ -18,14 +18,14 @@
        },
        "headNodeSize":{
           "type":"string",
-          "defaultValue":"Standard_D2s_v3",
+          "defaultValue":"Standard_DS11_v2",
           "metadata":{
              "description":"The VM size of the head nodes."
           }
        },
        "workerNodeSize":{
           "type":"string",
-          "defaultValue":"Standard_D4s_v3",
+          "defaultValue":"Standard_DS12_v2",
           "metadata":{
              "description":"The VM size of the worker nodes."
           }
@@ -97,21 +97,36 @@
            "metadata": {
                "description": ""
            }
-         }
+         },
+        "existingHdiUserManagedIdentityResourceGroup": {
+           "type": "string",
+           "metadata": {
+              "description": ""
+           }
+         },
+        "existingHdiUserManagedIdentityName": {
+           "type": "string",
+           "metadata": {
+              "description": ""
+           }
+        }
+    },
+    "variables":{
+       "hdimanagedidentityname": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', parameters('existingHdiUserManagedIdentityResourceGroup'),'/providers/Microsoft.ManagedIdentity/userAssignedIdentities/', parameters('existingHdiUserManagedIdentityName'))]"
     },
     "resources":[
-       {
-          "name":"[parameters('clusterName')]",
-          "type":"Microsoft.HDInsight/clusters",
-          "location":"[resourceGroup().location]",
-          "apiVersion":"2018-06-01-preview",
-          "identity": {
-            "type": "UserAssigned",
-            "userAssignedIdentities": {
-                "[variables('hdimanagedidentityname')]": {}
-        }
-       },
-          "properties":{
+      {
+         "name":"[parameters('clusterName')]",
+         "type":"Microsoft.HDInsight/clusters",
+         "location":"[resourceGroup().location]",
+         "apiVersion":"2018-06-01-preview",
+         "identity": {
+           "type": "UserAssigned",
+           "userAssignedIdentities": {
+               "[variables('hdimanagedidentityname')]": {}
+             }
+           },
+         "properties": {
              "clusterVersion":"[parameters('clusterVersion')]",
              "osType":"Linux",
              "clusterDefinition":{
@@ -121,7 +136,7 @@
                       "restAuthCredential.isEnabled":true,
                       "restAuthCredential.username":"[parameters('clusterLoginUserName')]",
                       "restAuthCredential.password":"[parameters('clusterLoginPassword')]"
-                   },
+                   }
                 }
              },
              "storageProfile":{
@@ -129,8 +144,8 @@
                     {
                         "name": "[concat(parameters('existingAdlsGen2StgAccountname'),'.dfs.core.windows.net')]",
                         "resourceId": "[resourceId(parameters('existingAdlsGen2StgAccountResourceGroup'),'Microsoft.Storage/storageAccounts', parameters('existingAdlsGen2StgAccountname'))]",
-                        "msiResourceId": "[variables('hdimanagedidentityname')]",
                         "fileSystem": "[parameters('newOrExistingAdlsGen2FileSystem')]",
+                        "msiResourceId": "[variables('hdimanagedidentityname')]",
                         "isDefault": true
                     }
                 ]
