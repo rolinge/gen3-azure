@@ -64,4 +64,9 @@ resource "azurerm_template_deployment" "hdi" {
     azurerm_storage_account.gen3hdinsightsstorage,
     azurerm_role_assignment.stg_auth_hdiuseridentity
   ]
+  timeouts {
+    create = "60m"
+    delete = "2h"
+
+  }
 }

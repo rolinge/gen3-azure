@@ -1,0 +1,96 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  managedFields:
+  - apiVersion: v1
+  name: gen3k8dev
+spec:
+  finalizers:
+  - kubernetes
+status:
+  phase: Active
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  managedFields:
+  - apiVersion: v1
+  name: gen3elastic
+spec:
+  finalizers:
+  - kubernetes
+status:
+  phase: Active
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  managedFields:
+  - apiVersion: v1
+  name: gen3elastic
+spec:
+  finalizers:
+  - kubernetes
+status:
+  phase: Active
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  managedFields:
+  - apiVersion: v1
+  name: ogs
+spec:
+  finalizers:
+  - kubernetes
+status:
+  phase: Active
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  managedFields:
+  - apiVersion: v1
+  name: jacob
+spec:
+  finalizers:
+  - kubernetes
+status:
+  phase: Active
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  managedFields:
+  - apiVersion: v1
+  name: katie
+spec:
+  finalizers:
+  - kubernetes
+status:
+  phase: Active
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  managedFields:
+  - apiVersion: v1
+  name: randy
+spec:
+  finalizers:
+  - kubernetes
+status:
+  phase: Active
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  managedFields:
+  - apiVersion: v1
+  name: ingress-gen3
+spec:
+  finalizers:
+  - kubernetes
+status:
+  phase: Active
+---
