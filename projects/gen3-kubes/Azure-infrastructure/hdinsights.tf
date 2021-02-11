@@ -89,4 +89,10 @@ resource "azurerm_hdinsight_spark_cluster" "gen3spark" {
       virtual_network_id = azurerm_virtual_network.dce_aks_vnet.id
     }
   }
+  depends_on = [
+    azurerm_role_assignment.stg_auth_hdiuseridentity,
+    azurerm_storage_container" "gen3hdinsightcontainer,
+    azurerm_storage_data_lake_gen2_filesystem.gen3hdinsights,
+    azurerm_storage_account.gen3hdinsightsstorage
+  ]
 }
