@@ -318,6 +318,8 @@ portal:
   externalhostname: "k8sgen3dev.optum.com"
   gitops: "assets/optum4c.png"
   gitopslogo: "assets/optum4c.png"
+  workspaceurlsuffix: /lw-workspace/proxy/tree
+  initialDelaySeconds: 300 
   resources:
     limits:
       cpu: '2000m'
@@ -361,3 +363,5 @@ jupyter:
       memory: 3000Mi
 spark:
   spark_master: https://hdinsights-k8sgen3rmo.azurehdinsight.net
+  spark_executor_memory: 2Gi
+  spark_driver_memroy: 512Mi

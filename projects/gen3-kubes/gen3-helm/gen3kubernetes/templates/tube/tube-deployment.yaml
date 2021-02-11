@@ -46,11 +46,11 @@ spec:
             - name: REQUESTS_CA_BUNDLE
               value: "/etc/ssl/certs/ca-certificates.crt"
             - name: "SPARK_MASTER"
-            - value: {{ .Values.spark.spark_master }}
-
-SPARK_EXECUTOR_MEMORY  "2g"
-SPARK_DRIVER_MEMORY = os.getenv("SPARK_DRIVER_MEMORY", "512m")
-
+              value: {{ .Values.spark.spark_master }}
+            - name: "SPARK_EXECUTOR_MEMORY"
+              value: {{ .Values.spark.spark_executor_memory }}
+            - name: "SPARK_DRIVER_MEMORY"
+              value: {{ .Values.spark.spark_driver_memroy }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.tube.image }}"
@@ -65,15 +65,16 @@ SPARK_DRIVER_MEMORY = os.getenv("SPARK_DRIVER_MEMORY", "512m")
             - name: http
               containerPort: 80
               protocol: TCP
-          # livenessProbe:
-          #   tcpSocket:
-          #     port: http
-          # readinessProbe:
-          #   httpGet:
-          #     path: /_status
-          #     port: http
-          #   initialDelaySeconds: 30
-          #   periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: http
+            initialDelaySeconds: 180
+          readinessProbe:
+            httpGet:
+              path: /_status
+              port: http
+            initialDelaySeconds: {{ .Values.portal.initialDelaySeconds }}
+            periodSeconds: 10
           resources:
             {{- toYaml .Values.tube.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}
