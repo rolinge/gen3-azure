@@ -1,5 +1,5 @@
 resource "azurerm_storage_account" "gen3hdinsightsstorage" {
-  name                            = "hdstg${var.cluster_name}${random_string.uid.result}"
+  name                            = "hdstg${var.cluster_name}"
   location                        = azurerm_resource_group.rg.location
   resource_group_name             = azurerm_resource_group.rg.name
   account_tier                    = "Standard"
@@ -17,10 +17,15 @@ resource "azurerm_storage_data_lake_gen2_filesystem" "gen3hdinsights" {
   }
 }
 
+resource "azurerm_storage_container" "gen3hdinsightcontainer" {
+  name                  = "hdinsights"
+  storage_account_name  = azurerm_storage_account.gen3hdinsightsstorage.name
+  container_access_type = "private"
+}
+
 resource "azurerm_user_assigned_identity" "hdi-usermanagedidentity" {
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
-
   name = "${var.prefix}hdiumi"
 }
 resource "azurerm_role_assignment" "stg_auth_hdiuseridentity" {
@@ -29,44 +34,59 @@ resource "azurerm_role_assignment" "stg_auth_hdiuseridentity" {
   principal_id         = azurerm_user_assigned_identity.hdi-usermanagedidentity.principal_id
 }
 
-resource "azurerm_storage_container" "gen3hdinsightcontainer" {
-  name                  = "hdinsights${random_string.uid.result}"
-  storage_account_name  = azurerm_storage_account.gen3hdinsightsstorage.name
-  container_access_type = "private"
-}
-
-resource "azurerm_template_deployment" "hdi" {
-  name                          = "hdi-${var.cluster_name}${random_string.uid.result}"
+resource "azurerm_hdinsight_spark_cluster" "gen3spark" {
+  name                          = "hdinsights-${var.cluster_name}"
+  location                      = azurerm_resource_group.rg.location
   resource_group_name           = azurerm_resource_group.rg.name
-  template_body = file("./hdi-armresources/template.json")
-  parameters = {
-      "clusterName" = "${var.cluster_name}${random_string.uid.result}"
-      "clusterLoginUserName" = var.hdinsight_gw_username
-      "clusterLoginPassword" = var.hdinsight_gw_password
-      "clusterVersion" = "4.0"
-      "sshUserName" = var.hdi_ssh_username
-      "sshPassword" =  var.hdi_ssh_Password
-      "existingVirtualNetworkResourceGroup" = azurerm_resource_group.rg.name
-      "existingVirtualNetworkName" =  azurerm_virtual_network.dce_aks_vnet.name
-      "existingVirtualNetworkSubnetName" = azurerm_subnet.dce_aks_subnet2.name
-      "existingAdlsGen2StgAccountResourceGroup" = azurerm_resource_group.rg.name
-      "existingAdlsGen2StgAccountname" =  azurerm_storage_account.gen3hdinsightsstorage.name
-      "newOrExistingAdlsGen2FileSystem" = azurerm_storage_data_lake_gen2_filesystem.gen3hdinsights.name
-      "existingHdiUserManagedIdentityResourceGroup" = azurerm_resource_group.rg.name
-      "existingHdiUserManagedIdentityName" = "${var.prefix}hdiumi"
-      "headNodeSize" = var.hdiHeadNodeSize
-      "workerNodeSize" = var.hdiWorkerNodeSize
-   }
-  deployment_mode = "Incremental"
-  depends_on =   [
-    azurerm_virtual_network.dce_aks_vnet,
-    azurerm_subnet.dce_aks_subnet2,
-    azurerm_storage_account.gen3hdinsightsstorage,
-    azurerm_role_assignment.stg_auth_hdiuseridentity
-  ]
+  cluster_version               = "3.6"
+  tier                          = "Standard"
+
+  component_version {
+    spark = "2.3"
+  }
+
   timeouts {
     create = "60m"
     delete = "2h"
+  }
 
+  gateway {
+    #enabled  = true
+    username = var.hdinsight_gw_username
+    password = var.hdinsight_gw_password
+  }
+
+  storage_account_gen2 {
+    is_default           = true
+    managed_identity_resource_id = azurerm_user_assigned_identity.hdi-usermanagedidentity.id
+    storage_resource_id = azurerm_storage_account.gen3hdinsightsstorage.id
+    filesystem_id = azurerm_storage_data_lake_gen2_filesystem.gen3hdinsights.id
+  }
+
+  roles {
+    head_node {
+      vm_size  = "STANDARD_A4_V2"
+      username = var.hdinsight_node_username
+      ssh_keys = [file(var.sshKeyPath_hdinsights)]
+      subnet_id = azurerm_subnet.dce_aks_subnet2.id
+      virtual_network_id = azurerm_virtual_network.dce_aks_vnet.id
+    }
+
+    worker_node {
+      vm_size  = "STANDARD_A4_V2"
+      username = var.hdinsight_node_username
+      ssh_keys = [file(var.sshKeyPath_hdinsights)]
+      target_instance_count = 3
+      subnet_id = azurerm_subnet.dce_aks_subnet2.id
+      virtual_network_id = azurerm_virtual_network.dce_aks_vnet.id
+    }
+
+    zookeeper_node {
+      vm_size  = "Medium"
+      username = var.hdinsight_node_username
+      ssh_keys = [file(var.sshKeyPath_hdinsights)]
+      subnet_id = azurerm_subnet.dce_aks_subnet2.id
+      virtual_network_id = azurerm_virtual_network.dce_aks_vnet.id
+    }
   }
 }
