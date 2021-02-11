@@ -146,7 +146,7 @@ variable "api_server_authorized_ip_ranges" {
 
 variable "sshKeyPath_hdinsights" {
   type        = string
-  default     = "~/.ssh/dbe_rsa.pub"
+  default     = "assets/hdinsights_rsa.pub"
   description = "Local SSH Key which should be used for the local administrator."
 }
 
