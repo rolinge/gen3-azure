@@ -31,3 +31,11 @@ output "postgresql_server_version" {
 output "postgresql_server_fqdn" {
   value = azurerm_postgresql_server.g3DATA.fqdn
 }
+
+output "gen3keyid" {
+  value = azurerm_key_vault_secret.gen3keyid.id
+}
+
+output "gen3KeySecret" {
+  value = azurerm_key_vault_secret.gen3KeySecret.id
+}

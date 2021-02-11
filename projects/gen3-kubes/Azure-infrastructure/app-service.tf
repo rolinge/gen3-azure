@@ -44,11 +44,11 @@ resource "azurerm_function_app" "funcapp" {
     FUNCTIONS_EXTENSION_VERSION = "~3"
     #AzureWebJobsStorage = ""
     COMMONS_URL = var.commons_url
-    gen3KeyID = format("@Microsoft.KeyVault(SecretUri=%s)", azurerm_key_vault_secret.gen3keyid.id)
-    gen3KeySecret = format("@Microsoft.KeyVault(SecretUri=%s)", azurerm_key_vault_secret.gen3KeySecret.id)
+    gen3KeyID = format("@Microsoft.KeyVault(VaultName=%s;SecretName=%s)",azurerm_key_vault.keyvault1.name ,azurerm_key_vault_secret.gen3keyid.name)
+    gen3KeySecret = format("@Microsoft.KeyVault(VaultName=%s;SecretName=%s)", azurerm_key_vault.keyvault1.name ,azurerm_key_vault_secret.gen3KeySecret.name)
     MOUNT_POINT = "/opt/shared"
     RESULTS_FILE = "gen3_hashes.csv"
-    StorageaccountConnectString = format("@Microsoft.KeyVault(SecretUri=%s)",azurerm_key_vault_secret.StorageaccountConnectString.id)
+    StorageaccountConnectString = format("@Microsoft.KeyVault(VaultName=%s;SecretName=%s)",azurerm_key_vault.keyvault1.name ,azurerm_key_vault_secret.StorageaccountConnectString.name)
     HASH = base64encode(filesha256(var.functionapp))
     WEBSITE_RUN_FROM_PACKAGE = format("https://%s.blob.core.windows.net/%s/%s%s",
                                         azurerm_storage_account.gen3.name,
