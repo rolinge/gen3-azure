@@ -36,7 +36,7 @@ spec:
             - name: PYTHONPATH
               value: "/usr/local/lib/python3.6/site-packages/:/pidgin/"
             - name: DICTIONARY_URL
-              value: "https://s3.amazonaws.com/dictionary-artifacts/datadictionary/develop/schema.json"
+              value: {{ .Values.dictionary_url }}
             - name: REQUESTS_CA_BUNDLE
               value: "/etc/ssl/certs/ca-certificates.crt"
           securityContext:

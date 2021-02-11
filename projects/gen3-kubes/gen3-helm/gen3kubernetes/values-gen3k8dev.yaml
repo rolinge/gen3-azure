@@ -7,6 +7,7 @@ config_helper: "assets/config_helper.py"
 
 #global tag for lables, etc
 ENV: gen3k8dev
+dictionary_url: "https://s3.amazonaws.com/dictionary-artifacts/datadictionary/develop/schema.json"
 fence:
   serviceport: 80
   database:
@@ -319,7 +320,7 @@ portal:
   gitops: "assets/optum4c.png"
   gitopslogo: "assets/optum4c.png"
   workspaceurlsuffix: /lw-workspace/proxy/tree
-  initialDelaySeconds: 300 
+  initialDelaySeconds: 300
   resources:
     limits:
       cpu: '2000m'

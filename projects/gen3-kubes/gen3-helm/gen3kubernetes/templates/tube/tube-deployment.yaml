@@ -34,7 +34,7 @@ spec:
         - name: "tube-{{ .Values.ENV }}"
           env:
             - name: "DICTIONARY_URL"
-              value: "https://s3.amazonaws.com/dictionary-artifacts/datadictionary/develop/schema.json"
+              value: {{ .Values.dictionary_url }}
             - name: "ES_URL"
               value: {{ .Values.tube.elastic.url | quote }}
             - name: "ES_INDEX_NAME"

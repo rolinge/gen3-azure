@@ -45,12 +45,6 @@ spec:
               value: "http://service-revproxy-{{ .Values.ENV }}/api/v0/submission/"
             - name: "WORKSPACE_URL"
               value: "https://{{ .Values.portal.externalhostname }}/{{ .Values.portal.workspaceurlsuffix }}/"
-            # - name: "ARBORIST_URL"
-            #   value: "http://service-arborist-{{ .Values.ENV }}/"
-            # - name: "FENCE_URL"
-            #   value: "http://service-fence-{{ .Values.ENV }}/"
-            # - name: "INDEXD_URL"
-            #   value: "http://service-indexd-{{ .Values.ENV }}/"
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.portal.image }}"
