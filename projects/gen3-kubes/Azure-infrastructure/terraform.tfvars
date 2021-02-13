@@ -10,3 +10,4 @@ hdi_ssh_Password = "Gen3AnnoysMe3!"
 
 hdiHeadNodeSize = "STANDARD_DS12_V2"
 hdiWorkerNodeSize = "STANDARD_DS13_V2"
+blobindexfunction_version = v0.2

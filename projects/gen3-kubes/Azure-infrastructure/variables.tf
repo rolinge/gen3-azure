@@ -196,3 +196,8 @@ variable "hdiWorkerNodeSize" {
   description = "HDInsights worker head node machine size"
   default = "STANDARD_DS12_V2"
 }
+
+variable "blobindexfunction_version" {
+  type        = string
+  description = "version (tag) on the function that indexes the blobs"
+}
