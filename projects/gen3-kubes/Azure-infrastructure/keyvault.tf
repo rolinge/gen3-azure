@@ -146,13 +146,18 @@ resource "azurerm_key_vault_secret" "gen3keyid" {
   name         = "gen3keyid"
   value        = "BLANK-FILLINLATER"
   key_vault_id = azurerm_key_vault.keyvault1.id
-
+  lifecycle {
+    ignore_changes = [   value , tags ]
+  }
   tags = merge(var.tags, local.common_tags)
 }
 resource "azurerm_key_vault_secret" "gen3KeySecret" {
   name         = "gen3KeySecret"
   value        = "BLANK-FILLINLATER"
   key_vault_id = azurerm_key_vault.keyvault1.id
+  lifecycle {
+    ignore_changes = [   value , tags ]
+  }
 
   tags = merge(var.tags, local.common_tags)
 }
@@ -161,6 +166,9 @@ resource "azurerm_key_vault_secret" "StorageaccountConnectString" {
   name         = "StorageaccountConnectString"
   value        = azurerm_storage_account.gen3.primary_connection_string
   key_vault_id = azurerm_key_vault.keyvault1.id
+  lifecycle {
+    ignore_changes = [   value , tags ]
+  }
   tags = merge(var.tags, local.common_tags)
 }
 
