@@ -26,7 +26,7 @@ resource "azurerm_function_app" "funcapp" {
   tags = merge(var.tags, local.common_tags)
 
   site_config {
-    linux_fx_version = "DOCKER|docker.io/rmolinger/blobtriggerdocker:test06"
+    linux_fx_version = format("DOCKER|%s/gen3/blobtriggerdocker:latest",azurerm_container_registry.gen3.login_server)
     use_32_bit_worker_process = false
     always_on = true
   }
@@ -49,13 +49,10 @@ resource "azurerm_function_app" "funcapp" {
     MOUNT_POINT = "/opt/shared"
     RESULTS_FILE = "gen3_hashes.csv"
     StorageaccountConnectString = format("@Microsoft.KeyVault(VaultName=%s;SecretName=%s)",azurerm_key_vault.keyvault1.name ,azurerm_key_vault_secret.StorageaccountConnectString.name)
-    HASH = base64encode(filesha256(var.functionapp))
-    WEBSITE_RUN_FROM_PACKAGE = format("https://%s.blob.core.windows.net/%s/%s%s",
-                                        azurerm_storage_account.gen3.name,
-                                        azurerm_storage_container.functioncode.name,
-                                        azurerm_storage_blob.appcode.name,
-                                        data.azurerm_storage_account_sas.gen3sas.sas
-                                        )
+    "DOCKER_REGISTRY_SERVER_URL" = azurerm_container_registry.gen3.login_server
+    "DOCKER_REGISTRY_SERVER_USERNAME" = format("@Microsoft.KeyVault(VaultName=%s;SecretName=%s)",azurerm_key_vault.keyvault1.name ,azurerm_key_vault_secret.acrAdminUsername.name)
+    "DOCKER_REGISTRY_SERVER_PASSWORD" = format("@Microsoft.KeyVault(VaultName=%s;SecretName=%s)",azurerm_key_vault.keyvault1.name ,azurerm_key_vault_secret.acrAdminPassword.name)
+
     }
 
 }

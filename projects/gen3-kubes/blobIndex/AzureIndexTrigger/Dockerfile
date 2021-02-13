@@ -9,7 +9,7 @@ COPY requirements.txt /
 RUN pip install -r /requirements.txt
 
 RUN which python3
-COPY gen3playground.optum.com-chain.pem .
-RUN cat ./gen3playground.optum.com-chain.pem >> /usr/local/lib/python3.8/site-packages/pip/_vendor/certifi/cacert.pem \
-       && cat ./gen3playground.optum.com-chain.pem >> /usr/local/lib/python3.8/site-packages/certifi/cacert.pem
+ADD certs /
+RUN cat /*.crt >> /usr/local/lib/python3.8/site-packages/pip/_vendor/certifi/cacert.pem \
+       && cat /*.crt >> /usr/local/lib/python3.8/site-packages/certifi/cacert.pem
 COPY . /home/site/wwwroot

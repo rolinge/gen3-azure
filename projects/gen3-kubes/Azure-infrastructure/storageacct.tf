@@ -40,13 +40,19 @@ resource "azurerm_storage_container" "functioncode" {
   container_access_type = "private"
 }
 
-resource "azurerm_storage_blob" "appcode" {
-    name = "functionapp.zip"
-    storage_account_name = azurerm_storage_account.gen3.name
-    storage_container_name = azurerm_storage_container.functioncode.name
-    type = "Block"
-    source = var.functionapp
+resource "azurerm_storage_container" "registry" {
+  name                  = "registry"
+  storage_account_name  = azurerm_storage_account.gen3.name
+  container_access_type = "private"
 }
+
+#resource "azurerm_storage_blob" "appcode" {
+#    name = "functionapp.zip"
+#    storage_account_name = azurerm_storage_account.gen3.name
+#    storage_container_name = azurerm_storage_container.functioncode.name
+#    type = "Block"
+#    source = var.functionapp
+#}
 
 
 data "azurerm_storage_account_sas" "gen3sas" {

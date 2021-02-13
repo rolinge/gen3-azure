@@ -39,3 +39,13 @@ output "gen3keyid" {
 output "gen3KeySecret" {
   value = azurerm_key_vault_secret.gen3KeySecret.id
 }
+output "acrUsername" {
+  value = azurerm_container_registry.gen3.admin_password
+}
+
+output "acrPassword" {
+value = azurerm_container_registry.gen3.admin_username
+}
+output "acrHost" {
+value = azurerm_container_registry.gen3.login_server
+}
