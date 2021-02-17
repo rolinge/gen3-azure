@@ -17,16 +17,16 @@ This code runs in a Azure functionapp that is hosted in an application_Service ,
   In a terminal window,
 
         cd to the directory clinicogenomics/projects/gen3-kubes/blobIndex/AzureIndexTrigger
-        $ docker build -t gen3/blobtriggerdocker:{yournamehere}
+        $ docker build -t {yourreponamehere}/gen3/blobtriggerdocker:{yourtagnamehere}
 
 2. push docker container to the registry
         $ docker login acrgen3klnow.azurecr.io
         user is acrgen3klnow
         -password is available in the Azure portal
-        $ docker push gen3/blobtriggerdocker:{yournamehere}
+        $ docker push {yourreponamehere}/gen3/blobtriggerdocker:{yourtagnamehere}
 
 3. update the app service to use the new container
-    (Look in the configuration of the app service [here](https://portal.azure.com/#@uhgazure.onmicrosoft.com/resource/subscriptions/21a7a4d3-3641-4382-95a8-85ae72399ceb/resourceGroups/k8s-gen3/providers/Microsoft.Web/sites/blobindexfuncdevklnow/AppServiceDeploymentCenter))
+    (Look in the configuration of the app service deployment center in Azure portal )
 
         update the tag to your new tag,
         click save.
