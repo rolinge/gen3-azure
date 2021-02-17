@@ -1,9 +1,6 @@
 
-pipeline {
-    agent {
-        label any
-    }
 
+pipeline {
     stages {
         stage('Source Code') {
             steps {
@@ -13,18 +10,16 @@ pipeline {
             }
         }
 
-        stage('Build Docker Image') {
+        stage('Build and Push Docker Image') {
             steps {
-                sh 'cd projects/gen3-kubes/blobIndex/AzureIndexTrigger'
-		        sh 'docker build -t acrgen3klnow.azurecr.io/gen3/blobtriggerdocker:klnow01 .'
-            }
-        }
-
-        stage('Push to docker registry') {
-            steps {
-                sh 'docker push acrgen3klnow.azurecr.io/gen3/blobtriggerdocker:klnow01'	
-            }
-        }
-    }
+                withDockerRegistry([credentialsId: 'gen3-acr-klnow', url: "https://acrgen3klnow.azurecr.io/"]) {
+                    sh '''
+                    cd projects/gen3-kubes/blobIndex/AzureIndexTrigger
+                    docker build -t acrgen3klnow.azurecr.io/gen3/blobtriggerdocker:klnow01 .
+                    docker push acrgen3klnow.azurecr.io/gen3/blobtriggerdocker:klnow01
+                    '''
+        		}
+    		}
+		}
+	}
 }
-
