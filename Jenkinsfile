@@ -1,12 +1,9 @@
-
-
 pipeline {
+    agent any
     stages {
         stage('Source Code') {
             steps {
-                script {
-                    sh 'ls -l'
-                }
+		sh 'ls -l'
             }
         }
 
@@ -18,8 +15,8 @@ pipeline {
                     docker build -t acrgen3klnow.azurecr.io/gen3/blobtriggerdocker:klnow01 .
                     docker push acrgen3klnow.azurecr.io/gen3/blobtriggerdocker:klnow01
                     '''
-        		}
-    		}
+        			}
+    			}
 		}
 	}
 }
