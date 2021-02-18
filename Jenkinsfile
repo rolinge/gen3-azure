@@ -1,11 +1,17 @@
 pipeline {
 	agent {
-		label 'docker-terraform-agent'
+		label 'docker-slave'
 	}
     stages {
         stage('Source Code') {
             steps {
-		sh 'ls -l'
+		        sh 'ls -l'
+            }
+        }
+
+        stage('Connect to Azure') {
+            steps {
+                sh 'which az'
             }
         }
 
