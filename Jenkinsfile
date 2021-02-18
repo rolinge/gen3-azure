@@ -1,6 +1,6 @@
 pipeline {
 	agent {
-		label 'docker-slave'
+		label 'docker-terraform-agent'
 	}
     stages {
         stage('Source Code') {
