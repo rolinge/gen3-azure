@@ -36,10 +36,13 @@ pipeline {
 
         stage('Terraform Commands') {
             steps {
-                sh 'pwd'
-                sh 'ls'
-                sh 'cd projects/gen3-kubes/Azure-infrastructure'
-                sh 'terraform apply -target=azurerm_function_app.funcapp -var blobindexfunction_version=$TAG'
+                sh '''
+                pwd
+                ls
+                cd projects/gen3-kubes/Azure-infrastructure
+                terraform init
+                terraform apply -target=azurerm_function_app.funcapp -var blobindexfunction_version=$TAG
+                '''
             }
         }
 	}
