@@ -6,7 +6,7 @@ pipeline {
 	}
 
     environment {
-        TAG = SAFE_BRANCH_NAME
+        TAG = "${SAFE_BRANCH_NAME}"
 
     }
     stages {
