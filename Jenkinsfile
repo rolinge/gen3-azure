@@ -40,7 +40,7 @@ pipeline {
                 withCredentials([azureServicePrincipal('azure-ectgenomics-deploy')]) {
                     sh '''
                     az login --service-principal -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET -t $AZURE_TENANT_ID
-                    az webapp config container set --docker-custom-image-name acrgen3klnow.azurecr.io/gen3/blobtriggerdocker:$TAG 
+                    az webapp config container set --docker-custom-image-name acrgen3klnow.azurecr.io/gen3/blobtriggerdocker:$TAG --name blobindexfuncdevklnow --resource-group k8s-gen3
                     '''
                 }
             }
