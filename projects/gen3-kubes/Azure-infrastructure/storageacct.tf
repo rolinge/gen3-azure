@@ -56,7 +56,7 @@ resource "azurerm_storage_container" "registry" {
 
 
 data "azurerm_storage_account_sas" "gen3sas" {
-    connection_string = "${azurerm_storage_account.gen3.primary_connection_string}"
+    connection_string = azurerm_storage_account.gen3.primary_connection_string
     https_only = true
     start = "2020-12-02"
     expiry = "2021-02-28"
