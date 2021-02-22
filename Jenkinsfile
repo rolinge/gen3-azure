@@ -1,9 +1,10 @@
+
 def SAFE_BRANCH_NAME = env.BRANCH_NAME.replaceAll("[/_.\$%^&*()@!]","")
 
 pipeline {
-	agent {
-		label 'docker-slave'
-	}
+    agent {
+        label 'docker-slave'
+    }
 
     environment {
         TAG = "${SAFE_BRANCH_NAME}"
@@ -12,7 +13,7 @@ pipeline {
     stages {
         stage('Source Code') {
             steps {
-		        sh 'ls -l'
+                sh 'ls -l'
             }
         }
 
@@ -30,20 +31,19 @@ pipeline {
                     docker build -t acrgen3klnow.azurecr.io/gen3/blobtriggerdocker:$TAG .
                     docker push acrgen3klnow.azurecr.io/gen3/blobtriggerdocker:$TAG
                     '''
-        			}
-    			}
-		}
+                    }
+                }
+        }
 
         stage('Terraform Commands') {
             steps {
-                sh '''
-                pwd
-                ls
-                cd projects/gen3-kubes/Azure-infrastructure
-                terraform init
-                terraform apply -target=azurerm_function_app.funcapp -var blobindexfunction_version=$TAG
-                '''
+                withCredentials([azureServicePrincipal('azure-ectgenomics-deploy')]) {
+                    sh '''
+                    az login --service-principal -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET -t $AZURE_TENANT_ID
+                    az webapp config container set --docker-custom-image-name acrgen3klnow.azurecr.io/gen3/blobtriggerdocker:$TAG 
+                    '''
+                }
             }
         }
-	}
+    }
 }
