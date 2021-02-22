@@ -36,11 +36,15 @@ pipeline {
         }
 
         stage('Terraform Commands') {
+            environment {
+                USER_CREDENTIALS = credentials('gen3-acr-klnow')
+            }
             steps {
                 withCredentials([azureServicePrincipal('azure-ectgenomics-deploy')]) {
                     sh '''
+                    docker login  -u username -p password 
                     az login --service-principal -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET -t $AZURE_TENANT_ID
-                    az webapp config container set --docker-custom-image-name gen3/blobtriggerdocker:$TAG --name blobindexfuncdevklnow --resource-group k8s-gen3 --docker-registry-server-url https://acrgen3klnow.azurecr.io/
+                    az webapp config container set --docker-custom-image-name gen3/blobtriggerdocker:$TAG --name blobindexfuncdevklnow --resource-group k8s-gen3 --docker-registry-server-url https://acrgen3klnow.azurecr.io/ --docker-registry-server-password $USER_CREDENTIALS_PSW --docker-registry-server-user $USER_CREDENTIALS_USR 
                     '''
                 }
             }
