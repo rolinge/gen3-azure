@@ -6,12 +6,12 @@ metadata:
     component: tube-configmap
   name: tube-config-configmap-{{ .Values.ENV }}
 data:
-  etl_creds.json: |
+  creds.json: |
     {
       "db_host": {{ .Values.sheepdog.database.servername | quote }},
       "db_username": "{{ .Values.sheepdog.database.username }}@{{ .Values.sheepdog.database.servername}}",
       "db_password": {{ .Values.sheepdog.database.db_password | quote }},
-      "db_database": {{ .Values.sheepdog.database.databasename | quote }},
+      "db_database": {{ .Values.sheepdog.database.databasename | quote }}
     }
   etlMapping.yaml: |
     mappings:
@@ -100,6 +100,5 @@ data:
         target_nodes:
           - name: slide_image
             path: slides.samples.cases
-  user.yaml: |
-    LEFTBLANKINTENTIONALLY
-  
+  tube_startup.ksh: |
+{{ .Files.Get  .Values.tube.startupfileLocation  | indent 4}}

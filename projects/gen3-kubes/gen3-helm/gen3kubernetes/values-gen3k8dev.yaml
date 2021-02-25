@@ -255,6 +255,7 @@ tube:
   image: "quay.io/cdis/tube:2020.12"
   serviceport: 80
   replicas: 1
+  startupfileLocation: "assets/tube_startup.ksh"
   resources:
     limits:
       cpu: 500m

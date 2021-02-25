@@ -55,26 +55,30 @@ spec:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.tube.image }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          command: ["bash" , "-c", "while true; do sleep 5; done"]
+          command: ["bash" , "-c", ". /usr/share/gen3/tube/tube_startup.ksh"]
+          #command: ["bash" , "-c", "while true; do sleep 5; done"]
           #command: ["sleep" , "60000000"]
           volumeMounts:
             - name: "etl-setup"
               mountPath: "/usr/share/gen3/tube"
               readOnly: false
+            - name: "fence-configs"
+              mountPath: "/gen3/tube"
+              readOnly: false
           ports:
             - name: http
               containerPort: 80
               protocol: TCP
-          livenessProbe:
-            tcpSocket:
-              port: http
-            initialDelaySeconds: 180
-          readinessProbe:
-            httpGet:
-              path: /_status
-              port: http
-            initialDelaySeconds: {{ .Values.portal.initialDelaySeconds }}
-            periodSeconds: 10
+          # livenessProbe:
+          #   tcpSocket:
+          #     port: http
+          #   initialDelaySeconds: 180
+          # readinessProbe:
+          #   httpGet:
+          #     path: /_status
+          #     port: http
+          #   initialDelaySeconds: {{ .Values.portal.initialDelaySeconds }}
+          #   periodSeconds: 10
           resources:
             {{- toYaml .Values.tube.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}
@@ -94,3 +98,7 @@ spec:
           configMap:
             defaultMode: 0775
             name: tube-config-configmap-{{ .Values.ENV }}
+        - name: "fence-configs"
+          configMap:
+            defaultMode: 0775
+            name: "fence-config-configmap-{{ .Values.ENV }}"
