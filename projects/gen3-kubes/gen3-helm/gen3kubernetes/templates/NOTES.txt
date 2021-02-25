@@ -2,9 +2,16 @@ Arborist needs to have some tables and indexes defined due to the initialization
 to grant to the application id.  (CREATE EXTENSION IF NOT EXISTS ltree;)   Since this is part of the arborist init, it
 fails and has to have manual intervention.  Looking for a solution.
 
+1. Once application is running make sure to go back to the Azure keyvault and update the secrets from
+   the API_KEY in an admin account.  Commands to do such are...
+
+    $ az keyvault secret set --name gen3keyid --value "xxx" --vault-name keyvault-dev-klnow
+    $ az keyvault secret set --name gen3KeySecret  --value "yyy"  --vault-name keyvault-dev-klnow
+       (Remember to replace xxx and yyy with the proper values)
 
 
-1. Get the application URL by running these commands:
+
+2. Get the application URL by running these commands:
 {{- if .Values.ingress.enabled }}
 {{- range $host := .Values.ingress.hosts }}
   {{- range .paths }}

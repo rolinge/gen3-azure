@@ -17,7 +17,7 @@ metadata:
   name: dev-user-full-access-gen3k8dev
   namespace: gen3k8dev
 rules:
-  - apiGroups: ["", "extensions", "apps"]
+  - apiGroups: ["", "extensions", "apps","networking.k8s.io"]
     resources: ["*"]
     verbs: ["*"]
   - apiGroups: ["batch"]
@@ -31,7 +31,33 @@ metadata:
   name: dev-user-full-access-gen3elastic
   namespace: gen3elastic
 rules:
-  - apiGroups: ["", "extensions", "apps"]
+  - apiGroups: ["", "extensions", "apps","networking.k8s.io"]
+    resources: ["*"]
+    verbs: ["*"]
+  - apiGroups: ["batch"]
+    verbs: ["*"]
+    resources: [ "jobs", "cronjobs" ]
+---
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: dev-user-full-access-katie
+  namespace: katie
+rules:
+  - apiGroups: ["", "extensions", "apps","networking.k8s.io"]
+    resources: ["*"]
+    verbs: ["*"]
+  - apiGroups: ["batch"]
+    verbs: ["*"]
+    resources: [ "jobs", "cronjobs" ]
+---
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: dev-user-full-access-jacob
+  namespace: jacob
+rules:
+  - apiGroups: ["", "extensions", "apps","networking.k8s.io"]
     resources: ["*"]
     verbs: ["*"]
   - apiGroups: ["batch"]
@@ -76,6 +102,32 @@ roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
   name: dev-user-full-access-gen3elastic
+subjects:
+  - kind: Group
+    name: c1a150d8-6037-46d0-b603-bcb11b80f612
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: Gen3-ClinicoGenomics-katie
+  namespace: katie
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: dev-user-full-access-katie
+subjects:
+  - kind: Group
+    name: c1a150d8-6037-46d0-b603-bcb11b80f612
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: Gen3-ClinicoGenomics-jacob
+  namespace: jacob
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: dev-user-full-access-jacob
 subjects:
   - kind: Group
     name: c1a150d8-6037-46d0-b603-bcb11b80f612

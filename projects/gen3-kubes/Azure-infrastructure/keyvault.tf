@@ -6,27 +6,9 @@ resource "azurerm_key_vault" "keyvault1" {
   resource_group_name         = azurerm_resource_group.rg.name
   enabled_for_disk_encryption = true
   tenant_id                   = data.azurerm_client_config.current.tenant_id
-  soft_delete_enabled         = true
   soft_delete_retention_days  = 7
   purge_protection_enabled    = false
   sku_name = "standard"
-  access_policy {
-    tenant_id = data.azurerm_client_config.current.tenant_id
-    object_id = data.azurerm_client_config.current.object_id
-    key_permissions = [
-      "get",  "list", "delete", "recover",  "backup", "restore",
-      "create", "decrypt", "encrypt", "import", "sign",
-      "unwrapKey", "update", "verify" , "wrapKey"
-    ]
-    secret_permissions = [
-    "get",  "list", "delete", "recover",  "backup", "restore",  "set"
-    ]
-    storage_permissions = [
-    "get",  "list", "delete", "recover",  "backup", "restore",
-    "regeneratekey", "getsas", "listsas", "deletesas", "set", "setsas",
-    "update"
-    ]
-  }
   network_acls {
     default_action = "Allow"
     bypass         = "AzureServices"
@@ -135,20 +117,29 @@ resource "azurerm_key_vault_access_policy" "functionapp" {
 }
 
 
-
-
+#The gen3 secrets are created with junk data and need to be populated before the background jobs will run.
+# use the following commands to update from the creds.json file from the web portal.
+#
+# (Remember to replace xxx and yyy with the proper values)
+# $ az keyvault secret set --name gen3keyid --value "xxx" --vault-name keyvault-dev-klnow
+# $ az keyvault secret set --name gen3KeySecret  --value "yyy"  --vault-name keyvault-dev-klnow
 
 resource "azurerm_key_vault_secret" "gen3keyid" {
   name         = "gen3keyid"
-  value        = "9160a4e2-7368-4c4d-b9e3-4cfae4d47d92"
+  value        = "BLANK-FILLINLATER"
   key_vault_id = azurerm_key_vault.keyvault1.id
-
+  lifecycle {
+    ignore_changes = [   value , tags ]
+  }
   tags = merge(var.tags, local.common_tags)
 }
 resource "azurerm_key_vault_secret" "gen3KeySecret" {
   name         = "gen3KeySecret"
-  value        = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImtpZCI6ImZlbmNlX2tleV8yMDIwLTA5LTIyVDE2OjM2OjAwWiJ9.eyJwdXIiOiJhcGlfa2V5IiwiYXVkIjpbImRhdGEiLCJ1c2VyIiwiZmVuY2UiLCJvcGVuaWQiXSwic3ViIjoiMyIsImlzcyI6Imh0dHBzOi8vZ2VuM3BsYXlncm91bmQub3B0dW0uY29tL3VzZXIiLCJpYXQiOjE2MDUyMzQ5NzksImV4cCI6MTYwNzgyNjk3OSwianRpIjoiOTE2MGE0ZTItNzM2OC00YzRkLWI5ZTMtNGNmYWU0ZDQ3ZDkyIiwiYXpwIjoiIn0.NVCUxlO0bzFbfe5W1jjo8rqfe_8zjkUig3bcMXBvMrV9vDFWGAMTOvyXQ4wfY0ue41yDNt81oil5_TYE38iVaiVWsgZP9Iz_vsgC8Mstx4agBCXs9NbLdOt_QzuaH0Mp17E0KAegbq0hxCU2j2dYjQKFBv7XlN9w-77fWsjHx9QDqpV2gs0t4NKv3JS9WOYBsEBRH5RZOs4AzvgT03qPGEVmwWk-km5WP8g4O6x5IhUWv5dMYocNJCNLFgTmC_V3VOxu6q4Ovs4eX0ly_nNIT4aI7YXDtTfG3HLqpOT6pW_Agao3XXjMAo66KjsqT-98A0jp2vOV72djyHe8xEvOWA"
+  value        = "BLANK-FILLINLATER"
   key_vault_id = azurerm_key_vault.keyvault1.id
+  lifecycle {
+    ignore_changes = [   value , tags ]
+  }
 
   tags = merge(var.tags, local.common_tags)
 }
@@ -156,6 +147,22 @@ resource "azurerm_key_vault_secret" "gen3KeySecret" {
 resource "azurerm_key_vault_secret" "StorageaccountConnectString" {
   name         = "StorageaccountConnectString"
   value        = azurerm_storage_account.gen3.primary_connection_string
+  key_vault_id = azurerm_key_vault.keyvault1.id
+  lifecycle {
+    ignore_changes = [   value , tags ]
+  }
+  tags = merge(var.tags, local.common_tags)
+}
+
+resource "azurerm_key_vault_secret" "acrAdminPassword" {
+  name         = "acrAdminPassword"
+  value        = azurerm_container_registry.gen3.admin_password
+  key_vault_id = azurerm_key_vault.keyvault1.id
+  tags = merge(var.tags, local.common_tags)
+}
+resource "azurerm_key_vault_secret" "acrAdminUsername" {
+  name         = "acrAdminUsername"
+  value        = azurerm_container_registry.gen3.admin_username
   key_vault_id = azurerm_key_vault.keyvault1.id
   tags = merge(var.tags, local.common_tags)
 }

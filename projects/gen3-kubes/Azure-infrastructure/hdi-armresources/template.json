@@ -1,0 +1,200 @@
+{
+    "$schema":"https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion":"1.0.0.0",
+    "parameters":{
+       "clusterName":{
+          "type":"string",
+          "defaultValue":"[concat('hdi-', uniqueString(resourceGroup().id))]",
+          "metadata":{
+             "description":"The name of the cluster to create."
+          }
+       },
+       "clusterVersion":{
+          "type":"string",
+          "defaultValue":"4.0",
+          "metadata":{
+             "description":"The HDInsight version to deploy."
+          }
+       },
+       "headNodeSize":{
+          "type":"string",
+          "defaultValue":"STANDARD_DS13_V2",
+          "metadata":{
+             "description":"The VM size of the head nodes."
+          }
+       },
+       "workerNodeSize":{
+          "type":"string",
+          "defaultValue":"STANDARD_DS13_V2",
+          "metadata":{
+             "description":"The VM size of the worker nodes."
+          }
+       },
+       "workerNodeCount":{
+          "type":"int",
+          "defaultValue":1,
+          "metadata":{
+             "description":"The number of worker nodes in the cluster."
+          }
+       },
+       "clusterLoginUserName":{
+          "type":"string",
+          "metadata":{
+             "description":"These credentials can be used to submit jobs to the cluster and to log into cluster dashboards."
+          }
+       },
+       "clusterLoginPassword":{
+          "type":"securestring",
+          "metadata":{
+             "description":"The password must be at least 10 characters in length and must contain at least one digit, one non-alphanumeric character, and one upper or lower case letter."
+          }
+       },
+       "sshUserName":{
+          "type":"string",
+          "metadata":{
+             "description":"These credentials can be used to remotely access the cluster."
+          }
+       },
+       "sshPassword":{
+          "type":"securestring",
+          "metadata":{
+             "description":"The password must be at least 10 characters in length and must contain at least one digit, one non-alphanumeric character, and one upper or lower case letter."
+          }
+       },
+       "existingVirtualNetworkResourceGroup":{
+          "type":"string",
+          "defaultValue":"[resourceGroup().name]",
+          "metadata":{
+             "description":"The existing virtual network resource group name."
+          }
+       },
+       "existingVirtualNetworkName":{
+          "type":"string",
+          "metadata":{
+             "description":"The existing virtual network name."
+          }
+       },
+       "existingVirtualNetworkSubnetName":{
+          "type":"string",
+          "metadata":{
+             "description":"The existing virtual network subnet name."
+          }
+       },
+       "existingAdlsGen2StgAccountResourceGroup": {
+         "type": "string",
+         "metadata": {
+             "description": ""
+         }
+       },
+       "existingAdlsGen2StgAccountname": {
+           "type": "string",
+           "metadata": {
+               "description": ""
+           }
+       },
+       "newOrExistingAdlsGen2FileSystem": {
+           "type": "string",
+           "metadata": {
+               "description": ""
+           }
+         },
+        "existingHdiUserManagedIdentityResourceGroup": {
+           "type": "string",
+           "metadata": {
+              "description": ""
+           }
+         },
+        "existingHdiUserManagedIdentityName": {
+           "type": "string",
+           "metadata": {
+              "description": ""
+           }
+        }
+    },
+    "variables":{
+       "hdimanagedidentityname": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', parameters('existingHdiUserManagedIdentityResourceGroup'),'/providers/Microsoft.ManagedIdentity/userAssignedIdentities/', parameters('existingHdiUserManagedIdentityName'))]"
+    },
+    "resources":[
+      {
+         "name":"[parameters('clusterName')]",
+         "type":"Microsoft.HDInsight/clusters",
+         "location":"[resourceGroup().location]",
+         "apiVersion":"2018-06-01-preview",
+         "identity": {
+           "type": "UserAssigned",
+           "userAssignedIdentities": {
+               "[variables('hdimanagedidentityname')]": {}
+             }
+           },
+         "properties": {
+             "clusterVersion":"[parameters('clusterVersion')]",
+             "osType":"Linux",
+             "clusterDefinition":{
+                "kind":"spark",
+                "configurations":{
+                   "gateway":{
+                      "restAuthCredential.isEnabled":true,
+                      "restAuthCredential.username":"[parameters('clusterLoginUserName')]",
+                      "restAuthCredential.password":"[parameters('clusterLoginPassword')]"
+                   }
+                }
+             },
+             "storageProfile":{
+                "storageaccounts": [
+                    {
+                        "name": "[concat(parameters('existingAdlsGen2StgAccountname'),'.dfs.core.windows.net')]",
+                        "resourceId": "[resourceId(parameters('existingAdlsGen2StgAccountResourceGroup'),'Microsoft.Storage/storageAccounts', parameters('existingAdlsGen2StgAccountname'))]",
+                        "fileSystem": "[parameters('newOrExistingAdlsGen2FileSystem')]",
+                        "msiResourceId": "[variables('hdimanagedidentityname')]",
+                        "isDefault": true
+                    }
+                ]
+             },
+             "computeProfile":{
+                "roles":[
+                   {
+                      "name":"headnode",
+                      "targetInstanceCount":2,
+                      "hardwareProfile":{
+                         "vmSize":"[parameters('headNodeSize')]"
+                      },
+                      "osProfile":{
+                         "linuxOperatingSystemProfile":{
+                            "username":"[parameters('sshUserName')]",
+                            "password":"[parameters('sshPassword')]"
+                         }
+                      },
+                      "virtualNetworkProfile":{
+                         "id":"[resourceId(parameters('existingVirtualNetworkResourceGroup'), 'Microsoft.Network/virtualNetworks', parameters('existingVirtualNetworkName'))]",
+                         "subnet":"[resourceId(parameters('existingVirtualNetworkResourceGroup'), 'Microsoft.Network/virtualNetworks/subnets', parameters('existingVirtualNetworkName'), parameters('existingVirtualNetworkSubnetName'))]"
+                      }
+                   },
+                   {
+                      "name":"workernode",
+                      "targetInstanceCount":"[parameters('workerNodeCount')]",
+                      "hardwareProfile":{
+                         "vmSize":"[parameters('workerNodeSize')]"
+                      },
+                      "osProfile":{
+                         "linuxOperatingSystemProfile":{
+                            "username":"[parameters('sshUserName')]",
+                            "password":"[parameters('sshPassword')]"
+                         }
+                      },
+                      "virtualNetworkProfile":{
+                         "id":"[resourceId(parameters('existingVirtualNetworkResourceGroup'), 'Microsoft.Network/virtualNetworks', parameters('existingVirtualNetworkName'))]",
+                         "subnet":"[resourceId(parameters('existingVirtualNetworkResourceGroup'), 'Microsoft.Network/virtualNetworks/subnets', parameters('existingVirtualNetworkName'), parameters('existingVirtualNetworkSubnetName'))]"
+                      }
+                   }
+                ]
+             }
+          }
+       }
+    ],
+    "outputs":{
+       "cluster":{
+          "type":"object",
+          "value":"[reference(resourceId('Microsoft.HDInsight/clusters',parameters('clusterName')))]"
+       }
+    }
+ }

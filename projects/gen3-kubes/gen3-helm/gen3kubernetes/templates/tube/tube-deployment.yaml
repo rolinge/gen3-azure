@@ -1,0 +1,104 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tube-{{ .Values.ENV }}
+  labels:
+    {{- include "gen3kubernetes.labels" . | nindent 4 }}
+    component: "tube"
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.tube.replicas }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "gen3kubernetes.selectorLabels" . | nindent 6 }}
+      component: "tube"
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "gen3kubernetes.selectorLabels" . | nindent 8 }}
+        component: "tube"
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "gen3kubernetes.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: "tube-{{ .Values.ENV }}"
+          env:
+            - name: "DICTIONARY_URL"
+              value: {{ .Values.dictionary_url }}
+            - name: "ES_URL"
+              value: {{ .Values.tube.elastic.url | quote }}
+            - name: "ES_INDEX_NAME"
+              value: "etl"
+            - name: "HADOOP_URL"
+              value: {{ .Values.spark.hadoop_url }}
+            - name: "HADOOP_HOST"
+              value: {{ .Values.spark.hadoop_host }}
+            - name: REQUESTS_CA_BUNDLE
+              value: "/etc/ssl/certs/ca-certificates.crt"
+            - name: "SPARK_MASTER"
+              value: {{ .Values.spark.spark_master }}
+            - name: "SPARK_EXECUTOR_MEMORY"
+              value: {{ .Values.spark.spark_executor_memory }}
+            - name: "SPARK_DRIVER_MEMORY"
+              value: {{ .Values.spark.spark_driver_memroy }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.tube.image }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["bash" , "-c", ". /usr/share/gen3/tube/tube_startup.ksh"]
+          #command: ["bash" , "-c", "while true; do sleep 5; done"]
+          #command: ["sleep" , "60000000"]
+          volumeMounts:
+            - name: "etl-setup"
+              mountPath: "/usr/share/gen3/tube"
+              readOnly: false
+            - name: "fence-configs"
+              mountPath: "/gen3/tube"
+              readOnly: false
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          # livenessProbe:
+          #   tcpSocket:
+          #     port: http
+          #   initialDelaySeconds: 180
+          # readinessProbe:
+          #   httpGet:
+          #     path: /_status
+          #     port: http
+          #   initialDelaySeconds: {{ .Values.portal.initialDelaySeconds }}
+          #   periodSeconds: 10
+          resources:
+            {{- toYaml .Values.tube.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+        - name: "etl-setup"
+          configMap:
+            defaultMode: 0775
+            name: tube-config-configmap-{{ .Values.ENV }}
+        - name: "fence-configs"
+          configMap:
+            defaultMode: 0775
+            name: "fence-config-configmap-{{ .Values.ENV }}"

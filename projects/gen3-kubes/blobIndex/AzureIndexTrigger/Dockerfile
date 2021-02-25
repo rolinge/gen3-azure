@@ -7,9 +7,18 @@ ENV AzureWebJobsScriptRoot=/home/site/wwwroot \
 
 COPY requirements.txt /
 RUN pip install -r /requirements.txt
+RUN apt-get update && apt-get install -y openssh-server \
+     && echo "root:Docker!" | chpasswd
+COPY sshd_config /etc/ssh/
+COPY init.sh /usr/local/bin/
 
+RUN chmod u+x /usr/local/bin/init.sh
+
+EXPOSE 80 2222
 RUN which python3
-COPY gen3playground.optum.com-chain.pem .
-RUN cat ./gen3playground.optum.com-chain.pem >> /usr/local/lib/python3.8/site-packages/pip/_vendor/certifi/cacert.pem \
-       && cat ./gen3playground.optum.com-chain.pem >> /usr/local/lib/python3.8/site-packages/certifi/cacert.pem
+ADD certs /
+RUN if (ls /*crt ) ; then  cat /*.crt >> /usr/local/lib/python3.8/site-packages/pip/_vendor/certifi/cacert.pem \
+       && cat /*.crt >> /usr/local/lib/python3.8/site-packages/certifi/cacert.pem ; fi
 COPY . /home/site/wwwroot
+#ENTRYPOINT ["/usr/local/bin/init.sh"]
+CMD ["bash", "-c", "/usr/local/bin/init.sh"]

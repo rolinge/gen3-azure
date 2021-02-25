@@ -36,7 +36,7 @@ spec:
             - name: PYTHONPATH
               value: "/usr/local/lib/python3.6/site-packages/:/peregrine/"
             - name: DICTIONARY_URL
-              value: "https://s3.amazonaws.com/dictionary-artifacts/datadictionary/develop/schema.json"
+              value: {{ .Values.dictionary_url }}
             # PATH_TO_SCHEMA_DIR: /schemas_dir
             - name: REQUESTS_CA_BUNDLE
               value: "/etc/ssl/certs/ca-certificates.crt"
@@ -55,6 +55,8 @@ spec:
               value: {{ .Values.peregrine.database.port | quote }}
             - name: "PGSSLMODE"
               value: "disable"
+            - name: "ARBORIST_URL"
+              value: "http://service-arborist-{{ .Values.ENV }}"
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.peregrine.image }}"

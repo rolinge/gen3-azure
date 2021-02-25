@@ -26,7 +26,7 @@ resource "azurerm_function_app" "funcapp" {
   tags = merge(var.tags, local.common_tags)
 
   site_config {
-    linux_fx_version = "DOCKER|docker.io/rmolinger/blobtriggerdocker:test06"
+    linux_fx_version = format("DOCKER|%s/gen3/blobtriggerdocker:%s",azurerm_container_registry.gen3.login_server, var.blobindexfunction_version)
     use_32_bit_worker_process = false
     always_on = true
   }
@@ -44,18 +44,15 @@ resource "azurerm_function_app" "funcapp" {
     FUNCTIONS_EXTENSION_VERSION = "~3"
     #AzureWebJobsStorage = ""
     COMMONS_URL = var.commons_url
-    gen3KeyID = format("@Microsoft.KeyVault(SecretUri=%s)", azurerm_key_vault_secret.gen3keyid.id)
-    gen3KeySecret = format("@Microsoft.KeyVault(SecretUri=%s)", azurerm_key_vault_secret.gen3KeySecret.id)
+    gen3KeyID = format("@Microsoft.KeyVault(VaultName=%s;SecretName=%s)",azurerm_key_vault.keyvault1.name ,azurerm_key_vault_secret.gen3keyid.name)
+    gen3KeySecret = format("@Microsoft.KeyVault(VaultName=%s;SecretName=%s)", azurerm_key_vault.keyvault1.name ,azurerm_key_vault_secret.gen3KeySecret.name)
     MOUNT_POINT = "/opt/shared"
     RESULTS_FILE = "gen3_hashes.csv"
-    StorageaccountConnectString = format("@Microsoft.KeyVault(SecretUri=%s)",azurerm_key_vault_secret.StorageaccountConnectString.id)
-    HASH = base64encode(filesha256(var.functionapp))
-    WEBSITE_RUN_FROM_PACKAGE = format("https://%s.blob.core.windows.net/%s/%s%s",
-                                        azurerm_storage_account.gen3.name,
-                                        azurerm_storage_container.functioncode.name,
-                                        azurerm_storage_blob.appcode.name,
-                                        data.azurerm_storage_account_sas.gen3sas.sas
-                                        )
+    StorageaccountConnectString = format("@Microsoft.KeyVault(VaultName=%s;SecretName=%s)",azurerm_key_vault.keyvault1.name ,azurerm_key_vault_secret.StorageaccountConnectString.name)
+    "DOCKER_REGISTRY_SERVER_URL" = azurerm_container_registry.gen3.login_server
+    "DOCKER_REGISTRY_SERVER_USERNAME" = azurerm_container_registry.gen3.admin_username
+    "DOCKER_REGISTRY_SERVER_PASSWORD" = azurerm_container_registry.gen3.admin_password
+    #maybe later for /home "WEBSITES_ENABLE_APP_SERVICE_STORAGE"=true
     }
 
 }

@@ -143,3 +143,61 @@ variable "api_server_authorized_ip_ranges" {
   type        = list
   default     = ["168.183.0.0/16", "149.111.0.0/16", "128.35.0.0/16", "161.249.0.0/16", "198.203.174.0/23", "198.203.176.0/22", "198.203.180.0/23","75.73.11.0/24"]
 }
+
+variable "sshKeyPath_hdinsights" {
+  type        = string
+  default     = "assets/hdinsights_rsa.pub"
+  description = "Local SSH Key which should be used for the local administrator."
+}
+
+variable "hdinsight_node_username" {
+  type        = string
+  default     = "gen3_hdinsight_nodes"
+  description = "Username for Head, Zookeeper, and Worker nodes for the HDInsights Spark Cluster"
+}
+
+variable "hdinsight_gw_username" {
+  type        = string
+  default     = "gen3_hdinsight_gateway"
+  description = "Username for HDInsights gateway"
+}
+
+variable "hdinsight_gw_password" {
+  type        = string
+  description = "Password for HDInsights gateway"
+}
+
+variable "hdi_ssh_username" {
+  type        = string
+  description = "ssh username for HDInsights gateway"
+  default     = "hdiadmin"
+}
+
+variable "hdi_ssh_Password" {
+  type        = string
+  description = "Password for HDInsights gateway"
+}
+
+variable "hdiHeadNodeSize" {
+  type        = string
+  description = "HDInsights server head node machine size"
+  default = "STANDARD_DS12_V2"
+# valid sizes (2021) A6,A7,EXTRALARGE,LARGE,STANDARD_D12_V2,STANDARD_D13_V2,STANDARD_D14_V2,STANDARD_D3_V2,
+#                     STANDARD_D4_V2,STANDARD_D5_V2,STANDARD_DS12_V2,STANDARD_DS13_V2,STANDARD_DS14_V2,
+#                     STANDARD_DS3_V2,STANDARD_DS4_V2,STANDARD_DS5_V2,STANDARD_A4_V2,STANDARD_A8_V2,
+#                     STANDARD_A4M_V2,STANDARD_A8M_V2,STANDARD_E16_V3,STANDARD_E2_V3,STANDARD_E20_V3,
+#                     STANDARD_E32_V3,STANDARD_E4_V3,STANDARD_E64_V3,STANDARD_E64I_V3,STANDARD_E8_V3,
+#                     STANDARD_A5,STANDARD_A6,STANDARD_A7,STANDARD_D16A_V4,STANDARD_D32A_V4,STANDARD_D48A_V4,
+#                     STANDARD_D4A_V4,STANDARD_D64A_V4,STANDARD_D8A_V4,STANDARD_D96A_V4
+}
+
+variable "hdiWorkerNodeSize" {
+  type        = string
+  description = "HDInsights worker head node machine size"
+  default = "STANDARD_DS12_V2"
+}
+
+variable "blobindexfunction_version" {
+  type        = string
+  description = "version (tag) on the function that indexes the blobs"
+}

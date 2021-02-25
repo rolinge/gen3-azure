@@ -1,7 +1,8 @@
 apiVersion: v1
+# Useful pod for connecting and debugging network connections...
 kind: Pod
 metadata:
-  name: "{{ include "gen3kubernetes.fullname" . }}-jumpserver-{{ .Values.ENV }}"
+  name: "jumpserver-{{ .Values.ENV }}"
   labels:
     {{- include "gen3kubernetes.labels" . | nindent 4 }}
 spec:

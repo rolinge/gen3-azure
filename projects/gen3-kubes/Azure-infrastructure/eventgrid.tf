@@ -14,7 +14,9 @@ resource "azurerm_eventgrid_event_subscription" "gen3trigger" {
   event_delivery_schema = "EventGridSchema"
   included_event_types = [ "Microsoft.Storage.BlobCreated" ]
   azure_function_endpoint {
-  function_id = format ("%s/functions/BlobEventTrigger1", azurerm_function_app.funcapp.id)
+    function_id = format ("%s/functions/BlobEventTrigger1", azurerm_function_app.funcapp.id)
+    max_events_per_batch              = 1
+    preferred_batch_size_in_kilobytes = 128
   }
 
 }

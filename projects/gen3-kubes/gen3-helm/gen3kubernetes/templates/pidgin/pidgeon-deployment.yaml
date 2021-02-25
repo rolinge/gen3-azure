@@ -1,0 +1,83 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pidgin-{{ .Values.ENV }}
+  labels:
+    {{- include "gen3kubernetes.labels" . | nindent 4 }}
+    component: "pidgin"
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.pidgin.replicas }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "gen3kubernetes.selectorLabels" . | nindent 6 }}
+      component: "pidgin"
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "gen3kubernetes.selectorLabels" . | nindent 8 }}
+        component: "pidgin"
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "gen3kubernetes.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: "pidgin-{{ .Values.ENV }}"
+          env:
+            - name: PYTHONPATH
+              value: "/usr/local/lib/python3.6/site-packages/:/pidgin/"
+            - name: DICTIONARY_URL
+              value: {{ .Values.dictionary_url }}
+            - name: REQUESTS_CA_BUNDLE
+              value: "/etc/ssl/certs/ca-certificates.crt"
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.pidgin.image }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["bash" , "-c", "/var/www/data-portal/waitForContainers.sh"]
+          #command: ["sleep" , "60000000"]
+          volumeMounts:
+            - name: pidgin-startup
+              mountPath: /var/www/data-portal
+              readOnly: False
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          livenessProbe:
+            tcpSocket:
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /_status
+              port: http
+            initialDelaySeconds: 20
+            periodSeconds: 10
+          resources:
+            {{- toYaml .Values.pidgin.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+        - name: pidgin-startup
+          configMap:
+            defaultMode: 0775
+            name: pidgin-config-startup-{{ .Values.ENV }}
