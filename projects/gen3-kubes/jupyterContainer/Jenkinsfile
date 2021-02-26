@@ -11,18 +11,7 @@ pipeline {
 
     }
     stages {
-        stage('Source Code') {
-            steps {
-                sh 'ls -l'
-            }
-        }
-
-        stage('Connect to Azure') {
-            steps {
-                sh 'which az'
-            }
-        }
-
+        
         stage('Build and Push Docker Image') {
             steps {
                 withDockerRegistry([credentialsId: 'gen3-acr-klnow', url: "https://acrgen3klnow.azurecr.io/"]) {
