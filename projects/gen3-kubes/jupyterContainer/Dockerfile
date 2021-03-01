@@ -26,13 +26,12 @@ ADD ca-certs /
 RUN cp /*.crt /usr/local/share/ca-certificates/ && update-ca-certificates
 RUN if (ls /*crt ) ; then  for i in /*.crt; do certname=`openssl x509 -noout -subject -in $i | sed -n 's/ *CN *= //p'`; echo $i hello $certname; keytool -import -trustcacerts -noprompt \
     -keystore /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/security/cacerts -storepass changeit     \
-    -file $i -alias $certname; done; fi 
+    -file $i -alias $certname; done; fi
 
-RUN apt-get install -y libpq-dev && pip install pyspark gen3 psycopg2
+RUN apt-get install -y libpq-dev && pip install pyspark==2.4.2 gen3 psycopg2
 
 RUN cat /etc/ssl/certs/ca-certificates.crt >> /opt/conda/lib/python3.7/site-packages/certifi/cacert.pem
 
 WORKDIR  /home/jovyan
 
 USER jovyan:root
-
