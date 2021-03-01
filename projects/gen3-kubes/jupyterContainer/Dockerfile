@@ -1,4 +1,3 @@
-#FROM quay.io/occ_data/jupyternotebook:1.9.1
 FROM quay.io/cdis/jupyter-slim:jupyter-covid1.1.3
 USER root
 RUN apt-get update
@@ -22,13 +21,14 @@ WORKDIR /usr/local/hail/hail
 RUN make install-on-cluster HAIL_COMPILE_NATIVES=1 SPARK_VERSION=2.4.0 PY4J_VERSION=0.10.7
 
 #Certificate
+
 ADD ca-certs /
 RUN cp /*.crt /usr/local/share/ca-certificates/ && update-ca-certificates
 RUN if (ls /*crt ) ; then  for i in /*.crt; do certname=`openssl x509 -noout -subject -in $i | sed -n 's/ *CN *= //p'`; echo $i hello $certname; keytool -import -trustcacerts -noprompt \
     -keystore /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/security/cacerts -storepass changeit     \
     -file $i -alias $certname; done; fi
 
-RUN apt-get install -y libpq-dev && pip install pyspark==2.4.2 gen3 psycopg2
+RUN apt-get install -y libpq-dev && pip install pyspark==2.4.1 gen3 psycopg2
 
 RUN cat /etc/ssl/certs/ca-certificates.crt >> /opt/conda/lib/python3.7/site-packages/certifi/cacert.pem
 
