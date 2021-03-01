@@ -17,27 +17,11 @@ pipeline {
                 withDockerRegistry([credentialsId: 'gen3-acr-klnow', url: "https://acrgen3klnow.azurecr.io/"]) {
                     sh '''
                     cd projects/gen3-kubes/jupyterContainer
-                    docker build -t acrgen3klnow.azurecr.io/jupyter-slim:$TAG .
+                    docker build -t acrgen3klnow.azurecr.io/jupyter-slim:$TAG-${env.BUILD_NUMBER} .
                     docker push acrgen3klnow.azurecr.io/jupyter-slim:$TAG
                     '''
                     }
                 }
         }
-
-        // stage('Terraform Commands') {
-        //     environment {
-        //         USER_CREDENTIALS = credentials('gen3-acr-klnow')
-        //     }
-        //     steps {
-        //         withCredentials([azureServicePrincipal('azure-ectgenomics-deploy')]) {
-        //             withDockerRegistry([credentialsId: 'gen3-acr-klnow', url: "https://acrgen3klnow.azurecr.io/"]) {
-        //                 sh ''' 
-        //                 az login --service-principal -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET -t $AZURE_TENANT_ID
-        //                 az webapp config container set --docker-custom-image-name acrgen3klnow.azurecr.io/jupyter-slim:$TAG --name blobindexfuncdevklnow --resource-group k8s-gen3 --docker-registry-server-url https://acrgen3klnow.azurecr.io/ --docker-registry-server-password $USER_CREDENTIALS_PSW --docker-registry-server-user $USER_CREDENTIALS_USR 
-        //                 '''
-        //             }
-        //         }
-        //     }
-        // }
     }
 }
