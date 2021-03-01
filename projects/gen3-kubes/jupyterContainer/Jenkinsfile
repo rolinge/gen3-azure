@@ -17,8 +17,8 @@ pipeline {
                 withDockerRegistry([credentialsId: 'gen3-acr-klnow', url: "https://acrgen3klnow.azurecr.io/"]) {
                     sh '''
                     cd projects/gen3-kubes/jupyterContainer
-                    docker build -t acrgen3klnow.azurecr.io/jupyter-slim:$TAG-${env.BUILD_NUMBER} .
-                    docker push acrgen3klnow.azurecr.io/jupyter-slim:$TAG
+                    docker build -t acrgen3klnow.azurecr.io/jupyter-slim:$TAG-${BUILD_NUMBER} .
+                    docker push acrgen3klnow.azurecr.io/jupyter-slim:$TAG-${BUILD_NUMBER}
                     '''
                     }
                 }
