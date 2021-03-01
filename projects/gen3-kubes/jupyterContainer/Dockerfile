@@ -22,12 +22,11 @@ WORKDIR /usr/local/hail/hail
 RUN make install-on-cluster HAIL_COMPILE_NATIVES=1 SPARK_VERSION=2.4.0 PY4J_VERSION=0.10.7
 
 #Certificate
-
-ADD ca.crt /usr/local/share/ca-certificates/
-RUN update-ca-certificates
-RUN keytool -import -trustcacerts -noprompt \
+ADD ca-certs/ .
+RUN cp ca-certs/*.crt /usr/local/share/ca-certificates/ && update-ca-certificates
+RUN for i in ca-certs/*.crt; do certname=`openssl x509 -text -in $i  | grep Subject: | sed  's/^.*CN=//'`; echo $i $certname; keytool -import -trustcacerts -noprompt \
     -keystore /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/security/cacerts -storepass changeit     \
-    -file /usr/local/share/ca-certificates/ca.crt -alias OlingerSigningCert
+    -file $i -alias $certname; done
 
 RUN apt-get install -y libpq-dev && pip install pyspark gen3 psycopg2
 

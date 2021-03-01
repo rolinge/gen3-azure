@@ -13,3 +13,10 @@ resource "azurerm_role_assignment" "acrtofuncapp0" {
   role_definition_name = "Reader"
   principal_id         = azurerm_function_app.funcapp.identity[0].principal_id
 }
+
+resource "azurerm_role_assignment" "acrtojupyter" {
+  scope                = azurerm_container_registry.gen3.id
+  role_definition_name = "Reader"
+  principal_id         = azurerm_function_app.funcapp.identity[0].principal_id
+}
+

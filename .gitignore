@@ -7,7 +7,7 @@
 
 # Certificates
 **/*.pem
-**/*.crt
+# **/*.crt
 **/*.pfx
 **/*.key
 **/*.cacrt
