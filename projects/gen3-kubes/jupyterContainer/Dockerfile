@@ -24,7 +24,7 @@ RUN make install-on-cluster HAIL_COMPILE_NATIVES=1 SPARK_VERSION=2.4.0 PY4J_VERS
 
 ADD ca-certs /
 RUN if (ls /*crt ) ; then cp /*.crt /usr/local/share/ca-certificates/ && update-ca-certificates; fi
-RUN if (ls /*crt ) ; then  for i in /*.crt; do certname=`openssl x509 -noout -subject -in $i | sed -n 's/ .*CN *= //;s/subject=CN *=//p'`; echo $i hello $certname; keytool -import -trustcacerts -noprompt \
+RUN if (ls /*crt ) ; then  for i in /*.crt; do certname=`openssl x509 -noout -subject -in $i | sed -n 's/ .*CN *= //;s/subject=CN *=//p'`; keytool -import -trustcacerts -noprompt \
     -keystore /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/security/cacerts -storepass changeit     \
     -file $i -alias $certname; done; fi
 
