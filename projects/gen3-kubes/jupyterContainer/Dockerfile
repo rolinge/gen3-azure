@@ -18,19 +18,12 @@ RUN export SPARK_HOME=/usr/local/archive.cloudera.com/spark2/parcels/latest/SPAR
 RUN export PATH=$PATH:/usr/local/services.gradle.org/distributions/gradle-4.10.2/bin
 RUN ls -al
 WORKDIR /usr/local/hail/hail
-
-ADD ca-certs /
-RUN if (ls /*crt ) ; then cp /*.crt /usr/local/share/ca-certificates/ && update-ca-certificates; fi
-RUN if (ls /*crt ) ; then  for i in /*.crt; do certname=`openssl x509 -noout -subject -in $i | sed -n 's/ .*CN *= //;s/subject=CN *=//p'`; echo $i hello $certname; keytool -import -trustcacerts -noprompt \
-    -keystore /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/security/cacerts -storepass changeit     \
-    -file $i -alias $certname; done; fi
-
 RUN make install-on-cluster HAIL_COMPILE_NATIVES=1 SPARK_VERSION=2.4.0 PY4J_VERSION=0.10.7
 
 #Certificate
 
 ADD ca-certs /
-RUN if (ls /*crt ) ; cp /*.crt /usr/local/share/ca-certificates/ && update-ca-certificates; fi
+RUN if (ls /*crt ) ; then cp /*.crt /usr/local/share/ca-certificates/ && update-ca-certificates; fi
 RUN if (ls /*crt ) ; then  for i in /*.crt; do certname=`openssl x509 -noout -subject -in $i | sed -n 's/ .*CN *= //;s/subject=CN *=//p'`; echo $i hello $certname; keytool -import -trustcacerts -noprompt \
     -keystore /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/security/cacerts -storepass changeit     \
     -file $i -alias $certname; done; fi
