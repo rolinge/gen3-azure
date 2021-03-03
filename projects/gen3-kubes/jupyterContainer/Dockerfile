@@ -23,12 +23,13 @@ WORKDIR /usr/local/hail/hail
 #Certificate
 
 ADD ca-certs /
-RUN set -x && if (ls /*crt ) ; then cp /*.crt /usr/local/share/ca-certificates/ && update-ca-certificates; fi
-RUN set -x && if (ls /*crt ) ; then  for i in /*.crt; do certname=`openssl x509 -noout -subject -in $i | sed -n 's/^.*CN=//p' | tr -d " /:,.;"`; \
-    if ( test -z $certname ) ; then certname=$i-cert ; fi \
-    echo certname=$certname \
-    keytool -import -trustcacerts -noprompt -keystore /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/security/cacerts \
-    -storepass changeit  -file $i -alias $certname; done; fi
+RUN if (ls /*crt ) ; then cp /*.crt /usr/local/share/ca-certificates/ && update-ca-certificates; \
+      for i in /*.crt; \
+      do \
+        keytool -import -trustcacerts -noprompt -keystore /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/security/cacerts \
+        -storepass changeit  -file $i -alias $i-cert; \
+      done; \
+    fi
 
 RUN apt-get install -y libpq-dev && pip install pyspark==2.4.1 gen3 psycopg2
 
