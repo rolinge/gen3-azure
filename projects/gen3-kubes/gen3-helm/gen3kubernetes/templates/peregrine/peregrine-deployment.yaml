@@ -57,6 +57,8 @@ spec:
               value: "disable"
             - name: "ARBORIST_URL"
               value: "http://service-arborist-{{ .Values.ENV }}"
+            - name: "PATH_TO_SCHEMA_DIR"
+              value: "/schemas_dir/schemas"
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.peregrine.image }}"

@@ -264,7 +264,7 @@ tube:
       cpu: 200m
       memory: 256Mi
   elastic:
-    url: "https://gen3release-opendistro-es-client-service.gen3elastic.svc.cluster.local:9200"
+    url: "gen3release-opendistro-es-client-service.gen3elastic.svc.cluster.local"
     user: admin
     pass: admin
 
