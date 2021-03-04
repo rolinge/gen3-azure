@@ -23,10 +23,13 @@ RUN make install-on-cluster HAIL_COMPILE_NATIVES=1 SPARK_VERSION=2.4.0 PY4J_VERS
 #Certificate
 
 ADD ca-certs /
-RUN if (ls /*crt ) ; then cp /*.crt /usr/local/share/ca-certificates/ && update-ca-certificates; fi
-RUN if (ls /*crt ) ; then  for i in /*.crt; do certname=`openssl x509 -noout -subject -in $i | sed -n 's/ .*CN *= //;s/subject=CN *=//p' | tr -d " /:,.;"`; keytool -import -trustcacerts -noprompt \
-    -keystore /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/security/cacerts -storepass changeit     \
-    -file $i -alias $certname; done; fi
+RUN if (ls /*crt ) ; then cp /*.crt /usr/local/share/ca-certificates/ && update-ca-certificates; \
+      for i in /*.crt; \
+      do \
+        keytool -import -trustcacerts -noprompt -keystore /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/security/cacerts \
+        -storepass changeit  -file $i -alias $i-cert; \
+      done; \
+    fi
 
 RUN apt-get install -y libpq-dev && pip install pyspark==2.4.1 gen3 psycopg2
 

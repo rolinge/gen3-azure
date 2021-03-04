@@ -353,7 +353,7 @@ guppy:
       cpu: 100m
       memory: 256Mi
 jupyter:
-  image: "dbedevreg.azurecr.io/jupyter-slim:optum02"
+  image: "acrgen3klnow.azurecr.io/jupyter-slim:rolingeg3kubes-19"
   replicas: 1
   serviceport: 8888
   userDirSize: "10Gi"
