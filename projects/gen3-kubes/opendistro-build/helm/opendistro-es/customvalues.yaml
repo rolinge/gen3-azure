@@ -259,7 +259,7 @@ elasticsearch:
       size: 8Gi
       annotations: {}
 
-    resources: 
+    resources:
       limits:
         cpu: 1
         memory: 2048Mi
@@ -336,7 +336,7 @@ elasticsearch:
       size: 8Gi
       annotations: {}
 
-    resources: 
+    resources:
       limits:
         cpu: 1
         memory: 2024Mi
@@ -406,7 +406,7 @@ elasticsearch:
       #  - secretName: chart-example-tls
       #    hosts:
       #      - chart-example.local
-    resources: 
+    resources:
       limits:
         cpu: 1
         memory: 1024Mi

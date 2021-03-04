@@ -103,4 +103,6 @@ data:
   tube_startup.ksh: |
 {{ .Files.Get  .Values.tube.startupfileLocation  | indent 4}}
   es-root-ca.pem: |
-{{ .Files.Get  .Values.tube.es-root-calocation  | indent 4}}
+{{ .Files.Get  .Values.tube.esrootcalocation  | indent 4}}
+  run_etl_bespoke.py: |
+{{ .Files.Get  .Values.tube.extrarunetllocation  | indent 4}}

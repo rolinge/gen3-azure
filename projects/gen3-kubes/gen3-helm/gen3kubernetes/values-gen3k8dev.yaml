@@ -256,7 +256,8 @@ tube:
   serviceport: 80
   replicas: 1
   startupfileLocation: "assets/tube_startup.ksh"
-  es-root-calocation: "assets/es-root-ca.pem"
+  esrootcalocation: "assets/es-root-ca.pem"
+  extrarunetllocation: "assets/run_optum_etl.py"
   resources:
     limits:
       cpu: 500m
@@ -265,7 +266,7 @@ tube:
       cpu: 200m
       memory: 256Mi
   elastic:
-    url: "gen3release-opendistro-es-client-service.gen3elastic.svc.cluster.local"
+    url: "extra-client-service.gen3elastic.svc.cluster.local"
     user: admin
     pass: admin
 
