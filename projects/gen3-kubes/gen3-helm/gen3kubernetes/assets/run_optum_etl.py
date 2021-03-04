@@ -85,7 +85,7 @@ def main():
     context.verify_mode = ssl.CERT_NONE
 
 
-    es = Elasticsearch([es_hosts], port=es_port, http_auth=('user', 'secret'), scheme="https",
+    es = Elasticsearch([es_hosts], port=es_port, http_auth=('gen3', 'Gen3AnnoysMe3!'), scheme="https",
     ssl_context=context)
 
     index_names = interpreter.get_index_names(config)
