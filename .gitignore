@@ -6,7 +6,7 @@
 ._*
 
 # Certificates
-**/*.pem
+#**/*.pem
 # **/*.crt
 **/*.pfx
 **/*.key

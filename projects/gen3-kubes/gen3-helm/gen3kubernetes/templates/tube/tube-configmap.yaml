@@ -102,3 +102,5 @@ data:
             path: slides.samples.cases
   tube_startup.ksh: |
 {{ .Files.Get  .Values.tube.startupfileLocation  | indent 4}}
+  es-root-ca.pem: |
+{{ .Files.Get  .Values.tube.es-root-calocation  | indent 4}}

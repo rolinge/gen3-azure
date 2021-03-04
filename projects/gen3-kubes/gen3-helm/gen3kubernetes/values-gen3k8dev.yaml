@@ -256,6 +256,7 @@ tube:
   serviceport: 80
   replicas: 1
   startupfileLocation: "assets/tube_startup.ksh"
+  es-root-calocation: "assets/es-root-ca.pem"
   resources:
     limits:
       cpu: 500m
