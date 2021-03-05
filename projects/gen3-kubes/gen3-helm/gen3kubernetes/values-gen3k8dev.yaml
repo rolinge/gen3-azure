@@ -262,7 +262,7 @@ tube:
   resources:
     limits:
       cpu: 500m
-      memory: 512Mi
+      memory: 2200M
     requests:
       cpu: 200m
       memory: 256Mi
@@ -369,5 +369,5 @@ jupyter:
       memory: 3000Mi
 spark:
   spark_master: https://hdinsights-k8sgen3rmo.azurehdinsight.net
-  spark_executor_memory: 2Gi
-  spark_driver_memroy: 512Mi
+  spark_executor_memory: 2G
+  spark_driver_memroy: 2G
