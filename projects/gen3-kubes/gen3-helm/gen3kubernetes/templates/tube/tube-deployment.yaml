@@ -51,6 +51,13 @@ spec:
               value: {{ .Values.spark.spark_executor_memory }}
             - name: "SPARK_DRIVER_MEMORY"
               value: {{ .Values.spark.spark_driver_memroy }}
+            - name: "ELASTICSEARCH_USERNAME"
+              value: {{ .Values.tube.elasticusername }}
+            - name: "ELASTICSEARCH_PASSWORD"
+              valueFrom:
+                secretKeyRef:
+                  key: tubeelasticpassword
+                  name: database-secrets-{{ .Values.ENV }}              
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.tube.image }}"

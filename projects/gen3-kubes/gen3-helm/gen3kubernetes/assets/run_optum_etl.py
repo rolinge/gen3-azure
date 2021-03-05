@@ -7,7 +7,7 @@ from tube.formatters import BaseFormatter
 from tube.utils.spark import make_spark_context
 from tube.etl.outputs.es.timestamp import check_to_run_etl
 from elasticsearch import Elasticsearch
-import ssl 
+import ssl
 
 
 def run_import():
@@ -78,14 +78,15 @@ def main():
 
     es_hosts = config.ES["es.nodes"]
     es_port = config.ES["es.port"]
-
+    elastic_username = os.environ['ELASTICSEARCH_USERNAME']
+    elastic_password = os.environ['ELASTICSEARCH_PASSWORD']
 
     context = ssl.create_default_context(cafile="/usr/share/gen3/tube/es-root-ca.pem")
     context.check_hostname = False
     context.verify_mode = ssl.CERT_NONE
 
 
-    es = Elasticsearch([es_hosts], port=es_port, http_auth=('gen3', 'Gen3AnnoysMe3!'), scheme="https",
+    es = Elasticsearch([es_hosts], port=es_port, http_auth=(elastic_username, elastic_password), scheme="https",
     ssl_context=context)
 
     index_names = interpreter.get_index_names(config)

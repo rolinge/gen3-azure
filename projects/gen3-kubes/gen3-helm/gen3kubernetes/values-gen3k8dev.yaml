@@ -258,6 +258,7 @@ tube:
   startupfileLocation: "assets/tube_startup.ksh"
   esrootcalocation: "assets/es-root-ca.pem"
   extrarunetllocation: "assets/run_optum_etl.py"
+  elasticusername: "gen3"
   resources:
     limits:
       cpu: 500m

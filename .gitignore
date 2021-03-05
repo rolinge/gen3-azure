@@ -11,7 +11,7 @@
 **/*.pfx
 **/*.key
 **/*.cacrt
-
+**/*secrets*.yaml
 default.profraw
 
 .idea
