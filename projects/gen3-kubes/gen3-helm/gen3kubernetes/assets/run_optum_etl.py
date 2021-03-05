@@ -8,6 +8,7 @@ from tube.utils.spark import make_spark_context
 from tube.etl.outputs.es.timestamp import check_to_run_etl
 from elasticsearch import Elasticsearch
 import ssl
+import os
 
 
 def run_import():
