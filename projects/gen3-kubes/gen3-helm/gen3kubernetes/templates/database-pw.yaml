@@ -6,7 +6,7 @@ data:
   peregrineDatabasePassword: {{.Values.peregrine.database.db_password | b64enc}}
   arboristDatabasePassword: {{.Values.arborist.database.db_password | b64enc}}
   tubeelasticusername: {{.Values.tube.elasticusername | b64enc}}
-  tubeelasticpassword: "R2VuM0Fubm95c01lMyE="
+  tubeelasticpassword:  {{.Values.tube.elasticpasswordb64 }}
 kind: Secret
 metadata:
   creationTimestamp: null

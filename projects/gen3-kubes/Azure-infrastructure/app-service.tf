@@ -49,7 +49,7 @@ resource "azurerm_function_app" "funcapp" {
     MOUNT_POINT = "/opt/shared"
     RESULTS_FILE = "gen3_hashes.csv"
     StorageaccountConnectString = format("@Microsoft.KeyVault(VaultName=%s;SecretName=%s)",azurerm_key_vault.keyvault1.name ,azurerm_key_vault_secret.StorageaccountConnectString.name)
-    "DOCKER_REGISTRY_SERVER_URL" = azurerm_container_registry.gen3.login_server
+    "DOCKER_REGISTRY_SERVER_URL" = format("https://%s/",azurerm_container_registry.gen3.login_server)
     "DOCKER_REGISTRY_SERVER_USERNAME" = azurerm_container_registry.gen3.admin_username
     "DOCKER_REGISTRY_SERVER_PASSWORD" = azurerm_container_registry.gen3.admin_password
     #maybe later for /home "WEBSITES_ENABLE_APP_SERVICE_STORAGE"=true
