@@ -1,7 +1,7 @@
 
 
 resource "azurerm_key_vault" "keyvault1" {
-  name                       = join("-", ["keyvault", var.environment,random_string.uid.result])
+  name                        = join("-", ["keyvault", var.environment,random_string.uid.result])
   location                    = azurerm_resource_group.rg.location
   resource_group_name         = azurerm_resource_group.rg.name
   enabled_for_disk_encryption = true
@@ -13,7 +13,7 @@ resource "azurerm_key_vault" "keyvault1" {
   network_acls {
     default_action = "Allow"
     bypass         = "AzureServices"
-    ip_rules        = ["75.73.0.0/16" , "168.183.0.0/16", "149.111.0.0/16", "128.35.0.0/16", "161.249.0.0/16", "198.203.174.0/23", "198.203.176.0/22", "198.203.180.0/23"]
+    ip_rules       = var.api_server_authorized_ip_ranges
   }
   #contact {
   #  email = "randy.olinger@optum.com"
@@ -117,7 +117,6 @@ resource "azurerm_key_vault_access_policy" "functionapp" {
   secret_permissions = [  "Get",  "List"  ]
 }
 
-
 #The gen3 secrets are created with junk data and need to be populated before the background jobs will run.
 # use the following commands to update from the creds.json file from the web portal.
 #
@@ -166,6 +165,28 @@ resource "azurerm_key_vault_secret" "acrAdminUsername" {
   value        = azurerm_container_registry.gen3.admin_username
   key_vault_id = azurerm_key_vault.keyvault1.id
   tags = merge(var.tags, local.common_tags)
+}
+
+
+resource "azurerm_key_vault_key" "stgacctkey" {
+  name         = "storageaccount-encryption-key"
+  key_vault_id = azurerm_key_vault.keyvault1.id
+  key_type     = "RSA"
+  key_size     = 4096
+
+  key_opts = ["decrypt","encrypt","sign","unwrapKey","verify","wrapKey"  ]
+  depends_on = [    azurerm_key_vault_access_policy.ingest  ]
+  tags = merge(var.tags, local.common_tags)
+}
+
+
+resource "azurerm_key_vault_access_policy" "ingest" {
+  key_vault_id = azurerm_key_vault.keyvault1.id
+  tenant_id    = data.azurerm_client_config.current.tenant_id
+  object_id    = azurerm_storage_account.gen3ingest.identity.0.principal_id
+
+  key_permissions    = ["get", "create", "list", "restore", "recover", "unwrapkey", "wrapkey", "purge", "encrypt", "decrypt", "sign", "verify"]
+  secret_permissions = ["get"]
 }
 
 data "azurerm_key_vault" "keyvault1" {

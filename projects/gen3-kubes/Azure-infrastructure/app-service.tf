@@ -12,7 +12,6 @@ resource "azurerm_app_service_plan" "appplan1" {
   }
 }
 
-
 resource "azurerm_function_app" "funcapp" {
   name                       = format("blobindexfunc%s%s",var.environment,random_string.uid.result)
   location                   = azurerm_resource_group.rg.location

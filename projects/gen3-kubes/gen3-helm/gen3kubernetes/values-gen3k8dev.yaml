@@ -259,6 +259,7 @@ tube:
   esrootcalocation: "assets/es-root-ca.pem"
   extrarunetllocation: "assets/run_optum_etl.py"
   elasticusername: "gen3"
+  elasticpasswordb64: "R2VuM0Fubm95c01lMyE="
   resources:
     limits:
       cpu: 500m
