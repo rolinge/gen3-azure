@@ -35,6 +35,8 @@ resource "azurerm_user_assigned_identity" "hdi-usermanagedidentity" {
   location            = azurerm_resource_group.rg.location
   name = "${var.prefix}hdiumi"
 }
+
+
 resource "azurerm_role_assignment" "stg_auth_hdiuseridentity" {
   scope                = azurerm_storage_account.gen3hdinsightsstorage.id
   role_definition_name = "Storage Blob Data Owner"

@@ -8,7 +8,7 @@ resource "azurerm_key_vault" "keyvault1" {
   tenant_id                   = data.azurerm_client_config.current.tenant_id
   soft_delete_retention_days  = 7
   soft_delete_enabled         = true
-  purge_protection_enabled    = false
+  purge_protection_enabled    = true
   sku_name = "standard"
   network_acls {
     default_action = "Allow"
@@ -116,6 +116,28 @@ resource "azurerm_key_vault_access_policy" "functionapp" {
 
   secret_permissions = [  "Get",  "List"  ]
 }
+
+resource "azurerm_key_vault_access_policy" "colordrop01" {
+  key_vault_id = azurerm_key_vault.keyvault1.id
+
+  tenant_id = data.azurerm_client_config.current.tenant_id
+  object_id = azurerm_storage_account.colordropbox.identity[0].principal_id
+
+  key_permissions = [   "Get",  "List" ,"Encrypt" ,"Decrypt"  ,"Wrapkey"  ,"Unwrapkey"  ,"Verify"  ,"Sign"]
+
+}
+
+resource "azurerm_key_vault_access_policy" "gen3accesspolicy" {
+  key_vault_id = azurerm_key_vault.keyvault1.id
+
+  tenant_id = data.azurerm_client_config.current.tenant_id
+  object_id = azurerm_storage_account.gen3.identity[0].principal_id
+
+  key_permissions = [   "Get",  "List" ,"Encrypt" ,"Decrypt"  ,"Wrapkey"  ,"Unwrapkey"  ,"Verify"  ,"Sign"]
+
+}
+
+
 
 #The gen3 secrets are created with junk data and need to be populated before the background jobs will run.
 # use the following commands to update from the creds.json file from the web portal.

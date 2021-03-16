@@ -9,6 +9,10 @@ resource "azurerm_storage_account" "gen3" {
   enable_https_traffic_only = "true"
   min_tls_version           = "TLS1_2"
   account_kind              = "StorageV2"
+  
+  identity {
+    type = "SystemAssigned"
+  }
 
   tags = merge(var.tags, local.common_tags)
 }
@@ -139,15 +143,45 @@ resource "azurerm_storage_account" "colordropbox" {
   tags = merge(var.tags, local.common_tags)
 }
 
+resource "azurerm_storage_share" "minioconfig" {
+  name                 = "minio"
+  storage_account_name = azurerm_storage_account.colordropbox.name
+  quota                = 5
+
+  acl {
+    id = "CE1362BF-7414-4A26-9A0B-42D95F2DC400"
+
+    access_policy {
+      permissions = "rwdl"
+    }
+  }
+}
+
+resource "azurerm_storage_account_customer_managed_key" "gen3keyassignment" {
+  storage_account_id = azurerm_storage_account.gen3.id
+  key_vault_id       = azurerm_key_vault.keyvault1.id
+  key_name           = azurerm_key_vault_key.stgacctkey.name
+  depends_on = [
+                  azurerm_key_vault_access_policy.colordrop01,
+                  azurerm_storage_account.gen3
+                ]
+
+}
+
 resource "azurerm_storage_account_customer_managed_key" "gen3colorkeyassignment" {
   storage_account_id = azurerm_storage_account.colordropbox.id
   key_vault_id       = azurerm_key_vault.keyvault1.id
   key_name           = azurerm_key_vault_key.stgacctkey.name
+  depends_on = [
+                  azurerm_key_vault_access_policy.colordrop01,
+                  azurerm_storage_account.colordropbox
+                ]
+
 }
 
-
-#resource "azurerm_role_assignment" "gen3ingest" {
-#  scope                = azurerm_storage_account.gen3hdinsightsstorage.id
-#  role_definition_name = "Contributor"
-#  principal_id         = "AZUCLINICOGENOMICSGROUPID"
-#}
+# this adds the group AZU_Clinicogenomics_fileshare_rw ACL to the file share.
+resource "azurerm_role_assignment" "gen3ingest" {
+  scope                = azurerm_storage_account.gen3hdinsightsstorage.id
+  role_definition_name = "Contributor"
+  principal_id         = "40e2f0b8-827b-4db4-b110-885a474d2945"
+}
