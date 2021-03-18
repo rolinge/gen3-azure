@@ -27,7 +27,7 @@ ADD ca-certs /
 RUN if (ls /*crt ) ; then cp /*.crt /usr/local/share/ca-certificates/ \
                           && update-ca-certificates \
                           && cat /*.crt >> /opt/conda/ssl/cacert.pem  \
-                          && cat /*.crt >> /opt/conda/lib/python3.7/site-packages/certifi/cacert.pem
+                          && cat /*.crt >> /opt/conda/lib/python3.7/site-packages/certifi/cacert.pem \
       && for i in /*.crt; \
       do \
         keytool -import -trustcacerts -noprompt -keystore /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/security/cacerts \
