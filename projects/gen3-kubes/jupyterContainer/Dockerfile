@@ -23,7 +23,9 @@ RUN make install-on-cluster HAIL_COMPILE_NATIVES=1 SPARK_VERSION=2.4.0 PY4J_VERS
 #Certificate
 
 ADD ca-certs /
-RUN if (ls /*crt ) ; then cp /*.crt /usr/local/share/ca-certificates/ && update-ca-certificates; \
+RUN if (ls /*crt ) ; then cp /*.crt /usr/local/share/ca-certificates/ \
+                          && update-ca-certificates \
+                          && cat /*.crt >> /opt/conda/ssl/cacert.pem  \
       for i in /*.crt; \
       do \
         keytool -import -trustcacerts -noprompt -keystore /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/security/cacerts \
