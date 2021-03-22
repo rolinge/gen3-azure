@@ -55,6 +55,8 @@ spec:
               value: {{ .Values.sheepdog.database.port | quote }}
             - name: "PGSSLMODE"
               value: "disable"
+            - name: "ARBORIST_URL"
+              value: "http://service-arborist-{{ .Values.ENV }}"
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.sheepdog.image }}"
