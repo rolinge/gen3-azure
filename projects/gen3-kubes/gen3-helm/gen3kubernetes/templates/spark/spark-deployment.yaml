@@ -47,14 +47,14 @@ spec:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.spark.image }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          #command: ["bash" , "-c", "python run_config.py && hdfs --daemon start namenode && hdfs --daemon start datanode && yarn --daemon start resourcemanager && yarn --daemon start nodemanager && hdfs dfsadmin -safemode leave &&  hdfs dfs -mkdir /result && while true; do sleep 5; done"]
-          command:
-            - "bash"
-            - "-c"
-            - "python run_config.py && test ! -f /hadoop/hdfs/data/dfs/namenode/current/VERSION && hdfs namenode -format -force || echo existing data found, no hdfs-format needed;"
-            - "bash"
-            - "-c"
-            - "python run_config.py && hdfs --daemon start namenode && hdfs --daemon start datanode && yarn --daemon start resourcemanager && yarn --daemon start nodemanager && hdfs dfsadmin -safemode leave &&  hdfs dfs -mkdir /result && while true; do sleep 5; done ;"]
+          command: ["bash" , "-c", "python run_config.py && hdfs --daemon start namenode && hdfs --daemon start datanode && yarn --daemon start resourcemanager && yarn --daemon start nodemanager && hdfs dfsadmin -safemode leave &&  hdfs dfs -mkdir /result && while true; do sleep 5; done"]
+          # command:
+          #   - "bash"
+          #   - "-c"
+          #   - "python run_config.py && test ! -f /hadoop/hdfs/data/dfs/namenode/current/VERSION && hdfs namenode -format -force || echo existing data found, no hdfs-format needed;"
+          #   - "bash"
+          #   - "-c"
+          #   - "python run_config.py && hdfs --daemon start namenode && hdfs --daemon start datanode && yarn --daemon start resourcemanager && yarn --daemon start nodemanager && hdfs dfsadmin -safemode leave &&  hdfs dfs -mkdir /result && while true; do sleep 5; done ;"]
           #command: ["sleep" , "60000000"]
           volumeMounts:
             - name: spark-userspace
