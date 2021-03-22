@@ -15,3 +15,9 @@ To update the helm deploy
 ```
 helm upgrade  gen3k8dev   -f <VALUES_FILE>  --namespace <NAMESPACE>   .
 ```
+
+After running helm deploy if you the changes to be reflected in the pod, you must perform a kubectl rollout
+
+```
+kubectl rollout  restart deployment <microservice>-gen3k8dev
+```
