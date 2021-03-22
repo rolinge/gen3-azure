@@ -193,7 +193,15 @@ ingress:
     # kubernetes.io/tls-acme: "true"
   hosts:
     - host: k8sgen3dev.optum.com
-      paths: ["/(.*)"]
+      paths:
+        - path :
+          actualPath: "/(.*)"
+          serviceName: service-revproxy-gen3k8dev
+          servicePort: 80
+        - path:
+          actualPath: "/colordropboxdev"
+          serviceName: service-minio-gen3k8dev
+          servicePort: 9000
   tls:
     - secretName: k8sgen3dev-ingress-tls
       hosts:
@@ -251,6 +259,21 @@ peregrine:
     requests:
       cpu: 200m
       memory: 256Mi
+minio:
+  image: "minio/minio"
+  pullPolicy: IfNotPresent
+  serviceport: 9000
+  AZURE_STORAGE_ACCOUNT: stgaccolordevklnow
+  AZURE_STORAGE_KEY: "Hm8r2OSVwC8pgZlWl7IoOGAgJIWiw6yLAsRy7C42ZK+BMU0eD1ZD2RAS9JW3l3pBGiNgD1vSHjwKfYK27GjvLA=="
+  MINIO_ROOT_USER: "colordropgen3dev"
+  MINIO_ROOT_PASSWORD: "NUMxODUxQjUtREZGRC00NEE1LTlFRDItRTVCREI2MjFDNDY0Cg=="
+  resources:
+    limits:
+      cpu: 500m
+      memory: 1024Mi
+    requests:
+      cpu: 200m
+      memory: 512Mi
 tube:
   image: "quay.io/cdis/tube:2020.12"
   serviceport: 80
@@ -357,7 +380,7 @@ guppy:
       cpu: 100m
       memory: 256Mi
 jupyter:
-  image: "acrgen3klnow.azurecr.io/jupyter-slim:rolingeg3kubes-19"
+  image: "acrgen3klnow.azurecr.io/jupyter-slim:rolingeg3kubes-23"
   replicas: 1
   serviceport: 8888
   userDirSize: "10Gi"
@@ -368,7 +391,43 @@ jupyter:
     requests:
       cpu: 2000m
       memory: 3000Mi
+#spark:
+#  spark_master: https://hdinsights-k8sgen3rmo.azurehdinsight.net
+#  spark_executor_memory: 2G
+#  spark_driver_memroy: 2G
 spark:
+  image: "quay.io/cdis/gen3-spark:2020.05"
+  replicas: 1
+  pullPolicy: IfNotPresent
   spark_master: https://hdinsights-k8sgen3rmo.azurehdinsight.net
+  userDirSize: 32Gi
   spark_executor_memory: 2G
   spark_driver_memroy: 2G
+  serviceports:
+    - port: 9000
+      name: "ninethousand"
+    - port: 8030
+      name: "eightythirty"
+    - port: 8031
+      name: "eightythirtyone"
+    - port: 8032
+      name: "eightythirtytwo"
+    - port: 22
+      name: ssh
+  environment:
+    - name:  "HADOOP_URL"
+      value: "hdfs://0.0.0.0:9000"
+    - name: "HADOOP_HOST"
+      value: "0.0.0.0"
+
+kibana:
+  image: docker.elastic.co/kibana/kibana-oss:6.5.4
+  serviceport: 5601
+
+  resources:
+    limits:
+      cpu: 2000m
+      memory: 4096Mi
+    requests:
+      cpu: 500m
+      memory: 1024Mi

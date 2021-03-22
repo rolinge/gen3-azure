@@ -1,38 +1,110 @@
-# I suspect we will need to use stateful sets here.
-# Begs the question, can we use an Azure service instead of creating our own hadoop cluster?
-#     Pro - Using Azure services is one less hassle to worry about.  Scaling, configuration management, monitoring, uptime, etc.
-#     Con - A small cluster requires at least 5 servers running full time, so figure $250 per month?  Hmm, maybe not that bad.
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spark-{{ .Values.ENV }}
+  labels:
+    {{- include "gen3kubernetes.labels" . | nindent 4 }}
+    component: "spark"
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.spark.replicas }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "gen3kubernetes.selectorLabels" . | nindent 6 }}
+      component: "spark"
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "gen3kubernetes.selectorLabels" . | nindent 8 }}
+        component: "spark"
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "gen3kubernetes.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      volumes:
+        - name: spark-userspace
+          persistentVolumeClaim:
+            claimName: pvc-spark-{{ .Values.ENV }}
 
-
-# Alternative - Use an existing helm chart to create hadoop in short term.
-# helm install --name hadoop $(stable/hadoop/tools/calc_resources.sh 50) stable/hadoop
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  # spark-service: - from the docker-compose.yaml file...
-  #   image: "quay.io/cdis/gen3-spark:2020.05"
-  #   container_name: spark-service
-  #   command: bash -c "python run_config.py && hdfs namenode -format -force && hdfs --daemon start namenode && hdfs --daemon start datanode && yarn --daemon start resourcemanager && yarn --daemon start nodemanager && hdfs dfsadmin -safemode leave &&  hdfs dfs -mkdir /result && while true; do sleep 5; done"
-  #   expose:
-  #     - 22
-  #     - 8030
-  #     - 8031
-  #     - 8032
-  #     - 9000
-  #   networks:
-  #     - devnet
-  #   environment:
-  #     - HADOOP_URL=hdfs://0.0.0.0:9000
-  #     - HADOOP_HOST=0.0.0.0
+      containers:
+        - name: "spark-{{ .Values.ENV }}"
+          env:
+            {{- range .Values.spark.environment }}
+            - name:  {{ .name  | quote }}
+              value: {{ .value | quote }}
+            {{- end }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.spark.image }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          #command: ["bash" , "-c", "python run_config.py && hdfs --daemon start namenode && hdfs --daemon start datanode && yarn --daemon start resourcemanager && yarn --daemon start nodemanager && hdfs dfsadmin -safemode leave &&  hdfs dfs -mkdir /result && while true; do sleep 5; done"]
+          command:
+            - "bash"
+            - "-c"
+            - "python run_config.py && test ! -f /hadoop/hdfs/data/dfs/namenode/current/VERSION && hdfs namenode -format -force || echo existing data found, no hdfs-format needed;"
+            - "bash"
+            - "-c"
+            - "python run_config.py && hdfs --daemon start namenode && hdfs --daemon start datanode && yarn --daemon start resourcemanager && yarn --daemon start nodemanager && hdfs dfsadmin -safemode leave &&  hdfs dfs -mkdir /result && while true; do sleep 5; done ;"]
+          #command: ["sleep" , "60000000"]
+          volumeMounts:
+            - name: spark-userspace
+              mountPath: /hadoop/hdfs/data
+              readOnly: False
+          ports:
+            {{- range .Values.spark.serviceports }}
+            - name: {{ .name }}
+              containerPort: {{ .port }}
+              protocol: "TCP"
+            {{- end }}
+          livenessProbe:
+            tcpSocket:
+              port: "eightythirty"
+            initialDelaySeconds: 30
+            periodSeconds: 15
+            timeoutSeconds: 10
+            successThreshold: 1
+            failureThreshold: 3
+          readinessProbe:
+            tcpSocket:
+              port: "eightythirtyone"
+            initialDelaySeconds: 30
+            periodSeconds: 15
+            timeoutSeconds: 10
+            successThreshold: 1
+            failureThreshold: 3
+          resources:
+            {{- toYaml .Values.spark.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-spark-{{ .Values.ENV }}
+spec:
+  storageClassName: gen3-azurefile
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: {{ .Values.spark.userDirSize }}

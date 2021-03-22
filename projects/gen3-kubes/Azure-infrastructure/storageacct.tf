@@ -9,7 +9,7 @@ resource "azurerm_storage_account" "gen3" {
   enable_https_traffic_only = "true"
   min_tls_version           = "TLS1_2"
   account_kind              = "StorageV2"
-  
+
   identity {
     type = "SystemAssigned"
   }
@@ -144,7 +144,7 @@ resource "azurerm_storage_account" "colordropbox" {
 }
 
 resource "azurerm_storage_share" "minioconfig" {
-  name                 = "minio"
+  name                 = "miniovolume"
   storage_account_name = azurerm_storage_account.colordropbox.name
   quota                = 5
 
