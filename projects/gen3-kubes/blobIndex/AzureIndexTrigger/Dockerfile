@@ -16,9 +16,13 @@ RUN chmod u+x /usr/local/bin/init.sh
 
 EXPOSE 80 2222
 RUN which python3
+
 ADD certs /
 RUN if (ls /*crt ) ; then  cat /*.crt >> /usr/local/lib/python3.8/site-packages/pip/_vendor/certifi/cacert.pem \
-       && cat /*.crt >> /usr/local/lib/python3.8/site-packages/certifi/cacert.pem ; fi
+       && cat /*.crt >> /usr/local/lib/python3.8/site-packages/certifi/cacert.pem \
+       && cp /*.crt /usr/local/share/ca-certificates/ \
+       && update-ca-certificates ; fi
+
 COPY . /home/site/wwwroot
 #ENTRYPOINT ["/usr/local/bin/init.sh"]
 CMD ["bash", "-c", "/usr/local/bin/init.sh"]
