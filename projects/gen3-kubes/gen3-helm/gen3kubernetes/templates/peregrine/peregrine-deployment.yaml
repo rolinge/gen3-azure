@@ -36,7 +36,7 @@ spec:
             - name: PYTHONPATH
               value: "/usr/local/lib/python3.6/site-packages/:/peregrine/"
             - name: PATH_TO_SCHEMA_DIR
-              value: {{ .Values.path_to_schema_dir_peregrine }}
+              value: {{ .Values.path_to_schema_dir }}
             # - name: DICTIONARY_URL
             #   value: {{ .Values.dictionary_url }}
             # PATH_TO_SCHEMA_DIR: /schemas_dir
