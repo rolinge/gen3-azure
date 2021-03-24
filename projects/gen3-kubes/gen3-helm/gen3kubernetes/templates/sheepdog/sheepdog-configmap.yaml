@@ -18,12 +18,12 @@ data:
 
 
     echo "setting up schemas dir"
-    if [ -f setup/sheepdog_shemas.tar.gz.base64 ] ;
+    if [ -f setup/sheepdog_schemas.tar.gz.base64 ] ;
       then
         curdir=$PWD
         mkdir /schemas_dir \
         && cd /schemas_dir \
-        && base64 -d /var/www/sheepdog/setup/sheepdog_shemas.tar.gz.base64 | gunzip -c | tar xf -
+        && base64 -d /var/www/sheepdog/setup/sheepdog_schemas.tar.gz.base64 | gunzip -c | tar xf -
         cd $curdir
       fi
 
@@ -110,5 +110,5 @@ data:
     }
   config_helper.py: |
 {{ .Files.Get  .Values.config_helper  | indent 4}}
-  sheepdog_shemas.tar.gz.base64: |
+  sheepdog_schemas.tar.gz.base64: |
 {{ .Files.Get  .Values.sheepdog.schemas  | indent 4}}

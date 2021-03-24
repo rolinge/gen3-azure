@@ -35,8 +35,10 @@ spec:
           env:
             - name: PYTHONPATH
               value: "/usr/local/lib/python3.6/site-packages/:/peregrine/"
-            - name: DICTIONARY_URL
-              value: {{ .Values.dictionary_url }}
+            - name: PATH_TO_SCHEMA_DIR
+              value: {{ .Values.path_to_schema_dir_peregrine }}
+            # - name: DICTIONARY_URL
+            #   value: {{ .Values.dictionary_url }}
             # PATH_TO_SCHEMA_DIR: /schemas_dir
             - name: REQUESTS_CA_BUNDLE
               value: "/etc/ssl/certs/ca-certificates.crt"

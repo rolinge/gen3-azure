@@ -18,12 +18,12 @@ data:
 
 
     echo "setting up schemas dir"
-    if [ -f setup/peregrine_shemas.tar.gz.base64 ] ;
+    if [ -f setup/peregrine_schemas.tar.gz.base64 ] ;
       then
         curdir=$PWD
         mkdir /schemas_dir \
         && cd /schemas_dir \
-        && base64 -d /var/www/peregrine/setup/peregrine_shemas.tar.gz.base64 | gunzip -c | tar xf -
+        && base64 -d /var/www/peregrine/setup/peregrine_schemas.tar.gz.base64 | gunzip -c | tar xf -
         cd $curdir
       fi
 
@@ -121,5 +121,5 @@ data:
     }
   config_helper.py: |
 {{ .Files.Get  .Values.config_helper  | indent 4}}
-  peregrine_shemas.tar.gz.base64: |
+  peregrine_schemas.tar.gz.base64: |
 {{ .Files.Get  .Values.peregrine.schemas  | indent 4}}
