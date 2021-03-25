@@ -6,6 +6,13 @@ resource "azurerm_storage_account" "gen3hdinsightsstorage" {
   account_replication_type        = "LRS"
   account_kind             = "StorageV2"
   is_hns_enabled           = "true"
+
+  network_rules {
+    default_action             = "Deny"
+    ip_rules                   = var.api_server_authorized_ip_ranges
+    virtual_network_subnet_ids = [azurerm_subnet.dce_aks_subnet.id,azurerm_subnet.dce_aks_subnet2.id]
+  }
+
 }
 
 resource "azurerm_storage_data_lake_gen2_filesystem" "gen3hdinsights" {
@@ -28,6 +35,8 @@ resource "azurerm_user_assigned_identity" "hdi-usermanagedidentity" {
   location            = azurerm_resource_group.rg.location
   name = "${var.prefix}hdiumi"
 }
+
+
 resource "azurerm_role_assignment" "stg_auth_hdiuseridentity" {
   scope                = azurerm_storage_account.gen3hdinsightsstorage.id
   role_definition_name = "Storage Blob Data Owner"

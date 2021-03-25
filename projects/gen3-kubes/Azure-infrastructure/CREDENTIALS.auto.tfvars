@@ -6,6 +6,7 @@ AZ_TENANT_ID       = "db05faca-c82a-4b9d-b9c5-0f64b6755421"
 hdinsight_node_username = "gen3_hdinsight_nodes"
 hdinsight_gw_username  	= "gen3_hdinsight_gateway"
 hdinsight_gw_password 	= "CYa9nXaq9VLQ2a9a"
+hdi_ssh_Password        = "Gen3AnnoysMe3!"
 
 
 #az storage account create --resource-group rolinge-01 --location eastus --name aksrmo --subscription=29bd0546-ff5b-437c-bab6-aea5fc7e5653

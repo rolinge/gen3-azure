@@ -18,12 +18,12 @@ data:
 
 
     echo "setting up schemas dir"
-    if [ -f setup/sheepdog_shemas.tar.gz.base64 ] ;
+    if [ -f setup/sheepdog_schemas.tar.gz.base64 ] ;
       then
         curdir=$PWD
         mkdir /schemas_dir \
         && cd /schemas_dir \
-        && base64 -d /var/www/sheepdog/setup/sheepdog_shemas.tar.gz.base64 | gunzip -c | tar xf -
+        && base64 -d /var/www/sheepdog/setup/sheepdog_schemas.tar.gz.base64 | gunzip -c | tar xf -
         cd $curdir
       fi
 
@@ -82,7 +82,7 @@ data:
     config['OIDC_ISSUER'] = 'https://{{.Values.portal.externalhostname}}/user'
 
     config['OAUTH2'] = {  }
-    config['USER_API'] = 'http://fence-service/'
+    config['USER_API'] = 'http://service-fence-{{ .Values.ENV }}/'
     # option to force authutils to prioritize USER_API setting over the issuer from
     # token when redirecting, used during local docker compose setup when the
     # services are on different containers but the hostname is still localhost
@@ -110,5 +110,5 @@ data:
     }
   config_helper.py: |
 {{ .Files.Get  .Values.config_helper  | indent 4}}
-  sheepdog_shemas.tar.gz.base64: |
+  sheepdog_schemas.tar.gz.base64: |
 {{ .Files.Get  .Values.sheepdog.schemas  | indent 4}}

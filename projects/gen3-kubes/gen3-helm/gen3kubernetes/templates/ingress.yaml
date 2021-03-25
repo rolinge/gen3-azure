@@ -29,13 +29,29 @@ spec:
       http:
         paths:
           {{- range .paths }}
-          - path: {{ . }}
-            pathType: Prefix
-            backend:
-              service:
-                name: service-revproxy-{{ $.Values.ENV }}
-                port:
-                  number: {{ $.Values.revproxy.serviceport }}
+        - path: {{ .actualPath }}
+          pathType: "Prefix"
+          backend:
+            service:
+              name: {{ .serviceName | quote }}
+              port:
+                number: {{ .servicePort }}
           {{- end }}
     {{- end }}
+  # rules:  ##WORKING##
+  #   {{- range .Values.ingress.hosts }}
+  #   - host: {{ .host | quote }}
+  #     http:
+  #       paths:
+  #         {{- range .paths }}
+  #         - path: {{ . }}
+  #           pathType: Prefix
+  #           backend:
+  #             service:
+  #               name: service-revproxy-{{ $.Values.ENV }}
+  #               port:
+  #                 number: {{ $.Values.revproxy.serviceport }}
+  #         {{- end }}
+  #   {{- end }}
+
   {{- end }}

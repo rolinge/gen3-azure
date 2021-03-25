@@ -40,17 +40,24 @@ spec:
             - name: "ES_INDEX_NAME"
               value: "etl"
             - name: "HADOOP_URL"
-              value: {{ .Values.spark.hadoop_url }}
+              value: "hdfs://service-spark-{{ .Values.ENV }}:9000"
             - name: "HADOOP_HOST"
-              value: {{ .Values.spark.hadoop_host }}
+              value: "service-spark-{{ .Values.ENV }}"
             - name: REQUESTS_CA_BUNDLE
               value: "/etc/ssl/certs/ca-certificates.crt"
             - name: "SPARK_MASTER"
-              value: {{ .Values.spark.spark_master }}
+              value: "service-spark-{{ .Values.ENV }}"
             - name: "SPARK_EXECUTOR_MEMORY"
               value: {{ .Values.spark.spark_executor_memory }}
             - name: "SPARK_DRIVER_MEMORY"
               value: {{ .Values.spark.spark_driver_memroy }}
+            - name: "ELASTICSEARCH_USERNAME"
+              value: {{ .Values.tube.elasticusername }}
+            - name: "ELASTICSEARCH_PASSWORD"
+              valueFrom:
+                secretKeyRef:
+                  key: tubeelasticpassword
+                  name: database-secrets-{{ .Values.ENV }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.tube.image }}"

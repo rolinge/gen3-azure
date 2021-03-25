@@ -75,7 +75,12 @@ data:
         location /api/ {
                 proxy_pass http://service-sheepdog-{{ .Values.ENV }}/;
         }
-
+        location /colordropboxdev/ {
+                proxy_pass http://service-minio-{{ .Values.ENV }}/;
+        }
+        location /minio/ {
+                proxy_pass http://service-minio-{{ .Values.ENV }}/;
+        }
         location /coremetadata/ {
             # redirect to coremetadata landing page if header does not specify otherwise
             if ($http_accept !~ (application/json|x-bibtex|application/vnd\.schemaorg\.ld\+json)) {

@@ -10,6 +10,10 @@ resource "azurerm_storage_account" "gen3" {
   min_tls_version           = "TLS1_2"
   account_kind              = "StorageV2"
 
+  identity {
+    type = "SystemAssigned"
+  }
+
   tags = merge(var.tags, local.common_tags)
 }
 
@@ -81,4 +85,103 @@ data "azurerm_storage_account_sas" "gen3sas" {
         update = false
         process = false
     }
+}
+
+# Create a storage account for ingesting data
+
+resource "azurerm_storage_account" "gen3ingest" {
+  name                     = format("stgacingest%s%s",var.environment,random_string.uid.result)
+  resource_group_name      = azurerm_resource_group.rg.name
+  location                 = azurerm_resource_group.rg.location
+  account_tier             = "Standard"
+  account_replication_type = "LRS"
+  enable_https_traffic_only = "true"
+  min_tls_version           = "TLS1_2"
+  account_kind              = "StorageV2"
+  allow_blob_public_access  = "false"
+
+  identity {
+    type = "SystemAssigned"
+  }
+  network_rules {
+    default_action             = "Deny"
+    ip_rules                   = var.api_server_authorized_ip_ranges
+    virtual_network_subnet_ids = [azurerm_subnet.dce_aks_subnet.id,azurerm_subnet.dce_aks_subnet2.id]
+  }
+
+  tags = merge(var.tags, local.common_tags)
+}
+
+resource "azurerm_storage_account_customer_managed_key" "gen3ingestkeyassignment" {
+  storage_account_id = azurerm_storage_account.gen3ingest.id
+  key_vault_id       = azurerm_key_vault.keyvault1.id
+  key_name           = azurerm_key_vault_key.stgacctkey.name
+}
+
+# Create a storage account for color to drop off data
+
+resource "azurerm_storage_account" "colordropbox" {
+  name                     = format("stgaccolor%s%s",var.environment,random_string.uid.result)
+  resource_group_name      = azurerm_resource_group.rg.name
+  location                 = azurerm_resource_group.rg.location
+  account_tier             = "Standard"
+  account_replication_type = "LRS"
+  enable_https_traffic_only = "true"
+  min_tls_version           = "TLS1_2"
+  account_kind              = "StorageV2"
+  allow_blob_public_access  = "false"
+
+  identity {
+    type = "SystemAssigned"
+  }
+  network_rules {
+    default_action             = "Deny"
+    ip_rules                   = var.api_server_authorized_ip_ranges
+    virtual_network_subnet_ids = [azurerm_subnet.dce_aks_subnet.id,azurerm_subnet.dce_aks_subnet2.id]
+  }
+
+  tags = merge(var.tags, local.common_tags)
+}
+
+resource "azurerm_storage_share" "minioconfig" {
+  name                 = "miniovolume"
+  storage_account_name = azurerm_storage_account.colordropbox.name
+  quota                = 5
+
+  acl {
+    id = "CE1362BF-7414-4A26-9A0B-42D95F2DC400"
+
+    access_policy {
+      permissions = "rwdl"
+    }
+  }
+}
+
+resource "azurerm_storage_account_customer_managed_key" "gen3keyassignment" {
+  storage_account_id = azurerm_storage_account.gen3.id
+  key_vault_id       = azurerm_key_vault.keyvault1.id
+  key_name           = azurerm_key_vault_key.stgacctkey.name
+  depends_on = [
+                  azurerm_key_vault_access_policy.colordrop01,
+                  azurerm_storage_account.gen3
+                ]
+
+}
+
+resource "azurerm_storage_account_customer_managed_key" "gen3colorkeyassignment" {
+  storage_account_id = azurerm_storage_account.colordropbox.id
+  key_vault_id       = azurerm_key_vault.keyvault1.id
+  key_name           = azurerm_key_vault_key.stgacctkey.name
+  depends_on = [
+                  azurerm_key_vault_access_policy.colordrop01,
+                  azurerm_storage_account.colordropbox
+                ]
+
+}
+
+# this adds the group AZU_Clinicogenomics_fileshare_rw ACL to the file share.
+resource "azurerm_role_assignment" "gen3ingest" {
+  scope                = azurerm_storage_account.gen3hdinsightsstorage.id
+  role_definition_name = "Contributor"
+  principal_id         = "40e2f0b8-827b-4db4-b110-885a474d2945"
 }

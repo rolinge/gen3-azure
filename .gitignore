@@ -6,12 +6,12 @@
 ._*
 
 # Certificates
-**/*.pem
-**/*.crt
+#**/*.pem
+# **/*.crt
 **/*.pfx
 **/*.key
 **/*.cacrt
-
+**/*secrets*.yaml
 default.profraw
 
 .idea

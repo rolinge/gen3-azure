@@ -201,3 +201,9 @@ variable "blobindexfunction_version" {
   type        = string
   description = "version (tag) on the function that indexes the blobs"
 }
+
+variable color_ip_address_range {
+  type        = string
+  description = "The ip address of Color Genomics which accesses our storage account"
+  default     = "127.0.0.1"
+}
