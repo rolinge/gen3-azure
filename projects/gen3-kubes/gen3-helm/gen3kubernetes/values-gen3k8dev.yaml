@@ -8,8 +8,7 @@ config_helper: "assets/config_helper.py"
 #global tag for lables, etc
 ENV: gen3k8dev
 #dictionary_url: "https://s3.amazonaws.com/dictionary-artifacts/datadictionary/develop/schema.json"
-path_to_schema_dir_peregrine: "/var/www/peregrine"
-path_to_schema_dir_sheepdog: "/var/www/sheepdog"
+path_to_schema_dir: "/schemas_dir/schemas"
 fence:
   serviceport: 80
   database:
@@ -253,7 +252,7 @@ peregrine:
   bagitbucket: "noIdeaWhatThisIs"
   s3access: "notSureThisIsUsed"
   s3secret: "notSureThisIsUsed"
-  schemas: assets/optum-gen3-clinical-omom.schema.tar.gz.b64
+  schemas: assets/optum-gen3-clinical-omop.schema.tar.gz.b64
   resources:
     limits:
       cpu: 500m
@@ -309,7 +308,7 @@ sheepdog:
   image: "quay.io/cdis/sheepdog:2020.12"
   s3access: "notSureThisIsUsed"
   s3secret: "notSureThisIsUsed"
-  schemas: assets/optum-gen3-clinical-omom.schema.tar.gz.b64
+  schemas: assets/optum-gen3-clinical-omop.schema.tar.gz.b64
   resources:
     limits:
       cpu: 500m
