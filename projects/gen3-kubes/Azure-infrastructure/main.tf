@@ -17,7 +17,7 @@ locals {
 }
 
 
-resource "azurerm_kubernetes_cluster" "dce_aks_cluster" {
+resource "azurerm_kubernetes_cluster" "aks_cluster" {
   name                            = join("_", [var.prefix, var.cluster_name])
   location                        = azurerm_resource_group.rg.location
   dns_prefix                      = var.prefix
@@ -33,7 +33,7 @@ resource "azurerm_kubernetes_cluster" "dce_aks_cluster" {
     max_count           = var.max_count
     min_count           = var.min_count
     type                = "VirtualMachineScaleSets"
-    vnet_subnet_id      = azurerm_subnet.dce_aks_subnet.id
+    vnet_subnet_id      = azurerm_subnet.aks_subnet.id
     os_disk_size_gb     = var.k8s_os_disk_size
   }
 #  service_principal {
@@ -79,12 +79,12 @@ resource "azurerm_kubernetes_cluster" "dce_aks_cluster" {
 resource "azurerm_kubernetes_cluster_node_pool" "gen3-2ndpool" {
 
   name                  = format("g3large%s",random_string.uid.result)
-  kubernetes_cluster_id = azurerm_kubernetes_cluster.dce_aks_cluster.id
+  kubernetes_cluster_id = azurerm_kubernetes_cluster.aks_cluster.id
   vm_size               = var.k8_agents_big
   enable_auto_scaling = true
   max_count           = var.max_count
   min_count           = 0
-  vnet_subnet_id      = azurerm_subnet.dce_aks_subnet2.id
+  vnet_subnet_id      = azurerm_subnet.aks_subnet2.id
   os_disk_size_gb     = var.k8s_os_disk_size
   os_type              = "Linux"
 

@@ -10,7 +10,7 @@ resource "azurerm_storage_account" "gen3hdinsightsstorage" {
   network_rules {
     default_action             = "Deny"
     ip_rules                   = var.api_server_authorized_ip_ranges
-    virtual_network_subnet_ids = [azurerm_subnet.dce_aks_subnet.id,azurerm_subnet.dce_aks_subnet2.id]
+    virtual_network_subnet_ids = [azurerm_subnet.aks_subnet.id,azurerm_subnet.aks_subnet2.id]
   }
 
 }
@@ -77,8 +77,8 @@ resource "azurerm_hdinsight_spark_cluster" "gen3spark" {
       vm_size  = "STANDARD_A4_V2"
       username = var.hdinsight_node_username
       ssh_keys = [file(var.sshKeyPath_hdinsights)]
-      subnet_id = azurerm_subnet.dce_aks_subnet2.id
-      virtual_network_id = azurerm_virtual_network.dce_aks_vnet.id
+      subnet_id = azurerm_subnet.aks_subnet2.id
+      virtual_network_id = azurerm_virtual_network.aks_vnet.id
     }
 
     worker_node {
@@ -86,16 +86,16 @@ resource "azurerm_hdinsight_spark_cluster" "gen3spark" {
       username = var.hdinsight_node_username
       ssh_keys = [file(var.sshKeyPath_hdinsights)]
       target_instance_count = 3
-      subnet_id = azurerm_subnet.dce_aks_subnet2.id
-      virtual_network_id = azurerm_virtual_network.dce_aks_vnet.id
+      subnet_id = azurerm_subnet.aks_subnet2.id
+      virtual_network_id = azurerm_virtual_network.aks_vnet.id
     }
 
     zookeeper_node {
       vm_size  = "Medium"
       username = var.hdinsight_node_username
       ssh_keys = [file(var.sshKeyPath_hdinsights)]
-      subnet_id = azurerm_subnet.dce_aks_subnet2.id
-      virtual_network_id = azurerm_virtual_network.dce_aks_vnet.id
+      subnet_id = azurerm_subnet.aks_subnet2.id
+      virtual_network_id = azurerm_virtual_network.aks_vnet.id
     }
   }
   depends_on = [

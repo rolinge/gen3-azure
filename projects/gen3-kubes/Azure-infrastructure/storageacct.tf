@@ -106,7 +106,7 @@ resource "azurerm_storage_account" "gen3ingest" {
   network_rules {
     default_action             = "Deny"
     ip_rules                   = var.api_server_authorized_ip_ranges
-    virtual_network_subnet_ids = [azurerm_subnet.dce_aks_subnet.id,azurerm_subnet.dce_aks_subnet2.id]
+    virtual_network_subnet_ids = [azurerm_subnet.aks_subnet.id,azurerm_subnet.aks_subnet2.id]
   }
 
   tags = merge(var.tags, local.common_tags)
@@ -137,7 +137,7 @@ resource "azurerm_storage_account" "colordropbox" {
   network_rules {
     default_action             = "Deny"
     ip_rules                   = var.api_server_authorized_ip_ranges
-    virtual_network_subnet_ids = [azurerm_subnet.dce_aks_subnet.id,azurerm_subnet.dce_aks_subnet2.id]
+    virtual_network_subnet_ids = [azurerm_subnet.aks_subnet.id,azurerm_subnet.aks_subnet2.id]
   }
 
   tags = merge(var.tags, local.common_tags)
