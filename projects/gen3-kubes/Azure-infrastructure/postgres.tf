@@ -34,10 +34,10 @@ resource "azurerm_postgresql_virtual_network_rule" "g3DATA" {
   name                = "postgres-${var.cluster_name}"
   resource_group_name = azurerm_resource_group.rg.name
   server_name         = azurerm_postgresql_server.g3DATA.name
-  subnet_id           = azurerm_subnet.dce_aks_subnet.id
+  subnet_id           = azurerm_subnet.aks_subnet.id
     depends_on = [
     azurerm_postgresql_server.g3DATA,
-    azurerm_subnet.dce_aks_subnet
+    azurerm_subnet.aks_subnet
   ]
 }
 
@@ -46,10 +46,10 @@ resource "azurerm_postgresql_virtual_network_rule" "g3DATA2" {
   name                = "postgres-${var.cluster_name}-2"
   resource_group_name = azurerm_resource_group.rg.name
   server_name         = azurerm_postgresql_server.g3DATA.name
-  subnet_id           = azurerm_subnet.dce_aks_subnet2.id
+  subnet_id           = azurerm_subnet.aks_subnet2.id
     depends_on = [
     azurerm_postgresql_server.g3DATA,
-    azurerm_subnet.dce_aks_subnet2
+    azurerm_subnet.aks_subnet2
   ]
 }
 

@@ -6,49 +6,13 @@ resource "azurerm_key_vault" "keyvault1" {
   resource_group_name         = azurerm_resource_group.rg.name
   enabled_for_disk_encryption = true
   tenant_id                   = data.azurerm_client_config.current.tenant_id
-  soft_delete_retention_days  = 7
-  soft_delete_enabled         = true
-  purge_protection_enabled    = true
   sku_name = "standard"
   network_acls {
     default_action = "Allow"
     bypass         = "AzureServices"
     ip_rules       = var.api_server_authorized_ip_ranges
   }
-  #contact {
-  #  email = "randy.olinger@optum.com"
-  #  name  = "Randy Olinger"
-  #  phone = "9522054278"
-  #}
   tags = merge(var.tags, local.common_tags)
-}
-
-
-resource "azurerm_key_vault_access_policy" "randyolinger" {
-  key_vault_id = azurerm_key_vault.keyvault1.id
-
-  tenant_id = data.azurerm_client_config.current.tenant_id
-  object_id = "be2b3c36-2c8b-4905-a81b-cc3c9c58e66e"
-
-  key_permissions = [
-  "Get",  "List", "Delete", "Recover",  "Backup", "Restore",
-  "Create", "Decrypt", "Encrypt", "Import", "Sign",
-  "UnwrapKey", "Update", "Verify" , "WrapKey"
-  ]
-  secret_permissions = [
-  "get",  "list", "delete", "recover",  "backup", "restore",  "set"
-  ]
-  storage_permissions = [
-  "get",  "list", "delete", "recover",  "backup", "restore",
-  "regeneratekey", "getsas", "listsas", "deletesas", "set", "setsas",
-  "update"
-  ]
-  certificate_permissions = [
-  "Get",  "List", "Delete", "Recover",  "Backup", "Restore",
-  "Update" , "Create", "Import", "ManageContacts",  "ManageIssuers",
-  "GetIssuers","ListIssuers","SetIssuers",
-  "DeleteIssuers","Purge"
-  ]
 }
 
 resource "azurerm_key_vault_access_policy" "serviceaccount" {
@@ -78,34 +42,6 @@ resource "azurerm_key_vault_access_policy" "serviceaccount" {
   ]
 }
 
-
-
-resource "azurerm_key_vault_access_policy" "carlosgarcia" {
-  key_vault_id = azurerm_key_vault.keyvault1.id
-
-  tenant_id = data.azurerm_client_config.current.tenant_id
-  object_id = "8d1aadf7-0913-4e23-a653-72ff9de2c226"
-
-  key_permissions = [
-    "Get",  "List", "Delete", "Recover",  "Backup", "Restore",
-    "Create", "Decrypt", "Encrypt", "Import", "Sign",
-    "UnwrapKey", "Update", "Verify" , "WrapKey"
-  ]
-  secret_permissions = [
-  "get",  "list", "delete", "recover",  "backup", "restore",  "set"
-  ]
-  storage_permissions = [
-  "get",  "list", "delete", "recover",  "backup", "restore",
-  "regeneratekey", "getsas", "listsas", "deletesas", "set", "setsas",
-  "update"
-  ]
-  certificate_permissions = [
-  "Get",  "List", "Delete", "Recover",  "Backup", "Restore",
-  "Update" , "Create", "Import", "ManageContacts",  "ManageIssuers",
-  "GetIssuers","ListIssuers","SetIssuers",
-  "DeleteIssuers","Purge"
-  ]
-}
 resource "azurerm_key_vault_access_policy" "functionapp" {
   key_vault_id = azurerm_key_vault.keyvault1.id
 
