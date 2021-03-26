@@ -12,7 +12,7 @@ data:
   creds.json: |
     {
 
-      "db_host": {{ .Values.indexd.database.servername | quote }},
+      "db_host": {{ .Values.database_servername | quote }},
       "db_username": {{ .Values.indexd.database.username | quote }} ,
       "db_password": {{ .Values.indexd.database.db_password | quote }},
       "db_database": {{ .Values.indexd.database.databasename | quote }},
@@ -41,7 +41,7 @@ data:
     done
 
     sleep 2
-    until (echo test | nc {{ .Values.indexd.database.servername }} {{ .Values.indexd.database.port }} -w 2 \
+    until (echo test | nc {{ .Values.database_servername }} {{ .Values.database_port }} -w 2 \
                 && echo "Postgres port is open") >/dev/null 2>&1; do
       echo "Postgres is unavailable - sleeping"
     done

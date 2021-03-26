@@ -68,8 +68,8 @@ data:
 
     config["FAKE_AUTH"] = False
     config["PSQLGRAPH"] = {
-        'host': '{{ .Values.sheepdog.database.servername }}' ,
-        'user': '{{ .Values.sheepdog.database.username }}@{{ .Values.sheepdog.database.servername }}',
+        'host': '{{ .Values.database_servername }}' ,
+        'user': '{{ .Values.sheepdog.database.username }}@{{ .Values.database_servername }}',
         'password': '{{ .Values.sheepdog.database.db_password }}',
         'database': '{{ .Values.sheepdog.database.databasename }}',
     }
@@ -77,7 +77,7 @@ data:
 
     config['HMAC_ENCRYPTION_KEY'] = {{ .Values.peregrine.hmac_key | quote }}
     config['FLASK_SECRET_KEY'] = {{ .Values.peregrine.gdcapi_secret_key | quote }}
-    config['PSQL_USER_DB_CONNECTION'] = 'postgresql://{{ .Values.fence.database.username }}:{{ .Values.fence.database.db_password }}@{{ .Values.fence.database.servername }}:{{ .Values.fence.database.port }}/{{ .Values.fence.database.databasename }}'
+    config['PSQL_USER_DB_CONNECTION'] = 'postgresql://{{ .Values.fence.database.username }}:{{ .Values.fence.database.db_password }}@{{ .Values.database_servername }}:{{ .Values.database_port }}/{{ .Values.fence.database.databasename }}'
 
     config['OIDC_ISSUER'] = 'https://{{.Values.portal.externalhostname}}/user'
 
@@ -98,12 +98,12 @@ data:
     application.debug = (environ.get('GEN3_DEBUG') == "True")
   creds.json: |
     {
-      "fence_host":     {{ .Values.fence.database.servername | quote }},
-      "fence_username": "{{ .Values.fence.database.username }}@{{ .Values.fence.database.servername }}",
+      "fence_host":     {{ .Values.database_servername | quote }},
+      "fence_username": "{{ .Values.fence.database.username }}@{{ .Values.database_servername }}",
       "fence_password": {{ .Values.fence.database.db_password | quote }},
       "fence_database": {{ .Values.fence.database.databasename | quote }},
-      "db_host": {{ .Values.sheepdog.database.servername | quote }},
-      "db_username": "{{ .Values.sheepdog.database.username }}@{{ .Values.sheepdog.database.servername}}",
+      "db_host": {{ .Values.database_servername | quote }},
+      "db_username": "{{ .Values.sheepdog.database.username }}@{{ .Values.database_servername}}",
       "db_password": {{ .Values.sheepdog.database.db_password | quote }},
       "db_database": {{ .Values.sheepdog.database.databasename | quote }},
       "hostname": {{ .Values.portal.externalhostname | quote }}
