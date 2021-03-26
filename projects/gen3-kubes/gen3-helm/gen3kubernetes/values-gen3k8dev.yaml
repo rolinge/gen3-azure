@@ -6,15 +6,16 @@ replicaCount: 1
 config_helper: "assets/config_helper.py"
 
 #global tag for lables, etc
+#Thi is what will be used to name all your services and your url, pick a name that works for you. 
 ENV: gen3k8dev
+database_servername: "" #this needs to be changed. 
+database_port: "5432"
 #dictionary_url: "https://s3.amazonaws.com/dictionary-artifacts/datadictionary/develop/schema.json"
 path_to_schema_dir: "/schemas_dir/schemas"
 fence:
   serviceport: 80
   database:
-    servername: "postgres-k8sgen3rmo.postgres.database.azure.com"
     username: "fence_gen3dev_user@postgres-k8sgen3rmo.postgres.database.azure.com"
-    port: "5432"
     databasename: "fence_db"
     db_password: "b65a802fdf7a101c619e35354e791eeb"
   defaultIDPProvider: google
@@ -127,9 +128,7 @@ fence:
     -----END PUBLIC KEY-----
 arborist:
   database:
-    servername: "postgres-k8sgen3rmo.postgres.database.azure.com"
     username: "arborist_gen3dev_user"
-    port: "5432"
     databasename: "arborist_db"
     db_password: "E98CF2-8DC7HGES"
   replicas: 1
@@ -241,9 +240,7 @@ revproxy:
 peregrine:
   image: "quay.io/cdis/peregrine:2020.12"
   database:
-    servername: "postgres-k8sgen3rmo.postgres.database.azure.com"
     username: "peregrine_gen3dev_user"
-    port: "5432"
     databasename: "metadata_db"
     db_password: "8ACB-0053084C2A97"
   serviceport: 80
@@ -298,9 +295,7 @@ tube:
 
 sheepdog:
   database:
-    servername: "postgres-k8sgen3rmo.postgres.database.azure.com"
     username: "sheepdog_gen3dev_user"
-    port: "5432"
     databasename: "metadata_db"
     db_password: "E24B9254-7019-4081"
   replicas: 1
@@ -321,9 +316,7 @@ sheepdog:
     port: 80
 indexd:
   database:
-    servername: "postgres-k8sgen3rmo.postgres.database.azure.com"
     username: "indexd_gen3dev_user"
-    port: "5432"
     databasename: "indexd_db"
     db_password: "D7E-2A715381173D"
   username: "indexd_client_gen3k8dev"
@@ -392,10 +385,6 @@ jupyter:
     requests:
       cpu: 2000m
       memory: 3000Mi
-#spark:
-#  spark_master: https://hdinsights-k8sgen3rmo.azurehdinsight.net
-#  spark_executor_memory: 2G
-#  spark_driver_memroy: 2G
 spark:
   image: "quay.io/cdis/gen3-spark:2020.05"
   replicas: 1
@@ -424,7 +413,6 @@ spark:
 kibana:
   image: docker.elastic.co/kibana/kibana-oss:6.5.4
   serviceport: 5601
-
   resources:
     limits:
       cpu: 2000m
