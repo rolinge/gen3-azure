@@ -6,10 +6,11 @@ is uploaded by the client.  The function is triggered by an eventGrid resource i
 after a blob is finished uploading.
 
 ## Dependancies
-This code runs in a Azure functionapp that is hosted in an application_Service , all provisioned by Terraform.  The function itself is deployed va VS Code, but it is just a docker container that is uploaded and built in Azure.  In the future we will move the container build into a Jenkins workflow to manage updates and releases.
+This code runs in a Azure functionapp that is hosted in an application_Service , all provisioned by Terraform.  The function itself is deployed as a Docker container that is run as an Azure python3 functionapp.  There is a Jenkinsfile that can be used as a template to integrate in CICD systems.
 
 ## Extra Steps
 -  At this point there is a requirement to map a file share volume into the function after it is created in Azure.  Sadly, this is not yet supported by terraform, so it must be done manually.  In a future version this requirement should go away as there is no reason for this procedure to store any data.  There is a commandscript named mapstorage.ksh that can be used for this purpose.
+- It is entirely possible that the [null resource](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) in Terraform could solve this problem... 
 
 ## Deploy in portal
 1. do a docker build on your desktop.
