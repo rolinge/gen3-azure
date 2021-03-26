@@ -12,6 +12,7 @@
 **/*.key
 **/*.cacrt
 **/*secrets*.yaml
+secrets
 default.profraw
 
 .idea

@@ -12,22 +12,29 @@ from datetime import datetime
 
 
 if True:
-    event33 = "event33"
-    result = """{"id": "0a13137c-e01e-003d-298e-be3d1c06b713", 
+    blobEventGen3 = "blobEventGen3"
+
+    #Change these variables to your test condition,
+    commons_url = "https://myplatground.mygen3.com"
+    connectString = "DefaultEndpointsProtocol=https;AccountName=azgen3blobstorage;AccountKey=12345678123456781234567801234567890123456789tZQ==;EndpointSuffix=core.windows.net"
+    testGuid = "abcdef01-82b1-0123-8d79-0123abcd4567"
+
+    # dummy data
+    result = """{"id": "01234567-89ab-cdef-0123-456789ab0000",
                 "data": {
-                    "api": "PutBlob", 
-                    "clientRequestId": "42941790-1b0d-4895-b4e4-62d78f179039", 
-                    "requestId": "0a13137c-e01e-003d-298e-be3d1c000000", 
-                    "eTag": "0x8D88CA59C68A4CC", 
-                    "contentType": "image/png", 
-                    "contentLength": 11000, 
-                    "blobType": "BlockBlob", 
-                    "blobUrl": "https://azgen3blobstorage.blob.core.windows.net/azgen3blobstorage/d05db566-8ace-47f6-8df6-b242e6f157fe/future.png", 
-                    "url": "https://azgen3blobstorage.blob.core.windows.net/azgen3blobstorage/d05db566-8ace-47f6-8df6-b242e6f157fe/future.png", 
-                    "sequencer": "00000000000000000000000000001f9d000000000001e3b8", 
-                    "storageDiagnostics": {"batchId": "8d2e6d6a-37c3-4d0d-ae7b-2b185e81e707"}
-                    }, 
-                "topic": "/subscriptions/21a7a4d3-3641-4382-95a8-85ae72399ceb/resourceGroups/gen3-compose-vprh/providers/Microsoft.Storage/storageAccounts/azgen3blobstorage", 
+                    "api": "PutBlob",
+                    "clientRequestId": "42941790-1b0d-4895-b4e4-62d78f179039",
+                    "requestId": "01234567-89ab-cdef-0123-456789ab0000",
+                    "eTag": "0x8D88CA59C68A4CC",
+                    "contentType": "image/png",
+                    "contentLength": 0,
+                    "blobType": "BlockBlob",
+                    "blobUrl": f"{testBlobURL}",
+                    "url": f"{testBlobURL}",
+                    "sequencer": "00000000000000000000000000001f9d000000000001e3b8",
+                    "storageDiagnostics": {"batchId": "8d2e696a-1234-4d1d-4567-89abcdef0123"}
+                    },
+                "topic": "/subscriptions/21a7a4d3-3641-4382-95a8-85ae72399ceb/resourceGroups/gen3-compose-vprh/providers/Microsoft.Storage/storageAccounts/azgen3blobstorage",
                 "subject": "/blobServices/default/containers/azgen3blobstorage/blobs/AIRacingLeague.png", "event_type": "Microsoft.Storage.BlobCreated"
                 }"""
      # Acquire the logger for a library (azure.storage.blob in this example)
@@ -41,7 +48,7 @@ if True:
 
 
     logger.info(f"Python EventGrid BlobEventTrigger1 processed an event: {result}")
-    logger.info(f"Event view from EventGrid of event33 looks like:{event33}")
+    logger.info(f"Event view from EventGrid of blobEventGen3 looks like:{blobEventGen3}")
 
     data33 = json.loads(result)
     logger.info(f"after deserializing result data33 looks like {data33}")
@@ -52,7 +59,7 @@ if True:
         assert eventType == "Microsoft.Storage.BlobCreated"
     except:
         logger.warning("Exiting -- Event is not BlobCreated")
-        
+
 
 
     url33 = data33["data"]["url"]
@@ -60,15 +67,11 @@ if True:
 
 
     try:
-        commons_url = "https://gen3playground.optum.com"
-        gen3KeyID = "67179b32-f584-4a3b-b122-73d54ac2c65b"
-        gen3KeySecret = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImtpZCI6ImZlbmNlX2tleV8yMDIwLTA5LTIyVDE2OjM2OjAwWiJ9.eyJwdXIiOiJhcGlfa2V5IiwiYXVkIjpbImRhdGEiLCJ1c2VyIiwiZmVuY2UiLCJvcGVuaWQiXSwic3ViIjoiMyIsImlzcyI6Imh0dHBzOi8vZ2VuM3BsYXlncm91bmQub3B0dW0uY29tL3VzZXIiLCJpYXQiOjE2MDUxMTMxODQsImV4cCI6MTYwNzcwNTE4NCwianRpIjoiNjcxNzliMzItZjU4NC00YTNiLWIxMjItNzNkNTRhYzJjNjViIiwiYXpwIjoiIn0.JBKC0mz2Gziq5q_sq184do8snFM2I-RpSqeBC359U4esfhtvDnZ4SrjuDAKBG-LM3YkE6L2Tz_aWjwXwediJzLjbCKm6PRu3HgMaY244CQZxoLnaLYNXWRrq7aHnY8qORNxhlAZVgQsNcWXu0SGk3mtDn8TY_d8Y7DIPhlaLQVAq18tfUHtg_9S5pz3XblWxAFHmz0Q_qdYDJwk5e3GseNI3_155XxP2UHURBhPfoWy8pQSU0LyKjwiL4VfbyAsS1KbWtS9K1NV0NzYUy3XdQrhJilkg97SrH03WVbLmEHQ1wVThPAA2jPF6jI7jf8nZpxwYQ_G69YtuoEiySeXp-g"
-        connectString = "DefaultEndpointsProtocol=https;AccountName=azgen3blobstorage;AccountKey=0yzBB7W6H7Tz1wtmGHukXUuVA91YiYGn5anpPFgq4NoeccZ1rcqMgyaRCYwSYoZpUqMT0YJx1dWXTDjUQMltZQ==;EndpointSuffix=core.windows.net"
         results_file = "aaa.csv"
-        mountPoint = "/tmp" 
+        mountPoint = "/tmp"
     except :
         logger.critical("Critical Exception -- application settings not proper\n")
-    
+
     #                                           0    1     2           3         4     5
     # split the fileURL since it is passed as https://site.azure.net/container/guid/filename
     try:
@@ -109,14 +112,14 @@ if True:
 
 
 # Download file in 10 Mbyte chunks and write to new file in azure file storage...
-    
+
 
     try:
         #mynewblobfile = open(f"{mountPoint}/{thisGuid}/{thisBlob}", "wb")
         md5_object = hashlib.md5()
         fileOffset = 0
         numBytestRead = 0
-        # set chunks to 10 MB in order to reduce HTTP turns, improve performance.  Could go higher if needed. 
+        # set chunks to 10 MB in order to reduce HTTP turns, improve performance.  Could go higher if needed.
         chunkSize = 10000000
         while fileOffset < blob_client.get_blob_properties().size :
             logger.info(f"fileoffset={fileOffset}")
@@ -139,7 +142,7 @@ if True:
         logger.info(f"downloaded {fileOffset/chunkSize} chunks of 10MB bytes from file at{url33}")
         #mynewblobfile.close()
 
-    
+
     logger.info(f"commons_url = {commons_url}, gen3KeyID = {base64.b64encode(gen3KeyID.encode('ascii'))}, results_file = {results_file}, mountPoint {mountPoint}")
     md5_hash = md5_object.hexdigest()
     b64_hash = base64.b64encode(md5_object.digest()).decode('utf-8')
@@ -154,24 +157,12 @@ if True:
         #b_file.write(f"Time,{current_time},Container,{thisContainer},Blob,{thisBlob},hexdigest,{md5_hash},base64hash,{b64_hash}\n")
         logger.info(f"Time,{current_time},Container,{thisContainer},Blob,{thisBlob},hexdigest,{md5_hash},base64hash,{b64_hash}\n")
 
-    except: 
+    except:
         logger.error(f"Error opening and writing results to {res_filename}\n")
     else:
         logger.info(f"wrote results file to {mountPoint}/azgen3blobstorage/{results_file}")
         logger.info(f"Time,{current_time},Container,{thisContainer},Blob,{thisBlob},hexdigest,{md5_hash},base64hash,{b64_hash}\n")
         #b_file.close()
-
-#    sas_token = generate_account_sas(
-#        blob_service_client.account_name,
-#        account_key=blob_service_client.credential.account_key,
-#        resource_types=ResourceTypes(object=True),
-#        permission=AccountSasPermissions(read=True,write=True,create=True),
-#        expiry=datetime.utcnow() + timedelta(hours=1)
-#    )
-#
-#    logger.warning(f"this is the sas token {sas_token}")
-#    blob_service_client2 = BlobServiceClient(account_url="https://azgen3blobstorage.blob.core.windows.net/", credential=sas_token)
-#    blob_client2 = blob_service_client2.get_blob_client(container="gen3-container", blob=f"guid-{thisBlob}/{thisBlob}")
 
     gen3Credentials = {}
     gen3Credentials['api_key'] = gen3KeySecret
@@ -181,7 +172,6 @@ if True:
     logging.warning(f"indexConnection = {indexConnection}")
     #logging.critical(f"Error with gen3connection{sys.exc_info()[0]}")
     try:
-        testGuid = "f04571da-82b1-4dd6-8d79-8e19f1a0883b"
         indexRecord = indexConnection.get(thisGuid)
     except:
         logging.critical("Error connecting to commons URL")
@@ -194,10 +184,6 @@ if True:
             indexRecord = indexConnection.get(thisGuid)
             indexRecord
         except:
-            logger.critical(f"Error updating GUID {thisGuid} record in commons object {thisBlob}")   
+            logger.critical(f"Error updating GUID {thisGuid} record in commons object {thisBlob}")
         else:
             logger.info("Updated gen3 commons index with needful data.")
-
-
-
-

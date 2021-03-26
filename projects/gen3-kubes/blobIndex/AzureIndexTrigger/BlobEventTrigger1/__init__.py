@@ -11,13 +11,13 @@ import azure.functions as func
 from datetime import datetime
 
 
-def main(event33: func.EventGridEvent):
+def main(blobEventGen3: func.EventGridEvent):
     jsonResult = json.dumps({
-        'id': event33.id,
-        'data': event33.get_json(),
-        'topic': event33.topic,
-        'subject': event33.subject,
-        'event_type': event33.event_type,
+        'id': blobEventGen3.id,
+        'data': blobEventGen3.get_json(),
+        'topic': blobEventGen3.topic,
+        'subject': blobEventGen3.subject,
+        'event_type': blobEventGen3.event_type,
     })
 
     # Acquire the logger for a library (azure.storage.blob in this example)
@@ -31,7 +31,7 @@ def main(event33: func.EventGridEvent):
     logger.addHandler(handler)
 
     logger.info(f"Python EventGrid BlobEventTrigger1 processed an event: {jsonResult}")
-    logger.info(f"Event view from EventGrid of event33 looks like:{event33}")
+    logger.info(f"Event view from EventGrid of blobEventGen3 looks like:{blobEventGen3}")
 
     data33 = json.loads(jsonResult)
     logger.info(f"after deserializing jsonResult data33 looks like {data33}")
