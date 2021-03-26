@@ -42,7 +42,7 @@ variable "min_count" {
 }
 
 variable "prefix" {
-  default = "dce-aks"
+  default = "aks"
 }
 
 variable "environment" {
