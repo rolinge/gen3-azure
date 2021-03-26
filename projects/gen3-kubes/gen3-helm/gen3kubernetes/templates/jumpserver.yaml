@@ -14,7 +14,7 @@ spec:
       args: ['60000000']
       env:
         - name: "DBHOST"
-          value: {{ quote .Values.fence.database.servername }}
+          value: {{ quote .Values.database_servername }}
         - name: "DBUSER"
           value: {{ quote .Values.fence.database.username }}
         - name:  "DBPASS"
@@ -22,7 +22,7 @@ spec:
         - name: "DBFENCE"
           value: {{ quote .Values.fence.database.databasename }}
         - name:  "FENCECONNECT"
-          value: "echo $DBPASS | psql -h {{  .Values.fence.database.servername }} -U {{  .Values.fence.database.username }}@{{  .Values.fence.database.servername }} {{  .Values.fence.database.databasename }}"
+          value: "echo $DBPASS | psql -h {{  .Values.database_servername }} -U {{  .Values.fence.database.username }}@{{  .Values.database_servername }} {{  .Values.fence.database.databasename }}"
       resources:
         limits:
           cpu: '200m'

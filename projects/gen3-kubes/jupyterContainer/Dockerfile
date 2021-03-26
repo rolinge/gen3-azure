@@ -7,10 +7,9 @@ WORKDIR /usr/local
 RUN apt-get install -y liblz4-tool && apt-get install -y liblz4-dev
 
 #UTILITIES
-RUN apt-get install -y wget && apt-get -y install git
+RUN apt-get install -y wget git gsutil rsync liblwp-protocol-https-perl
 RUN wget -q -r https://services.gradle.org/distributions/gradle-4.10.2-bin.zip && unzip services.gradle.org/distributions/gradle-4.10.2-bin.zip
 RUN wget -q -r http://archive.cloudera.com/spark2/parcels/latest/SPARK2-2.4.0.cloudera2-1.cdh5.13.3.p0.1041012-xenial.parcel && tar xvf archive.cloudera.com/spark2/parcels/latest/SPARK2-2.4.0.cloudera2-1.cdh5.13.3.p0.1041012-xenial.parcel
-RUN apt-get install -y rsync
 
 #HAIL Source
 WORKDIR /usr/local

@@ -45,16 +45,16 @@ spec:
             - name: "PGDATABASE"
               value: {{ .Values.sheepdog.database.databasename | quote }}
             - name: "PGUSER"
-              value: "{{ .Values.sheepdog.database.username }}@{{ .Values.sheepdog.database.servername }}"
+              value: "{{ .Values.sheepdog.database.username }}@{{ .Values.database_servername }}"
             - name: "PGPASSWORD"
               valueFrom:
                 secretKeyRef:
                   key: "sheepdogDatabasePassword"
                   name: "database-secrets-{{ .Values.ENV }}"
             - name: "PGHOST"
-              value: {{ .Values.sheepdog.database.servername | quote }}
+              value: {{ .Values.database_servername | quote }}
             - name: "PGPORT"
-              value: {{ .Values.sheepdog.database.port | quote }}
+              value: {{ .Values.database_port | quote }}
             - name: "PGSSLMODE"
               value: "disable"
             - name: "ARBORIST_URL"

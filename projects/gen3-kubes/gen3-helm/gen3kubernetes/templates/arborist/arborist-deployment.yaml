@@ -38,16 +38,16 @@ spec:
             - name: "PGDATABASE"
               value: {{ .Values.arborist.database.databasename | quote }}
             - name: "PGUSER"
-              value: "{{ .Values.arborist.database.username }}@{{ .Values.arborist.database.servername }}"
+              value: "{{ .Values.arborist.database.username }}@{{ .Values.database_servername }}"
             - name: "PGPASSWORD"
               valueFrom:
                 secretKeyRef:
                   key: "arboristDatabasePassword"
                   name: "database-secrets-{{ .Values.ENV }}"
             - name: "PGHOST"
-              value: {{ .Values.arborist.database.servername | quote }}
+              value: {{ .Values.database_servername | quote }}
             - name: "PGPORT"
-              value: {{ .Values.arborist.database.port | quote }}
+              value: {{ .Values.database_port | quote }}
             - name: "PGSSLMODE"
               value: "disable"
           securityContext:
