@@ -72,7 +72,7 @@ variable "location" {
 
 # az aks get-versions --location centralus --output table
 variable aks_k8s_version {
-  default = "1.19.3"
+  default = "1.19.7"
 }
 
 variable "k8_agents_regular" {
