@@ -25,7 +25,7 @@ resource "azurerm_function_app" "funcapp" {
   tags = merge(var.tags, local.common_tags)
 
   site_config {
-    linux_fx_version = format("DOCKER|%s/gen3/blobtriggerdocker:%s",azurerm_container_registry.gen3.login_server, var.blobindexfunction_version)
+    linux_fx_version = format("DOCKER|%s/gen3/blobtriggerdocker:%s",local.registry_hostname, var.blobindexfunction_version)
     use_32_bit_worker_process = false
     always_on = true
   }
@@ -48,10 +48,9 @@ resource "azurerm_function_app" "funcapp" {
     MOUNT_POINT = "/opt/shared"
     RESULTS_FILE = "gen3_hashes.csv"
     StorageaccountConnectString = format("@Microsoft.KeyVault(VaultName=%s;SecretName=%s)",azurerm_key_vault.keyvault1.name ,azurerm_key_vault_secret.StorageaccountConnectString.name)
-    "DOCKER_REGISTRY_SERVER_URL" = format("https://%s/",azurerm_container_registry.gen3.login_server)
-    "DOCKER_REGISTRY_SERVER_USERNAME" = azurerm_container_registry.gen3.admin_username
-    "DOCKER_REGISTRY_SERVER_PASSWORD" = azurerm_container_registry.gen3.admin_password
+    "DOCKER_REGISTRY_SERVER_URL" = format("https://%s/",local.registry_hostname)
+    "DOCKER_REGISTRY_SERVER_USERNAME" = local.registry_username
+    "DOCKER_REGISTRY_SERVER_PASSWORD" = local.registry_password
     #maybe later for /home "WEBSITES_ENABLE_APP_SERVICE_STORAGE"=true
     }
-
 }

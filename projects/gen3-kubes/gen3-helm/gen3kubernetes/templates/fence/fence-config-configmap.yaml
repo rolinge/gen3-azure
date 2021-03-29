@@ -10,7 +10,7 @@ data:
   fence-config.yaml: |
     APP_NAME: 'Gen3 Data Commons'
     BASE_URL: '{{ .Values.fence.base_url }}'
-    DB: 'postgresql://{{ .Values.fence.database.username }}:{{ .Values.fence.database.db_password }}@{{ .Values.fence.database.servername }}:{{ .Values.fence.database.port }}/{{ .Values.fence.database.databasename }}'
+    DB: 'postgresql://{{ .Values.fence.database.username }}:{{ .Values.fence.database.db_password }}@{{ .Values.database_servername }}:{{ .Values.database_port }}/{{ .Values.fence.database.databasename }}'
     DEBUG: true
     MOCK_AUTH: false
     MOCK_GOOGLE_AUTH: false
@@ -201,7 +201,7 @@ data:
     # entrypoint script for fence to sync user.yaml before running
 
     sleep 2
-    until (echo test | nc {{ .Values.fence.database.servername }} {{ .Values.fence.database.port }} -w 2 \
+    until (echo test | nc {{ .Values.database_servername }} {{ .Values.database_port }} -w 2 \
                 && echo "Postgres port is open") >/dev/null 2>&1; do
       echo "Postgres is unavailable - sleeping"
     done

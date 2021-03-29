@@ -3,7 +3,7 @@
   "bindings": [
     {
       "type": "eventGridTrigger",
-      "name": "event33",
+      "name": "blobEventGen3",
       "direction": "in"
     }
   ]

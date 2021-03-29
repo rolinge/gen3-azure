@@ -1,3 +1,0 @@
-0000000000000000000000000000000000000000 15c7a29544f0451c7ae81ca6efd7dc3259fc3426 Randy Olinger <randy.olinger@optum.com> 1607015308 -0600	clone: from https://github.com/opendistro-for-elasticsearch/opendistro-build
-15c7a29544f0451c7ae81ca6efd7dc3259fc3426 afbe200564312bc56b892261adddc72372293e26 Randy Olinger <randy.olinger@optum.com> 1614898733 -0600	commit: internal users setup
-afbe200564312bc56b892261adddc72372293e26 15c7a29544f0451c7ae81ca6efd7dc3259fc3426 Randy Olinger <randy.olinger@optum.com> 1615407848 -0600	reset: moving to 15c7a29544f0451c7ae81ca6efd7dc3259fc3426

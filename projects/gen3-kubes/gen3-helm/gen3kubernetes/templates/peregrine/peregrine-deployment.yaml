@@ -45,16 +45,16 @@ spec:
             - name: "PGDATABASE"
               value: {{ .Values.peregrine.database.databasename | quote }}
             - name: "PGUSER"
-              value: "{{ .Values.peregrine.database.username }}@{{ .Values.peregrine.database.servername }}"
+              value: "{{ .Values.peregrine.database.username }}@{{ .Values.database_servername }}"
             - name: "PGPASSWORD"
               valueFrom:
                 secretKeyRef:
                   key: "peregrineDatabasePassword"
                   name: "database-secrets-{{ .Values.ENV }}"
             - name: "PGHOST"
-              value: {{ .Values.peregrine.database.servername | quote }}
+              value: {{ .Values.database_servername | quote }}
             - name: "PGPORT"
-              value: {{ .Values.peregrine.database.port | quote }}
+              value: {{ .Values.database_port | quote }}
             - name: "PGSSLMODE"
               value: "disable"
             - name: "ARBORIST_URL"

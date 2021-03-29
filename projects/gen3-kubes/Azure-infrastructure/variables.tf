@@ -1,14 +1,22 @@
-variable "client_id" {
-  type        = string
-  description = "The name of the client id"
-  default = "f8b8b944-81bf-4c76-b460-f9e17beef02d"
-}
+#variable "client_id" {
+#  type        = string
+#  description = "The name of the client id"
+#  default = "f8b8b944-81bf-4c76-b460-f9e17beef02d"
+#}
 
-variable "client_secret" {
-  type        = string
-  description = "The value of the client secret"
-  default     = "XDUjUzCdgBc_TTpVaCChDP41-rNYR21~o4"
- }
+#variable "client_secret" {
+#  type        = string
+#  description = "The value of the client secret"
+#  default     = "XDUjUzCdgBc_TTpVaCChDP41-rNYR21~o4"
+#}
+
+
+locals {
+  # Ids for multiple sets of EC2 instances, merged together
+  registry_username = "gen3registryoptum"
+  registry_password = "F1EnKmQH7dGfWhGMr58YvgL/J=h9U0Cg"
+  registry_hostname = "gen3registryoptum.azurecr.io"
+}
 
 variable "agent_count" {
   default = 2
@@ -42,7 +50,7 @@ variable "min_count" {
 }
 
 variable "prefix" {
-  default = "dce-aks"
+  default = "aks"
 }
 
 variable "environment" {
@@ -72,7 +80,7 @@ variable "location" {
 
 # az aks get-versions --location centralus --output table
 variable aks_k8s_version {
-  default = "1.19.3"
+  default = "1.19.7"
 }
 
 variable "k8_agents_regular" {
@@ -191,12 +199,6 @@ variable "hdiHeadNodeSize" {
 #                     STANDARD_D4A_V4,STANDARD_D64A_V4,STANDARD_D8A_V4,STANDARD_D96A_V4
 }
 
-variable "hdiWorkerNodeSize" {
-  type        = string
-  description = "HDInsights worker head node machine size"
-  default = "STANDARD_DS12_V2"
-}
-
 variable "blobindexfunction_version" {
   type        = string
   description = "version (tag) on the function that indexes the blobs"
@@ -206,4 +208,9 @@ variable color_ip_address_range {
   type        = string
   description = "The ip address of Color Genomics which accesses our storage account"
   default     = "127.0.0.1"
+}
+
+variable "hdiWorkerNodSize" {
+  type        = string
+  description = "HDInsights worker head node machine size"
 }

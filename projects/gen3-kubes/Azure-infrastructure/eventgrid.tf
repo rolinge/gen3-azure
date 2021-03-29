@@ -18,5 +18,5 @@ resource "azurerm_eventgrid_event_subscription" "gen3trigger" {
     max_events_per_batch              = 1
     preferred_batch_size_in_kilobytes = 128
   }
-
+  depends_on = [azurerm_function_app.funcapp]
 }

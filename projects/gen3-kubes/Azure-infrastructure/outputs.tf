@@ -1,13 +1,13 @@
 output "kube_config" {
-  value = azurerm_kubernetes_cluster.dce_aks_cluster.kube_config_raw
+  value = azurerm_kubernetes_cluster.aks_cluster.kube_config_raw
 }
 output "kube_admin_config" {
-  value = azurerm_kubernetes_cluster.dce_aks_cluster.kube_admin_config
+  value = azurerm_kubernetes_cluster.aks_cluster.kube_admin_config
 }
 
 
 output "kublet_identity" {
-  value = azurerm_kubernetes_cluster.dce_aks_cluster.kubelet_identity
+  value = azurerm_kubernetes_cluster.aks_cluster.kubelet_identity
 }
 
 output "resource_group_name" {
@@ -40,12 +40,12 @@ output "gen3KeySecret" {
   value = azurerm_key_vault_secret.gen3KeySecret.id
 }
 output "acrUsername" {
-  value = azurerm_container_registry.gen3.admin_username
+  value = local.registry_username
 }
 
 output "acrPassword" {
-value = azurerm_container_registry.gen3.admin_password
+value = local.registry_password
 }
 output "acrHost" {
-value = azurerm_container_registry.gen3.login_server
+value = local.registry_hostname
 }

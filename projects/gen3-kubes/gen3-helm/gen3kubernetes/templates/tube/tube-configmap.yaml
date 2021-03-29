@@ -8,8 +8,8 @@ metadata:
 data:
   creds.json: |
     {
-      "db_host": {{ .Values.sheepdog.database.servername | quote }},
-      "db_username": "{{ .Values.sheepdog.database.username }}@{{ .Values.sheepdog.database.servername}}",
+      "db_host": {{ .Values.database_servername | quote }},
+      "db_username": "{{ .Values.sheepdog.database.username }}@{{ .Values.database_servername}}",
       "db_password": {{ .Values.sheepdog.database.db_password | quote }},
       "db_database": {{ .Values.sheepdog.database.databasename | quote }}
     }
