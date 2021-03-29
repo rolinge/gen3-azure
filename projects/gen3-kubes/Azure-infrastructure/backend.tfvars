@@ -1,4 +1,4 @@
-key = "azure-k8s-carlos.tfstate"
+key = "azure-k8s-cg2.tfstate"
 storage_account_name = "k8sgen3tf19336"
 container_name = "tfstate"
 access_key = "bcQkuWCHwLmN2KeJhaT8+tyICjAEVI+ET6LdonKfGhTyzqOMnGU11jOvItPPoKMMuj1C5lNa/pGRS5NAlky60Q=="

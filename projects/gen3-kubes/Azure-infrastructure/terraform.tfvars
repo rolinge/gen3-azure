@@ -2,7 +2,7 @@ location            = "West US 2"
 cluster_name        = "k8sgen3cg2"
 #This resource group is for the kubernetes resources
 resource_group_name = "k8s-gen3-cg2"
-POSTGRES_PASSWORD = "heyheymymyrockandrollwillneverdie&wb@"
+POSTGRES_PASSWORD = "HEYheymymyrockandrollwillneverd1e&wb@"
 commons_url = "https://k8sgen3dev-cg2.optum.com"
 
 max_count = 5
@@ -12,4 +12,4 @@ aks_k8s_version = "1.19.7"
 hdinsight_node_username = "gen3_hdinsight_nodes"
 hdiHeadNodeSize = "STANDARD_DS13_V2"
 hdiWorkerNodSize = "STANDARD_DS14_V2"
-blobindexfunction_version = "g3kubes-cg"
+blobindexfunction_version = "g3kubes-cg2"

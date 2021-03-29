@@ -1,11 +1,16 @@
-resource "azurerm_container_registry" "gen3" {
-  name                  = format("acrgen3%s",random_string.uid.result)
-  location                        = azurerm_resource_group.rg.location
-  resource_group_name             = azurerm_resource_group.rg.name
-  sku                      = "Basic"
-  admin_enabled            = true
-  #georeplication_locations = ["East US", "West Europe"]
+data "azurerm_container_registry" "gen3" {
+   name                  = "gen3registryoptum"
+   resource_group_name   = "gen3-compose-rg"
 }
+
+#resource "azurerm_container_registry" "gen3" {
+#  name                  = format("acrgen3%s",random_string.uid.result)
+#  location                        = azurerm_resource_group.rg.location
+#  resource_group_name             = azurerm_resource_group.rg.name
+#  sku                      = "Basic"
+#  admin_enabled            = true
+#  #georeplication_locations = ["East US", "West Europe"]
+#}
 #Grant access to the ACR, grant to the functionapp system
 
 resource "azurerm_role_assignment" "acrtofuncapp0" {

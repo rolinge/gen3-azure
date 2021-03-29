@@ -191,12 +191,6 @@ variable "hdiHeadNodeSize" {
 #                     STANDARD_D4A_V4,STANDARD_D64A_V4,STANDARD_D8A_V4,STANDARD_D96A_V4
 }
 
-variable "hdiWorkerNodeSize" {
-  type        = string
-  description = "HDInsights worker head node machine size"
-  default = "STANDARD_DS12_V2"
-}
-
 variable "blobindexfunction_version" {
   type        = string
   description = "version (tag) on the function that indexes the blobs"
@@ -206,4 +200,9 @@ variable color_ip_address_range {
   type        = string
   description = "The ip address of Color Genomics which accesses our storage account"
   default     = "127.0.0.1"
+}
+
+variable "hdiWorkerNodSize" {
+  type        = string
+  description = "HDInsights worker head node machine size"
 }

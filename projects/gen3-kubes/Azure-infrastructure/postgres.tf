@@ -31,7 +31,7 @@ resource "azurerm_postgresql_configuration" "g3DATA" {
 }
 
 resource "azurerm_postgresql_virtual_network_rule" "g3DATA" {
-  name                = "postgres-${var.cluster_name}"
+  name                = format("postgres-%s%s",var.environment,random_string.uid.result)
   resource_group_name = azurerm_resource_group.rg.name
   server_name         = azurerm_postgresql_server.g3DATA.name
   subnet_id           = azurerm_subnet.aks_subnet.id
@@ -43,7 +43,7 @@ resource "azurerm_postgresql_virtual_network_rule" "g3DATA" {
 
 
 resource "azurerm_postgresql_virtual_network_rule" "g3DATA2" {
-  name                = "postgres-${var.cluster_name}-2"
+  name                = format("postgres-%s%s-2",var.environment,random_string.uid.result)
   resource_group_name = azurerm_resource_group.rg.name
   server_name         = azurerm_postgresql_server.g3DATA.name
   subnet_id           = azurerm_subnet.aks_subnet2.id
