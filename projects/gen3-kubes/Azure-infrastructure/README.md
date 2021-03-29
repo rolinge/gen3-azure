@@ -1,7 +1,40 @@
+# Gen3 Kubernetes driven environment
+
+## Objective
+Create a Gen3 infrastructure using Kubernetes, HDInsights, Spark, and other Azure based assets using terraform, helm, and as few as possible manual operations.
+
+# Technologies
+- Azure Public Cloud (azure-cli) installed on your Mac, PC, or Linux system
+- Terraform for managing the Azure assets
+- Docker for running the microservices
+- Kubernetes for hosting the microservices
+- Helm for managing Kubernetes objects
+
+
+
+
+
+#get kubernetes credentials for the first admin
+LAMU02XLNBTJHC8:kubernetes-setup rolinge$ az aks get-credentials --resource-group k8s-gen3-cg2 --name aks_k8sgen3cg2 --admin
+
+kubectl apply namespaces.yaml
+kubectl apply clusteroles, roles
+kubectl apply StorageConfig
+vi opendistro/customevalues.yaml   (change the name)
+cd <opendistro>/helm  && helm install <name> -f customvalues.yaml .
+
+use the info in database_setup.txt to create users and assign permissions.  This requires getting the postgres server name and postgres password from the terraform output.
+
+in the gen3-helm directory, edit the values file for your specific settings.
+
+helm install nginx-ingress ingress-nginx/ingress-nginx --namespace default --set controller.replicaCount=2
+
+
+
 # DCE Kubernetes Sandbox (AKS)
 
 ## Objective
-Quickly get started with the the Azure Kubernetes Service in your DCE sandbox. Learn and explore best practices with this [everything-as-code](https://openpracticelibrary.com/practice/everything-as-code/) implementation. 
+Quickly get started with the the Azure Kubernetes Service in your DCE sandbox. Learn and explore best practices with this [everything-as-code](https://openpracticelibrary.com/practice/everything-as-code/) implementation.
 
 ## Overview
 DCE Kubernetes (AKS) deploys a VM scalesets and multi node pools Kubernetes cluster on Azure using AKS (Azure Kubernetes Service) and adds support for monitoring by attaching a Log Analytics solution.
@@ -10,7 +43,7 @@ DCE Kubernetes (AKS) deploys a VM scalesets and multi node pools Kubernetes clus
 - [x] A DCE subscription with an active [Azure DCE account](https://cloud.optum.com/app/dashboard). Learn more about DCE [here](https://cloud.optum.com/docs/dce/overview).
 - [x] An editor like VSCode to make a change (optional).
 - [x] [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest) installed and configured.
-- [x] Kubernetes command-line tool, kubectl, installed. Request from [AppStore](https://appstore.uhc.com/AppInfo/AppVersionId/16407?BackToList=/AppList/AppList). 
+- [x] Kubernetes command-line tool, kubectl, installed. Request from [AppStore](https://appstore.uhc.com/AppInfo/AppVersionId/16407?BackToList=/AppList/AppList).
 - [x] Terraform (~>0.12.0). Learn more [here](https://www.optumdeveloper.com/content/odv-optumdev/optum-developer/en/development-tools-and-standards/infrastructure-as-a-code/hashicorp.html).
 - [x] Git (>2.9)
 
@@ -61,7 +94,7 @@ You can use **kubectl** to connect to your AKS cluster. kubectl uses kubeconfig 
 
 > export KUBECONFIG=~/dce_kubeconfig
 
-> Note 1: By default, kubectl checks ~/.kube/config for a kubeconfig file. If no kubeconfig file already exists in the default location, then you can directly paste the kubeconfig value @ ~/.kube/config. There are ways to merge your multiple kubeconfig files but that is beyond the scope of this excercise. 
+> Note 1: By default, kubectl checks ~/.kube/config for a kubeconfig file. If no kubeconfig file already exists in the default location, then you can directly paste the kubeconfig value @ ~/.kube/config. There are ways to merge your multiple kubeconfig files but that is beyond the scope of this excercise.
 
 > Note 2: If you have not saved the file in the default location, then the kubectl session will be lost when you close your terminal.
 
@@ -71,7 +104,7 @@ Verify that kubectl can connect to the cluster by entering the following command
 
 > kubectl get serviceaccounts
 
-or 
+or
 
 > kubectl get sa
 
@@ -84,7 +117,7 @@ The output is similar to this:
 
 If you have followed all the preceding sections and subsections, you are ready to deploy your first container to AKS.
 
-* Find the nodes in your cluster by using kubectl command line.  
+* Find the nodes in your cluster by using kubectl command line.
     > kubectl get nodes
 
 You should find two nodes and your output is similar to this:
@@ -99,7 +132,7 @@ Now it is time to test and deploy the Nginx image. To do so, please use terminal
 *In the above command, you deployed one replica of nginx to your nodes and AKS will create one pod to run the image*
 
 
-* Verify the Pods like: 
+* Verify the Pods like:
     > $ kubectl get pods
 
 At this stage, the deployment has started. You are going to expose port 80 to the Nginx web server and allow access to it using a web browser. Without exposing the deployment, you can’t access the service.
@@ -130,7 +163,7 @@ After exposing the deployment, AKS will create a service called nginxsvc with po
 
 * [AKS Documentation](https://docs.microsoft.com/en-us/azure/aks/intro-kubernetes)
 * [Kubectl Guide](https://www.optumdeveloper.com/content/odv-optumdev/optum-developer/en/getting-started/health-care-cloud-getting-started/getting-started-with-kubernetes/step-6--configure-kubernetes-cli---kubectl.html)
-* [Optum Standard AKS Recommendations](https://cloud.optum.com/docs/technical-guides/aks-guide/) (for teams with an enterprise subscription needing further information) 
+* [Optum Standard AKS Recommendations](https://cloud.optum.com/docs/technical-guides/aks-guide/) (for teams with an enterprise subscription needing further information)
 
 ### Looking for More?
 This EaC pattern for DCE provides a environment for learning or POCing AKS and may not be suitable for all use cases. Let us know what else you'd like to see by submitting a [product feature request](https://github.optum.com/healthcarecloud-dce/feature-requests/issues/new/choose).

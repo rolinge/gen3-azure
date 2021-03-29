@@ -1,0 +1,19 @@
+apiVersion: v1
+# Useful pod for connecting and debugging network connections...
+kind: Pod
+metadata:
+  name: "jumpserver-initial"
+spec:
+  restartPolicy: 'Never'
+  containers:
+    - name: jump
+      image: centos:7
+      command: ['sleep']
+      args: ['60000000']
+      resources:
+        limits:
+          cpu: '1200m'
+          memory: '1720Mi'
+        requests:
+          cpu: '1100m'
+          memory: '1024Mi'
