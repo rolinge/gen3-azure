@@ -1,5 +1,3 @@
-
-
 resource "azurerm_key_vault" "keyvault1" {
   name                        = join("-", ["keyvault", var.environment,random_string.uid.result])
   location                    = azurerm_resource_group.rg.location
@@ -41,6 +39,67 @@ resource "azurerm_key_vault_access_policy" "serviceaccount" {
   "DeleteIssuers","Purge"
   ]
 }
+#----- Delete these once we get the group synched.
+
+resource "azurerm_key_vault_access_policy" "carlos" {
+  key_vault_id = azurerm_key_vault.keyvault1.id
+
+  tenant_id = data.azurerm_client_config.current.tenant_id
+  object_id = "8d1aadf7-0913-4e23-a653-72ff9de2c226"
+
+  key_permissions = [
+  "Get",  "List", "Delete", "Recover",  "Backup", "Restore",
+  "Create", "Decrypt", "Encrypt", "Import", "Sign",
+  "UnwrapKey", "Update", "Verify" , "WrapKey", "Purge"
+  ]
+  secret_permissions = [
+  "get",  "list", "delete", "recover",  "backup", "restore",  "set", "Purge"
+  ]
+  storage_permissions = [
+  "get",  "list", "delete", "recover",  "backup", "restore",
+  "regeneratekey", "getsas", "listsas", "deletesas", "set", "setsas",
+  "update"
+  ]
+  certificate_permissions = [
+  "Get",  "List", "Delete", "Recover",  "Backup", "Restore",
+  "Update" , "Create", "Import", "ManageContacts",  "ManageIssuers",
+  "GetIssuers","ListIssuers","SetIssuers",
+  "DeleteIssuers","Purge"
+  ]
+}
+resource "azurerm_key_vault_access_policy" "randy" {
+  key_vault_id = azurerm_key_vault.keyvault1.id
+
+  tenant_id = data.azurerm_client_config.current.tenant_id
+  object_id = "be2b3c36-2c8b-4905-a81b-cc3c9c58e66e"
+
+  key_permissions = [
+  "Get",  "List", "Delete", "Recover",  "Backup", "Restore",
+  "Create", "Decrypt", "Encrypt", "Import", "Sign",
+  "UnwrapKey", "Update", "Verify" , "WrapKey", "Purge"
+  ]
+  secret_permissions = [
+  "get",  "list", "delete", "recover",  "backup", "restore",  "set", "Purge"
+  ]
+  storage_permissions = [
+  "get",  "list", "delete", "recover",  "backup", "restore",
+  "regeneratekey", "getsas", "listsas", "deletesas", "set", "setsas",
+  "update"
+  ]
+  certificate_permissions = [
+  "Get",  "List", "Delete", "Recover",  "Backup", "Restore",
+  "Update" , "Create", "Import", "ManageContacts",  "ManageIssuers",
+  "GetIssuers","ListIssuers","SetIssuers",
+  "DeleteIssuers","Purge"
+  ]
+}
+
+#-----
+
+
+
+
+
 
 resource "azurerm_key_vault_access_policy" "functionapp" {
   key_vault_id = azurerm_key_vault.keyvault1.id

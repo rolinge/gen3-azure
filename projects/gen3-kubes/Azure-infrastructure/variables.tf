@@ -1,14 +1,14 @@
-variable "client_id" {
-  type        = string
-  description = "The name of the client id"
-  default = "f8b8b944-81bf-4c76-b460-f9e17beef02d"
-}
+#variable "client_id" {
+#  type        = string
+#  description = "The name of the client id"
+#  default = "f8b8b944-81bf-4c76-b460-f9e17beef02d"
+#}
 
-variable "client_secret" {
-  type        = string
-  description = "The value of the client secret"
-  default     = "XDUjUzCdgBc_TTpVaCChDP41-rNYR21~o4"
- }
+#variable "client_secret" {
+#  type        = string
+#  description = "The value of the client secret"
+#  default     = "XDUjUzCdgBc_TTpVaCChDP41-rNYR21~o4"
+#}
 
 variable "agent_count" {
   default = 2

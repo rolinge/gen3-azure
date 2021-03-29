@@ -36,11 +36,6 @@ resource "azurerm_kubernetes_cluster" "aks_cluster" {
     vnet_subnet_id      = azurerm_subnet.aks_subnet.id
     os_disk_size_gb     = var.k8s_os_disk_size
   }
-#  service_principal {
-#    client_id     =  var.client_id
-#    client_secret = var.client_secret
-#  }
-
   identity {
     type = "SystemAssigned"
   }
