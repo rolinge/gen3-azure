@@ -174,18 +174,18 @@ resource "azurerm_key_vault_secret" "StorageaccountConnectString" {
   tags = merge(var.tags, local.common_tags)
 }
 
-resource "azurerm_key_vault_secret" "acrAdminPassword" {
-  name         = "acrAdminPassword"
-  value        = azurerm_container_registry.gen3.admin_password
-  key_vault_id = azurerm_key_vault.keyvault1.id
-  tags = merge(var.tags, local.common_tags)
-}
-resource "azurerm_key_vault_secret" "acrAdminUsername" {
-  name         = "acrAdminUsername"
-  value        = azurerm_container_registry.gen3.admin_username
-  key_vault_id = azurerm_key_vault.keyvault1.id
-  tags = merge(var.tags, local.common_tags)
-}
+#resource "azurerm_key_vault_secret" "acrAdminPassword" {
+#  name         = "acrAdminPassword"
+#  value        = azurerm_container_registry.gen3.admin_password
+#  key_vault_id = azurerm_key_vault.keyvault1.id
+#  tags = merge(var.tags, local.common_tags)
+#}
+#resource "azurerm_key_vault_secret" "acrAdminUsername" {
+#  name         = "acrAdminUsername"
+#  value        = azurerm_container_registry.gen3.admin_username
+#  key_vault_id = azurerm_key_vault.keyvault1.id
+#  tags = merge(var.tags, local.common_tags)
+#}
 
 
 resource "azurerm_key_vault_key" "stgacctkey" {

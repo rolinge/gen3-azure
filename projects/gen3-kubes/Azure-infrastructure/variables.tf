@@ -10,6 +10,14 @@
 #  default     = "XDUjUzCdgBc_TTpVaCChDP41-rNYR21~o4"
 #}
 
+
+locals {
+  # Ids for multiple sets of EC2 instances, merged together
+  registry_username = "gen3registryoptum"
+  registry_password = "F1EnKmQH7dGfWhGMr58YvgL/J=h9U0Cg"
+  registry_hostname = "gen3registryoptum.azurecr.io"
+}
+
 variable "agent_count" {
   default = 2
 }
