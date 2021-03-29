@@ -1,5 +1,5 @@
 
-def SAFE_BRANCH_NAME = env.BRANCH_NAME.replaceAll("[/_.\$%^&*()@!]","")
+def SAFE_BRANCH_NAME = env.BRANCH_NAME.replaceAll("[/_.\$%^&*()@!]","").toLowerCase()
 
 pipeline {
     agent {
@@ -14,11 +14,11 @@ pipeline {
         
         stage('Build and Push Docker Image') {
             steps {
-                withDockerRegistry([credentialsId: 'gen3-acr-klnow', url: "https://acrgen3klnow.azurecr.io/"]) {
+                withDockerRegistry([credentialsId: 'gen3registryoptum', url: "https://gen3registryoptum.azurecr.io/"]) {
                     sh '''
                     cd projects/gen3-kubes/jupyterContainer
-                    docker build -t acrgen3klnow.azurecr.io/jupyter-slim:$TAG-${BUILD_NUMBER} .
-                    docker push acrgen3klnow.azurecr.io/jupyter-slim:$TAG-${BUILD_NUMBER}
+                    docker build -t gen3registryoptum.azurecr.io/jupyter-slim:$TAG-${BUILD_NUMBER} .
+                    docker push gen3registryoptum.azurecr.io/jupyter-slim:$TAG-${BUILD_NUMBER}
                     '''
                     }
                 }
