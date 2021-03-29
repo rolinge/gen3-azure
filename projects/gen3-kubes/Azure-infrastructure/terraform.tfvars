@@ -12,4 +12,5 @@ aks_k8s_version = "1.19.7"
 hdinsight_node_username = "gen3_hdinsight_nodes"
 hdiHeadNodeSize = "STANDARD_DS13_V2"
 hdiWorkerNodSize = "STANDARD_DS14_V2"
-blobindexfunction_version = "g3kubes-cg2"
+blobindexfunction_version = "develop"
+

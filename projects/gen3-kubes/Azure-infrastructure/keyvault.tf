@@ -25,10 +25,10 @@ resource "azurerm_key_vault_access_policy" "serviceaccount" {
   key_permissions = [
   "Get",  "List", "Delete", "Recover",  "Backup", "Restore",
   "Create", "Decrypt", "Encrypt", "Import", "Sign",
-  "UnwrapKey", "Update", "Verify" , "WrapKey"
+  "UnwrapKey", "Update", "Verify" , "WrapKey", "Purge"
   ]
   secret_permissions = [
-  "get",  "list", "delete", "recover",  "backup", "restore",  "set"
+  "get",  "list", "delete", "recover",  "backup", "restore",  "set", "Purge"
   ]
   storage_permissions = [
   "get",  "list", "delete", "recover",  "backup", "restore",
