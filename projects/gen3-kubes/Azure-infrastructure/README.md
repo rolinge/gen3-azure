@@ -29,6 +29,9 @@ in the gen3-helm directory, edit the values file for your specific settings.
 
 helm install nginx-ingress ingress-nginx/ingress-nginx --namespace default --set controller.replicaCount=2
 
+create ingres secret in file <secret-k8scg2dev-ingress-tls.yaml>
+Add google oath stuff to the google developer console  (see fence documentation)
+Create DNS cname in tech.optum.com
 
 
 # DCE Kubernetes Sandbox (AKS)
