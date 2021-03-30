@@ -6,18 +6,20 @@ This principle should have the ability to create and manage resource in the Azur
 ## Clone the git repository and look at Azure-Infrastructure folder
 ## Initialize Terraform with the backend.
 ```
-Insert command there
+terraform init -backend-config=backend.tfvars
 ```
 
 ## Run the terraform scripts to create kubernetes, storage accounts and other resources
 
 ```
-Insert command there
+terraform plan -out=/tmp/myplan
+terraform apply /tmp/myplan | tee /tmp/mygen3_environment.log
 ```
 
-## Capture the output of Terraform and reate the .kube/config file
+## Capture the output of Terraform and create the .kube/config file
 
 ```
+az aks get-credentials --admin --name MyManagedCluster --resource-group MyResourceGroup
 kubectl config set-context xxxx-admin
 ```
 
@@ -31,18 +33,20 @@ kubectl apply -f kubernetes-setup/namespaces.yaml
 
 ```
 helm install nginx-ingress ingress-nginx/ingress-nginx \
-    --namespace NAMESPACE \
+    --namespace default \
     --set controller.replicaCount=2
 ```
 
 ## Decide on  your security model and either create or authorize accounts in K8s (optional)
-
+You can also use RBAC in Azure to grant roles and clusterroles to peoples accounts.  This is an example.
 ```
 cp kubernetes-setup/example-roles.yaml kubernetes-setup/roles.yaml
 vi kubernetes-setup/roles.yaml
 kubectl apply kubernetes-setup/roles.yaml
 ```
-### customize the example-values.yaml file for your needs
+
+## Customize the example-values.yaml file for your needs
+Specific defnitions are available in the [VALUES](VALUES.md) instructions.
 ```
 cp kubernetes-setup/gen3-values-example.yaml kubernetes-setup/gen3-values.yaml
 vi kubernetes-setup/gen3-values.yaml
@@ -57,8 +61,6 @@ helm install <name> -f values.yaml .
 
 ## Customize and test your gen3 instance.
 The configuration of variables is a huge part of this, espeically for authentication and authorization.
-
-
 
 #get kubernetes credentials for the first admin
 LAMU02XLNBTJHC8:kubernetes-setup rolinge$ az aks get-credentials --resource-group k8s-gen3-cg2 --name aks_k8sgen3cg2 --admin
@@ -80,54 +82,7 @@ Add google oath stuff to the google developer console  (see fence documentation)
 Create DNS cname in tech.optum.com
 cp the values-gen3k8dev.yaml file to something that you will use for your helm install.  This is where the majority of changes will be made to control your gen3 instance configuration.
 
-Make sure to edit the following elements in your values*.yaml file.
-- ENV:
-- database_servername:
-- fence.database.username:
-- fence.database.db_password
-- fence.enabledIDPProviders:  (select one or more)
-- fence.base_url
-- fence.googleOauth:  (if using google auth)
-- fence.microsoftOauth: (if using Microsoft auth)
-- fence.oktaOauth:   (ditto)
-- fence.defaultLoginURLSuffix:
-- fence.amazonStorageCreds  (probably don't need these since using Azure, but they are there if you want to have a cross cloud infra)
-- fence.azCredentials:
-- fence.azureBlobstores:
-- fence.dataUploadBucket:
-- fence.adminUsers:  (list of people with elevated privelages)
-- fence.regularUsers:  (list of people with normal privelages)
-- cacrtFiles: if using private certificates
-- fence.jwt_private_key: (generate one if you want)
-- fence.jwt_public_key:  (generate one if you want)
-- arborist.database:
-- image.imagePullSecrets:  (if you are using a private registry that requires authentication)
-- ingress.hosts.host:
-- ingress.hosts.host.paths.path.serviceName: (name of the service for revproxy)
-- ingress.tls.secretName:
-- ingress.hosts.secrestname.hosts:
-- revproxy.crtFile:  (paths to the TLS files)
-- revproxy.keyFile:
-- revproxy.cacrtFile:
-- peregrine.database:  (set user, password, etc)
-- peregrine.gdcapi_secret_key:  (pick something)
-- peregrine.hmac_key:           (pick something)
-- peregrine.schemas:      (if you use a customer schema)
-- tube.esrootcalocation:
-- tube.elasticusername:
-- elasticpasswordb64:
-- tube.elastic.url
-- sheepdog.database:  (user, password, databasename)
-- sheepdog.schemas:   (in case you have a custom schema)
-- indexd.database:  (user, password, databasename)
-- indexd.username:  (make one up)
-- indexd.password:  (make one up)
-- portal.externalhostname:
-- portal.gitops:
-- portal.gitopslogo:
-- jupyter.image:    (if you have a custom notebook)
-- spark.spark_master: (your spark cluster)
--
+
 # DCE Kubernetes Sandbox (AKS)
 
 ## Objective
