@@ -8,17 +8,17 @@ Section  | Identifier  | Explanation
 Environment  | ENV:  | A moniker given to name your specic environment, like maybe DEV, TEST, etc.
 Postgres server  | database_servername:  |  Terraform build a postgres server for you, place its name here
 **fence**  |   |  [CDIS documentation](https://github.com/uc-cdis/fence/blob/master/README.md)
- | fence.database.username: | The fence database username
- |  fence.database.db_password: | database password
- |  fence.enabledIDPProviders: | Docuemnted in fence github. Select one or more
- |  fence.base_url: |   This is used in all the fence setup, set to the address you expect to have the web site hosted at.  (the web site URL)
- | fence.googleOauth:  | if using google auth, follow directions from fence team  |
- |fence.microsoftOauth:  | If using Microsoft auth, follow directions from fence team
- |fence.oktaOauth:  | If using OKTA auth, follow directions from fence team
- | fence.defaultLoginURLSuffix: | The callback URL for your IDP.  Usually set to 'login/\<provider\>'  |
- | fence.amazonStorageCreds:  | Probably don't need these since using Azure, but they are there if you want to have a cross cloud infra
- | fence.azCredentials:  | Need the login name and secret key for the Azure blob storage where files will be kept. There can be more than one.
- | fence.azureBlobstores: | Name of the blob store container and which creds to use.
+| | fence.database.username: | The fence database username
+|  |  fence.database.db_password: | database password
+|  |  fence.enabledIDPProviders: | Docuemnted in fence github. Select one or more
+|  |  fence.base_url: |   This is used in all the fence setup, set to the address you expect to have the web site hosted at.  (the web site URL)
+|  | fence.googleOauth:  | if using google auth, follow directions from fence team  |
+|  |fence.microsoftOauth:  | If using Microsoft auth, follow directions from fence team
+ | |fence.oktaOauth:  | If using OKTA auth, follow directions from fence team
+ | | fence.defaultLoginURLSuffix: | The callback URL for your IDP.  Usually set to 'login/\<provider\>'  |
+|  | fence.amazonStorageCreds:  | Probably don't need these since using Azure, but they are there if you want to have a cross cloud infra
+|  | fence.azCredentials:  | Need the login name and secret key for the Azure blob storage where files will be kept. There can be more than one.
+ | | fence.azureBlobstores: | Name of the blob store container and which creds to use.
  | fence.dataUploadBucket:  |  Pointer to which container(Azure) or bucket(AWS) that you want uploads to go to
  | fence.adminUsers: | A list of people with elevated priveleges
  | fence.regularUsers: | A list of people with regular priveleges
