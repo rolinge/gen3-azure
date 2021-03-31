@@ -7,15 +7,15 @@ config_helper: "assets/config_helper.py"
 
 #global tag for lables, etc
 #Thi is what will be used to name all your services and your url, pick a name that works for you.
-ENV: cg2
-database_servername: "postgres-k8sgen3cg2.postgres.database.azure.com" #this needs to be changed.
+ENV: gen3
+database_servername: "postgres-k8sgen3.postgres.database.azure.com" #this needs to be changed.
 database_port: "5432"
 #dictionary_url: "https://s3.amazonaws.com/dictionary-artifacts/datadictionary/develop/schema.json"
 path_to_schema_dir: "/schemas_dir/schemas"
 fence:
   serviceport: 80
   database:
-    username: "fence_gen3dev_user@postgres-k8sgen3cg2.postgres.database.azure.com"
+    username: "fence_gen3dev_user"
     databasename: "fence_db"
     db_password: "b65a802fdf7a101c619e35354e791eeb"
   defaultIDPProvider: google
@@ -27,10 +27,10 @@ fence:
     # - name: "okta"
     #   loginButtonText: "Okta Login"
   replicas: 1
-#  image: "quay.io/cdis/fence:2020.12"
+#  image: "quay.io/cdis/fence:2021.03"
 #  image: "rmolinger/fence:katie02"
-  image: "dbedevreg.azurecr.io/fence:katie02"
-  base_url: 'https://k8scg2dev.optum.com/user'
+  image: "quay.io/cdis/fence:2021.03"
+  base_url: 'https://mysitename.mydomain.com/user'
   resources:
     limits:
       cpu: '500m'
@@ -64,29 +64,29 @@ fence:
       region: 'us-east-1'
   azCredentials:
     - name: 'CREDA'
-      az_stgacctname: 'stgacgen3devnlecm'
-      az_connection_string: 'DefaultEndpointsProtocol=https;AccountName=stgacgen3devnlecm;AccountKey=/WwUoSRwLmnXSwVpmmVYAdk8BVCq8qYGe7SwfzxpLsICHpSXIKuQcmcjY8s3Wtyxdn+Q9KxUr5gqRnTECgmg5Q==;EndpointSuffix=core.windows.net'
+      az_stgacctname: 'stgacgen3devklnow'
+      az_connection_string: 'DefaultEndpointsProtocol=https;AccountName=stgacgen3devklnow;AccountKey=KY0cSrSewNiDsYuRzw2jGBc8DWXmhee9vjP/bohCNbjfkrVzg2HkIJ1EKL8I3pfyiIBjzVozPMNx1PfSD8pG6Q==;EndpointSuffix=core.windows.net'
   azureBlobstores:
     - name: 'azgen3blobstorage'
       credentialname: 'CREDA'
   dataUploadBucket: 'azgen3blobstorage'
   adminUsers:
-    - "randyolinger@gmail.com"
-    - "rjwswenson@gmail.com"
-    - "carlos.andrew.garcia@gmail.com"
-    - "optumogs@gmail.com"
-    - "grondahlkatie@gmail.com"
-    - "hammer.jacob.m@gmail.com"
+    - "sidney@gmail.com"
+    - "alex@gmail.com"
+    - "rodney@gmail.com"
+    - "mary@gmail.com"
+    - "Alam@gmail.com"
+    - "kick.me@gmail.com"
   regularUsers:
-    - "randy.olinger@optum.com"
-    - "carlos.garcia@optum.com"
+    - "foo@mydomain.com"
+    - "bar@mydomain.com"
   service:
     type: ClusterIP
     httpPort: 80
     httpsPort: 443
   cacrtFiles:
-    - name: "olingerSigningCert.crt"
-      fileLocation: "assets/olingerSigningCert.crt"
+    - name: "myprivatecert.crt"
+      fileLocation: "assets/myprivatecert.crt"
   jwt_private_key: |
     -----BEGIN PRIVATE KEY-----
     MIIEwAIBADANBgkqhkiG9w0BAQEFAASCBKowggSmAgEAAoIBAQDkS+nTVWUnXgIQ
@@ -133,7 +133,7 @@ arborist:
     db_password: "E98CF2-8DC7HGES"
   replicas: 1
   serviceport: 80
-  image: "quay.io/cdis/arborist:2020.12"
+  image: "quay.io/cdis/arborist:2021.03"
   resources:
     limits:
       cpu: 500m
@@ -163,7 +163,7 @@ serviceAccount:
   annotations: {}
   # The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
-  name: "gen3dev"
+  name: "gen3"
 
 podAnnotations: {}
 
@@ -192,11 +192,11 @@ ingress:
     # kubernetes.io/ingress.class: nginx
     # kubernetes.io/tls-acme: "true"
   hosts:
-    - host: k8sgen3dev.optum.com
+    - host: mysitename.mydomain.com
       paths:
         - path :
           actualPath: "/(.*)"
-          serviceName: service-revproxy-gen3k8dev
+          serviceName: service-revproxy-<$ENV>
           servicePort: 80
         - path:
           actualPath: "/colordropboxdev"
@@ -205,7 +205,7 @@ ingress:
   tls:
     - secretName: k8sgen3dev-ingress-tls
       hosts:
-        - k8sgen3dev.optum.com
+        - mysitename.mydomain.com
 
 
 autoscaling:
@@ -226,9 +226,6 @@ revproxy:
   replicas: 2
   serviceport: 80
   image: "quay.io/cdis/nginx:1.17.6-ctds-1.0.1"
-  crtFile: "assets/gen3k8dev.crt"
-  keyFile: "assets/gen3k8dev.npp.key"
-  cacrtFile: "assets/gen3k8dev.cacrt"
   resources:
     limits:
       cpu: '100m'
@@ -238,7 +235,7 @@ revproxy:
       memory: '128Mi'
 
 peregrine:
-  image: "quay.io/cdis/peregrine:2020.12"
+  image: "quay.io/cdis/peregrine:2021.03"
   database:
     username: "peregrine_gen3dev_user"
     databasename: "metadata_db"
@@ -249,7 +246,7 @@ peregrine:
   bagitbucket: "noIdeaWhatThisIs"
   s3access: "notSureThisIsUsed"
   s3secret: "notSureThisIsUsed"
-  schemas: assets/optum-gen3-clinical-omop.schema.tar.gz.b64
+  schemas: assets/my.schema.tar.gz.b64
   resources:
     limits:
       cpu: 500m
@@ -273,7 +270,7 @@ minio:
       cpu: 200m
       memory: 512Mi
 tube:
-  image: "quay.io/cdis/tube:2020.12"
+  image: "quay.io/cdis/tube:2021.03"
   serviceport: 80
   replicas: 1
   startupfileLocation: "assets/tube_startup.ksh"
@@ -300,10 +297,10 @@ sheepdog:
     db_password: "E24B9254-7019-4081"
   replicas: 1
   serviceport: 80
-  image: "quay.io/cdis/sheepdog:2020.12"
+  image: "quay.io/cdis/sheepdog:2021.03"
   s3access: "notSureThisIsUsed"
   s3secret: "notSureThisIsUsed"
-  schemas: assets/optum-gen3-clinical-omop.schema.tar.gz.b64
+  schemas: assets/my.schema.tar.gz.b64
   resources:
     limits:
       cpu: 500m
@@ -319,12 +316,12 @@ indexd:
     username: "indexd_gen3dev_user"
     databasename: "indexd_db"
     db_password: "D7E-2A715381173D"
-  username: "indexd_client_gen3k8dev"
-  password:  "indexd_client_pass_gen3k8dev"
+  username: "indexd_client_gen3v"
+  password:  "indexd_client_pass_gen3v"
   local_settings: "assets/indexd_settings.py"
   replicas: 1
   serviceport: 80
-  image: "quay.io/cdis/indexd:2020.12"
+  image: "quay.io/cdis/indexd:2021.03"
   resources:
     limits:
       cpu: 1
@@ -338,10 +335,10 @@ indexd:
 portal:
   replicas: 1
   serviceport: 80
-  image: "quay.io/cdis/data-portal:2020.12"
-  externalhostname: "k8scg2dev.optum.com"
-  gitops: "assets/optum4c.png"
-  gitopslogo: "assets/optum4c.png"
+  image: "quay.io/cdis/data-portal:2021.03"
+  externalhostname: "mysitename.mydomain.com"
+  gitops: "assets/gitops.png"
+  gitopslogo: "assets/gitopslogo.png"
   workspaceurlsuffix: /lw-workspace/proxy/tree
   initialDelaySeconds: 300
   resources:
@@ -352,7 +349,7 @@ portal:
       cpu: '2000m'
       memory: '2048Mi'
 pidgin:
-  image: "quay.io/cdis/pidgin:2020.12"
+  image: "quay.io/cdis/pidgin:2021.03"
   replicas: 1
   serviceport: 80
   resources:
@@ -363,7 +360,7 @@ pidgin:
       cpu: 100m
       memory: 256Mi
 guppy:
-  image: "quay.io/cdis/guppy:2020.12"
+  image: "quay.io/cdis/guppy:2021.03"
   replicas: 1
   serviceport: 80
   resources:
@@ -389,7 +386,7 @@ spark:
   image: "quay.io/cdis/gen3-spark:2020.05"
   replicas: 1
   pullPolicy: IfNotPresent
-  spark_master: https://hdinsights-k8sgen3rmo.azurehdinsight.net
+  spark_master: "http://<service-spark-ENV>"
   userDirSize: 32Gi
   spark_executor_memory: 2G
   spark_driver_memroy: 2G

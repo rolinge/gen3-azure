@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  labels:
+    {{- include "gen3kubernetes.labels" . | nindent 4 }}
+    component: guppy-configmap
+
+  name: guppy-configmap-{{ .Values.ENV }}
+data:
+  guppy_config.json: |
+    {
+      "indices":
+        [
+          { "index": "etl", "type": "case" },
+          { "index": "file", "type": "file" }
+        ],
+      "config_index": "etl_array-config",
+      "auth_filter_field": "auth_resource_path"
+    }

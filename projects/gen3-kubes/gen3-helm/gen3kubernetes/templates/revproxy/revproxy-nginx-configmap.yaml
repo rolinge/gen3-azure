@@ -12,11 +12,6 @@ data:
         server_name  revproxy-service;
         resolver 127.0.0.1;
 
-        listen 443 ssl;
-
-        ssl_certificate /etc/nginx/ssl/tls.crt;
-        ssl_certificate_key /etc/nginx/ssl/tls.key;
-
         set $access_token "";
         set $csrf_check "ok-tokenauth";
         if ($cookie_access_token) {
