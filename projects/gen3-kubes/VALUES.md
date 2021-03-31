@@ -60,5 +60,5 @@ Postgres server  | database_servername:  |  Terraform build a postgres server fo
  | | portal.gitopslogo: | path to another PNG logo file that shows up on the portal.
 **Jupyter**   |   |
   | |  jupyter.image:  |  Set this if you have a custom notebook, otherwise set it to the [CDIS image](https://quay.io/repository/occ_data/jupyternotebook?tag=1.7.2&tab=tags) at quay.io. |
-**Spark**  |   |  [CDIS Documentation](https://github.com/uc-cdis/data-portal/blob/master/README.md)|
+**Spark**  |   |  [CDIS Documentation](https://github.com/uc-cdis/gen3-spark)|
  | | spark.spark_master: | URL of your spark cluster|
