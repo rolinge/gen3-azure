@@ -124,45 +124,66 @@ vi internal_users.yml
 # Find the stanzas for the admin and gen3 users and change the hash value to the out of the previous steps above. Save and exit.
 ```
 
-### Exist the pod by typing exit
+```
+#Run the opendistro security command to update the passwords in the system
+
+/usr/share/elasticsearch/plugins/opendistro_security/tools/securityadmin.sh \
+ -cd "/usr/share/elasticsearch/plugins/ \
+ opendistro_security/securityconfig" -icl \
+ -key /usr/share/elasticsearch/config/kirk-key.pem \
+ -cert /usr/share/elasticsearch/config/kirk.pem \
+ -cacert /usr/share/elasticsearch/config/root-ca.pem \
+ -nhnv
+```
+
+
+
+### Exit the pod by typing exit
 Or if you are fancy use ctl-d
 
 ## Create an ingress controller for the kubernetes cluster
 This command creates the controller pair and Azure will give a public IP.  You can assign a domain name to it via the portal if you wish, or use your own DNS system to resolve your name.
 
 ```
-helm install nginx-ingress ingress-nginx/ingress-nginx --namespace default --set controller.replicaCount=2
+helm install nginx-ingress \
+   ingress-nginx/ingress-nginx \
+   --namespace default \
+   --set controller.replicaCount=2
 ```
 
 ## Handle TLS/SSL
 
 Create ingres secret in file <secret-k8sxxxdev-ingress-tls.yaml>
 (Debt - This should be templated in Helm...)
+Follow the [instructions here](INSTALL.md)
 
 ## Authentication - Google
-Follow the instructions for Fence to set up the google google developer console
+Follow the [instructions for Fence](https://github.com/uc-cdis/fence/blob/master/README.md#oidc--oauth2) to set up the google google developer console
 
 ## Authentication - Other Oauth
+Updates in the values.yaml file for help.
+[instructions for Fence](https://github.com/uc-cdis/fence/blob/master/README.md#oidc--oauth2)
+
+## Create DNS cname in your favorite DNS resolver
+The IP address can be found in the public-ip that is created in the kubernetes resources.
+
+## Customize Gen3 settings to  your specific needs
+cp the projects/gen3-kubes/gen3-helm/gen3kubernetes/values-example.yaml file to something that you will use for your helm install.  This is where the majority of changes will be made to control your gen3 instance configuration.  The configuration of variables is a huge part of this, espeically for authentication and authorization.
 
 
-Create DNS cname in tech.optum.com
-cp the values-gen3k8dev.yaml file to something that you will use for your helm install.  This is where the majority of changes will be made to control your gen3 instance configuration.
-
-
-
-## Customize the example-values.yaml file for your needs
 Specific defnitions are available in the [VALUES](VALUES.md) instructions.
 ```
-cp kubernetes-setup/gen3-values-example.yaml kubernetes-setup/gen3-values.yaml
-vi kubernetes-setup/gen3-values.yaml
+cp projects/gen3-kubes/gen3-helm/gen3kubernetes/values-example.yaml \
+   projects/gen3-kubes/gen3-helm/gen3kubernetes/values-myinstance.yaml
+vi projects/gen3-kubes/gen3-helm/gen3kubernetes/values-myinstance.yaml
 ```
 
 ## Build the Gen3 instance using helm
+
+Make up a name to define this instance.  It will be used for all subsequent helm commands.
 ```
-cd gen3-helm/gen3kubernetes
-ln -s ../../kubernetes-setup/gen3-values.yaml values.yaml
-helm install <name> -f values.yaml .
+cd projects/gen3-kubes/gen3-helm/gen3kubernetes
+helm install <name> -f values-myinstance.yaml --namespace=gen3k8dev  .
 ```
 
-## Customize and test your gen3 instance.
-The configuration of variables is a huge part of this, espeically for authentication and authorization.
+## Happy Gen3!
