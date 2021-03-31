@@ -35,12 +35,12 @@ spec:
           #command: ['sleep']
           #args: ['60000000']
           env:
-            -name: "GUPPY_CONFIG_FILEPATH"
-             value: "/guppy/config/guppy_config.json"
-            -name: "GEN3_ARBORIST_ENDPOINT"
-             value: "http://service-arborist-{{ .Values.ENV }}"
-            -name: "GEN3_ES_ENDPOINT"
-             value: "http://{{ .Values.tube.elastic.url }}:9200"
+            - name: "GUPPY_CONFIG_FILEPATH"
+              value: "/guppy/config/guppy_config.json"
+            - name: "GEN3_ARBORIST_ENDPOINT"
+              value: "http://service-arborist-{{ .Values.ENV }}"
+            - name: "GEN3_ES_ENDPOINT"
+              value: "http://{{ .Values.tube.elastic.url }}:9200"
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.guppy.image }}"
