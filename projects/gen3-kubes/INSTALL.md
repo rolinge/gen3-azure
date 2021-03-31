@@ -47,6 +47,7 @@ kubectl apply kubernetes-setup/roles.yaml
 
 ## create the database users and grant permissions.
 You can find unique generated passwords in the terraform output.  You can also use any passwords that you like.  Once you enter them into the config files, you don't have to deal with them anymore, so no reason to make them easy to remember.
+
 ```
 #POSTGRES_PASSWORD will come from the Terraform Output
 
