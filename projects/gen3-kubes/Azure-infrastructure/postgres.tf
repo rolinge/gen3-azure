@@ -105,6 +105,8 @@ module "postgres_password" {
 module "indexd_password" {
   source           = "modules/password_module"
 }
+
 module "opendistro_password" {
   source           = "modules/password_module"
 }
+
