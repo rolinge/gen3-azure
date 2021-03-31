@@ -10,7 +10,7 @@ resource "azurerm_postgresql_server" "g3DATA" {
   version                         = "11"
   ssl_enforcement_enabled         = false
   administrator_login             = "postgres"
-  administrator_login_password    = var.POSTGRES_PASSWORD
+  administrator_login_password    = random_string.postgres_password.result
   auto_grow_enabled               = true
 
   public_network_access_enabled    = true
@@ -84,4 +84,24 @@ resource "azurerm_postgresql_database" "indexd_db" {
   server_name         = azurerm_postgresql_server.g3DATA.name
   charset             = "UTF8"
   collation           = "English_United States.1252"
+}
+
+# Generate passwords that the user can choose to use
+module "arborist_password" {
+  source           = "modules/password_module"
+}
+module "fence_password" {
+  source           = "modules/password_module"
+}
+module "sheepdog_password" {
+  source           = "modules/password_module"
+}
+module "peregrine_password" {
+  source           = "modules/password_module"
+}
+module "postgres_password" {
+  source           = "modules/password_module"
+}
+module "indexd_password" {
+  source           = "modules/password_module"
 }

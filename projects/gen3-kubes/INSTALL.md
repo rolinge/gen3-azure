@@ -45,6 +45,33 @@ vi kubernetes-setup/roles.yaml
 kubectl apply kubernetes-setup/roles.yaml
 ```
 
+## create the database users and grant permissions.  Usually best to choose passwords that are complex and keep track, as you will need to enter them later.
+```
+#POSTGRES_PASSWORD will come from the Terraform Output
+
+# Your Terraform Output will supply the values for these password strings. Manually enter them inside the single quotes.
+
+CREATE USER fence_gen3dev_user with  createdb login password '<Password>';
+CREATE USER arborist_gen3dev_user with  createdb login password '<Password>';
+CREATE USER peregrine_gen3dev_user with  createdb login password '<Password>';
+CREATE USER sheepdog_gen3dev_user with  createdb login password '<Password>';
+CREATE USER indexd_gen3dev_user with  createdb login password '<Password>';
+
+# Grant permissions on each db to the users
+grant all on database fence_db to fence_gen3dev_user;
+grant all on database arborist_db to arborist_gen3dev_user;
+grant all on database indexd_db to indexd_gen3dev_user;
+grant all on database metadata_db to sheepdog_gen3dev_user;
+grant all on database metadata_db to peregrine_gen3dev_user;
+
+# finally add an extension to the postgres arborist database
+\c arborist_db
+CREATE EXTENSION ltree ;
+\q
+
+```
+
+
 ## Customize the example-values.yaml file for your needs
 Specific defnitions are available in the [VALUES](VALUES.md) instructions.
 ```
