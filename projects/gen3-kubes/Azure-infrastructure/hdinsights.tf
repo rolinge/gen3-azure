@@ -47,7 +47,7 @@ resource "azurerm_hdinsight_spark_cluster" "gen3spark" {
   name                          = "hdinsights-${var.cluster_name}"
   location                      = azurerm_resource_group.rg.location
   resource_group_name           = azurerm_resource_group.rg.name
-  cluster_version               = "3.6"
+  cluster_version               = "4.0"
   tier                          = "Standard"
 
   component_version {
