@@ -47,7 +47,7 @@ kubectl apply kubernetes-setup/roles.yaml
 
 ## create the database users and grant permissions.
 You can find unique generated passwords in the terraform output.  You can also use any passwords that you like.  Once you enter them into the config files, you don't have to deal with them anymore, so no reason to make them easy to remember.
-
+Connect to the database server with your favorite tool or command line.
 ```
 #POSTGRES_PASSWORD will come from the Terraform Output
 
@@ -188,3 +188,14 @@ helm install <name> -f values-myinstance.yaml --namespace=gen3k8dev  .
 ```
 
 ## Happy Gen3!
+While this is a very complex process with many steps, with a little debugging you can have a system up in no time.  Probably the most difficult service to get running is fence, as it interacts with external entities like cloud storage and authentication.  Pay VERY close attention to detail when entering the OAUTH settings.
+
+The following commands will help you diagnose and solve problems should they arise.  This is no substitute for a solid grasp of helm and kubernetes.
+
+- kubectl get pods           # see which pods are running or dead
+- kubectl logs -f <pod-name> # see real time output from a pod
+- kubectl exec -it <pod-name> -- bash   # run linux command line in a running pod.
+- kubectl delete deployment <deployment-name> # useful before running helm again, forces a redeploy.
+- kubectl scale deployment --replicas=n <deployment-name>   # add or remove counts of containers in a set
+- helm upgrade <name> --namespace=k8sgen3dev .   # new configuration after changing variables
+-
