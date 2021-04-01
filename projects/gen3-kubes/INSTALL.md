@@ -47,7 +47,9 @@ kubectl apply kubernetes-setup/roles.yaml
 
 ## create the database users and grant permissions.
 You can find unique generated passwords in the terraform output.  You can also use any passwords that you like.  Once you enter them into the config files, you don't have to deal with them anymore, so no reason to make them easy to remember.
+
 Connect to the database server with your favorite tool or command line.
+
 ```
 #POSTGRES_PASSWORD will come from the Terraform Output
 
@@ -76,10 +78,12 @@ CREATE EXTENSION ltree ;
 
 ## Get kubernetes credentials for the first admin
 This command will populte your .kube/config file with the admin creds.
+
 ```
 # use the az command to get the kubernetes
 az aks get-credentials --resource-group <yourRG> --name <k8s_Clustername>  --admin
 ```
+
 cd to the kubernetes_setup directory
 ```
 kubectl apply -f namespaces.yaml      #create the namespaces
@@ -140,6 +144,7 @@ vi internal_users.yml
 
 
 ### Exit the pod by typing exit
+
 Or if you are fancy use ctl-d
 
 ## Create an ingress controller for the kubernetes cluster
@@ -150,6 +155,7 @@ helm install nginx-ingress \
    ingress-nginx/ingress-nginx \
    --namespace default \
    --set controller.replicaCount=2
+
 ```
 
 ## Handle TLS/SSL
@@ -170,7 +176,6 @@ The IP address can be found in the public-ip that is created in the kubernetes r
 
 ## Customize Gen3 settings to  your specific needs
 cp the projects/gen3-kubes/gen3-helm/gen3kubernetes/values-example.yaml file to something that you will use for your helm install.  This is where the majority of changes will be made to control your gen3 instance configuration.  The configuration of variables is a huge part of this, espeically for authentication and authorization.
-
 
 Specific defnitions are available in the [VALUES](VALUES.md) instructions.
 ```
@@ -198,4 +203,4 @@ The following commands will help you diagnose and solve problems should they ari
 - kubectl delete deployment <deployment-name> # useful before running helm again, forces a redeploy.
 - kubectl scale deployment --replicas=n <deployment-name>   # add or remove counts of containers in a set
 - helm upgrade <name> --namespace=k8sgen3dev .   # new configuration after changing variables
--
+
