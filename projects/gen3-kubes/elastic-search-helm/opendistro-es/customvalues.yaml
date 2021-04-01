@@ -139,7 +139,7 @@ kibana:
 
 
 global:
-  clusterName: gen3knowlelasticsearch
+  clusterName: gen3
 
   psp:
     create: true
@@ -264,9 +264,9 @@ elasticsearch:
         cpu: 1
         memory: 2048Mi
       requests:
-        cpu: 500m
-        memory: 1324Mi
-    javaOpts: "-Xms712m -Xmx712m"
+        cpu: 1
+        memory: 2048Mi
+    javaOpts: "-Xms1512m -Xmx1512m"
     podDisruptionBudget:
       enabled: false
       minAvailable: 1
@@ -338,12 +338,12 @@ elasticsearch:
 
     resources:
       limits:
-        cpu: 4000m
-        memory: 1324Mi
+        cpu: 2000m
+        memory: 2200Mi
       requests:
         cpu: 2000m
-        memory: 1324Mi
-    javaOpts: "-Xms712m -Xmx712m"
+        memory: 2200Mi
+    javaOpts: "-Xms1712m -Xmx1712m"
     podDisruptionBudget:
       enabled: false
       minAvailable: 1
@@ -411,7 +411,7 @@ elasticsearch:
         cpu: 1
         memory: 1024Mi
       requests:
-        cpu: 200m
+        cpu: 1
         memory: 1024Mi
     podDisruptionBudget:
       enabled: false
@@ -437,7 +437,8 @@ elasticsearch:
     #              role: client
     podAnnotations: {}
 
-  config: {}
+  config:
+    opendistro_security.disabled: true
     ## Example Config
     # opendistro_security.allow_unsafe_democertificates: false
     # opendistro_security.allow_default_init_securityindex: true
