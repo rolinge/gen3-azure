@@ -246,7 +246,7 @@ peregrine:
   bagitbucket: "noIdeaWhatThisIs"
   s3access: "notSureThisIsUsed"
   s3secret: "notSureThisIsUsed"
-  schemas: assets/my.schema.tar.gz.b64
+  schemas: assets/compose-services-schema.tgz
   resources:
     limits:
       cpu: 500m
@@ -300,7 +300,7 @@ sheepdog:
   image: "quay.io/cdis/sheepdog:2021.03"
   s3access: "notSureThisIsUsed"
   s3secret: "notSureThisIsUsed"
-  schemas: assets/my.schema.tar.gz.b64
+  schemas: assets/compose-services-schema.tgz
   resources:
     limits:
       cpu: 500m
