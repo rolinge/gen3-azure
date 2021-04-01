@@ -39,7 +39,6 @@ spec:
               value: {{ .Values.path_to_schema_dir }}
             # - name: DICTIONARY_URL
             #   value: {{ .Values.dictionary_url }}
-            # PATH_TO_SCHEMA_DIR: /schemas_dir
             - name: REQUESTS_CA_BUNDLE
               value: "/etc/ssl/certs/ca-certificates.crt"
             - name: "PGDATABASE"
@@ -59,8 +58,6 @@ spec:
               value: "disable"
             - name: "ARBORIST_URL"
               value: "http://service-arborist-{{ .Values.ENV }}"
-            - name: "PATH_TO_SCHEMA_DIR"
-              value: "/schemas_dir/schemas"
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.peregrine.image }}"

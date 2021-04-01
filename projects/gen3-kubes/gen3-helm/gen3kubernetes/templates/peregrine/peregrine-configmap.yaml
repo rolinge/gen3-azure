@@ -122,4 +122,4 @@ data:
   config_helper.py: |
 {{ .Files.Get  .Values.config_helper  | indent 4}}
   peregrine_schemas.tar.gz.base64: |
-{{ .Files.Get  .Values.peregrine.schemas  | indent 4}}
+{{ .Files.Get  .Values.peregrine.schemas | b64enc | indent 4}}
