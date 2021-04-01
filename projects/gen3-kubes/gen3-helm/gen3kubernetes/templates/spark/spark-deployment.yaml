@@ -35,7 +35,10 @@ spec:
         - name: spark-userspace
           persistentVolumeClaim:
             claimName: pvc-spark-{{ .Values.ENV }}
-
+        - name: spark-startup
+          configMap:
+            defaultMode: 0775
+            name: spark-configmap-{{ .Values.ENV }}
       containers:
         - name: "spark-{{ .Values.ENV }}"
           env:
@@ -47,18 +50,14 @@ spec:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.spark.image }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          command: ["bash" , "-c", "python run_config.py && hdfs --daemon start namenode && hdfs --daemon start datanode && yarn --daemon start resourcemanager && yarn --daemon start nodemanager && hdfs dfsadmin -safemode leave &&  hdfs dfs -mkdir /result && while true; do sleep 5; done"]
-          # command:
-          #   - "bash"
-          #   - "-c"
-          #   - "python run_config.py && test ! -f /hadoop/hdfs/data/dfs/namenode/current/VERSION && hdfs namenode -format -force || echo existing data found, no hdfs-format needed;"
-          #   - "bash"
-          #   - "-c"
-          #   - "python run_config.py && hdfs --daemon start namenode && hdfs --daemon start datanode && yarn --daemon start resourcemanager && yarn --daemon start nodemanager && hdfs dfsadmin -safemode leave &&  hdfs dfs -mkdir /result && while true; do sleep 5; done ;"]
           #command: ["sleep" , "60000000"]
+          command: ["bash", "-c", "/gen3spark/startup/spark_startup.ksh"]
           volumeMounts:
-            - name: spark-userspace
-              mountPath: /hadoop/hdfs/data
+            - name: "spark-userspace"
+              mountPath: "/hadoop/hdfs/data"
+              readOnly: False
+            - name: "spark-startup"
+              mountPath: "/gen3spark/startup"
               readOnly: False
           ports:
             {{- range .Values.spark.serviceports }}

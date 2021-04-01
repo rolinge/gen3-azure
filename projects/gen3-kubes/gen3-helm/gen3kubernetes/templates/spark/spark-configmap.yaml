@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  labels:
+    {{- include "gen3kubernetes.labels" . | nindent 4 }}
+    component: spark-configmap
+
+  name: spark-configmap-{{ .Values.ENV }}
+data:
+  spark_startup.ksh: |
+    #!/bin/bash
+    #Command file to start up spark and other services.
+    #first, check if the volume has a hadoop file system, create one if not.
+    python run_config.py && test ! -f /hadoop/hdfs/data/dfs/namenode/current/VERSION && hdfs namenode -format -force || echo existing data found, no hdfs-format needed;
+    #Now start up all the hdfs and apache stuff...
+    python run_config.py \
+      && hdfs --daemon start namenode \
+      && hdfs --daemon start datanode \
+      && yarn --daemon start resourcemanager \
+      && yarn --daemon start nodemanager \
+      && hdfs dfsadmin -safemode leave \
+      &&  hdfs dfs -mkdir /result \
+      && while true; do sleep 5; done ;
