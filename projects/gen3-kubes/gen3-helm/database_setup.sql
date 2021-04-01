@@ -17,4 +17,4 @@ grant all on database metadata_db to sheepdog_gen3dev_user;
 grant all on database metadata_db to peregrine_gen3dev_user;
 
 \c arbortist_db
-CREATE ESTENSION ltree;
+CREATE EXTENSION IF NOT EXISTS ltree;
