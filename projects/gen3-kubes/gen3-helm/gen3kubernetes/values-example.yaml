@@ -276,8 +276,9 @@ tube:
   startupfileLocation: "assets/tube_startup.ksh"
   esrootcalocation: "assets/es-root-ca.pem"
   extrarunetllocation: "assets/run_optum_etl.py"
+  etlmappinglocation: assets/compose-services-etlmapping.yaml
   elasticusername: "gen3"
-  elasticpasswordb64: "R2VuM0Fubm95c01lMyE="
+  elasticpasswordb64: ""
   resources:
     limits:
       cpu: 500m
