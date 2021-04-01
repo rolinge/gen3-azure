@@ -28,7 +28,7 @@ resource "azurerm_kubernetes_cluster" "aks_cluster" {
   default_node_pool {
     name                = "nodepool"
 
-    vm_size             = var.k8_agents_regular
+    vm_size             = var.k8_agents_big
     enable_auto_scaling = true
     max_count           = var.max_count
     min_count           = var.min_count
@@ -71,20 +71,20 @@ resource "azurerm_kubernetes_cluster" "aks_cluster" {
 #  }
 }
 
-resource "azurerm_kubernetes_cluster_node_pool" "gen3-2ndpool" {
-
-  name                  = format("g3large%s",random_string.uid.result)
-  kubernetes_cluster_id = azurerm_kubernetes_cluster.aks_cluster.id
-  vm_size               = var.k8_agents_big
-  enable_auto_scaling = true
-  max_count           = var.max_count
-  min_count           = 0
-  vnet_subnet_id      = azurerm_subnet.aks_subnet2.id
-  os_disk_size_gb     = var.k8s_os_disk_size
-  os_type              = "Linux"
-
-  tags = merge(var.tags, local.common_tags)
-}
+#resource "azurerm_kubernetes_cluster_node_pool" "gen3-2ndpool" {
+#
+#  name                  = format("g3large%s",random_string.uid.result)
+#  kubernetes_cluster_id = azurerm_kubernetes_cluster.aks_cluster.id
+#  vm_size               = var.k8_agents_big
+#  enable_auto_scaling = true
+#  max_count           = var.max_count
+#  min_count           = 0
+#  vnet_subnet_id      = azurerm_subnet.aks_subnet2.id
+#  os_disk_size_gb     = var.k8s_os_disk_size
+#  os_type              = "Linux"
+#
+#  tags = merge(var.tags, local.common_tags)
+#}
 
 
 resource "azurerm_log_analytics_workspace" "k8" {
