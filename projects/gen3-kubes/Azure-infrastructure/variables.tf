@@ -88,7 +88,7 @@ variable "k8_agents_regular" {
   description = "The default virtual machine size for the Kubernetes agents"
 }
 variable "k8_agents_big" {
-  default     = "Standard_D4s_v3"
+  default     = "Standard_D8s_v3"
   description = "The default virtual machine size for the Kubernetes agents"
 }
 
