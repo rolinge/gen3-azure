@@ -209,10 +209,6 @@ resource "azurerm_key_vault_access_policy" "ingest" {
   secret_permissions = ["get"]
 }
 
-data "azurerm_key_vault" "keyvault1" {
-  name                       = join("-", ["keyvault", var.environment,random_string.uid.result])
-  resource_group_name         = azurerm_resource_group.rg.name
-}
 output "keyvault1vault_uri" {
-  value = data.azurerm_key_vault.keyvault1.vault_uri
+  value = azurerm_key_vault.keyvault1.vault_uri
 }

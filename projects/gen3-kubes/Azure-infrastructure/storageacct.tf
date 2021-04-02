@@ -112,12 +112,6 @@ resource "azurerm_storage_account" "gen3ingest" {
   tags = merge(var.tags, local.common_tags)
 }
 
-resource "azurerm_storage_account_customer_managed_key" "gen3ingestkeyassignment" {
-  storage_account_id = azurerm_storage_account.gen3ingest.id
-  key_vault_id       = azurerm_key_vault.keyvault1.id
-  key_name           = azurerm_key_vault_key.stgacctkey.name
-}
-
 # Create a storage account for color to drop off data
 
 resource "azurerm_storage_account" "colordropbox" {
@@ -157,26 +151,33 @@ resource "azurerm_storage_share" "minioconfig" {
   }
 }
 
+
+resource "time_sleep" "waitAccessPoliciesPlus30s" {
+  depends_on = [ azurerm_key_vault_access_policy.gen3accesspolicy,
+                  azurerm_key_vault_access_policy.colordrop01,
+                  azurerm_key_vault_access_policy.ingest]
+  create_duration = "30s"
+}
+
+
 resource "azurerm_storage_account_customer_managed_key" "gen3keyassignment" {
   storage_account_id = azurerm_storage_account.gen3.id
   key_vault_id       = azurerm_key_vault.keyvault1.id
   key_name           = azurerm_key_vault_key.stgacctkey.name
-  depends_on = [
-                  azurerm_key_vault_access_policy.colordrop01,
-                  azurerm_storage_account.gen3
-                ]
-
+  depends_on = [ azurerm_key_vault_access_policy.gen3accesspolicy,azurerm_storage_account.gen3,time_sleep.waitAccessPoliciesPlus30s]
 }
 
 resource "azurerm_storage_account_customer_managed_key" "gen3colorkeyassignment" {
   storage_account_id = azurerm_storage_account.colordropbox.id
   key_vault_id       = azurerm_key_vault.keyvault1.id
   key_name           = azurerm_key_vault_key.stgacctkey.name
-  depends_on = [
-                  azurerm_key_vault_access_policy.colordrop01,
-                  azurerm_storage_account.colordropbox
-                ]
-
+  depends_on = [  azurerm_key_vault_access_policy.colordrop01,azurerm_storage_account.colordropbox,time_sleep.waitAccessPoliciesPlus30s]
+}
+resource "azurerm_storage_account_customer_managed_key" "gen3ingestkeyassignment" {
+  storage_account_id = azurerm_storage_account.gen3ingest.id
+  key_vault_id       = azurerm_key_vault.keyvault1.id
+  key_name           = azurerm_key_vault_key.stgacctkey.name
+  depends_on = [  azurerm_key_vault_access_policy.ingest,azurerm_storage_account.colordropbox,time_sleep.waitAccessPoliciesPlus30s]
 }
 
 # this adds the group AZU_Clinicogenomics_fileshare_rw ACL to the file share.

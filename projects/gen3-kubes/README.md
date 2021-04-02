@@ -16,6 +16,6 @@ Use homebrew on the Mac to install these tools.
 ## Installation
 Follow the procedure in the [INSTALL.md](INSTALL.md) file, but there are a few things to keep in mind.
 - You will need an Azure subscription, and this creates quite a few resources.  Expect the monthly bill to be several hundred dollars.
-- This deployment builds a kubernetes cluster using Azure AKC, which is about 5 servers.
+- This deployment builds a kubernetes cluster using Azure AKS, which is about 5 servers.
 - This deployment creates HDInsight system for doing Spark processing, creates a few servers.
 - This deployment creates some functionapps for doing backend processing and metadata enrichment.  This are quite small
