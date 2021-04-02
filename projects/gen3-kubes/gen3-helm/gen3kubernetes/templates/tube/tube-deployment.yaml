@@ -33,8 +33,6 @@ spec:
       containers:
         - name: "tube-{{ .Values.ENV }}"
           env:
-            - name: "DICTIONARY_URL"
-              value: {{ .Values.dictionary_url }}
             - name: "ES_URL"
               value: {{ .Values.tube.elastic.url | quote }}
             - name: "ES_INDEX_NAME"
@@ -58,6 +56,8 @@ spec:
                 secretKeyRef:
                   key: tubeelasticpassword
                   name: database-secrets-{{ .Values.ENV }}
+            - name: PATH_TO_SCHEMA_DIR
+              value: {{ .Values.path_to_schema_dir }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.tube.image }}"

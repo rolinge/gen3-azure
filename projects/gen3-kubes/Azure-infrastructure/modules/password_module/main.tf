@@ -1,7 +1,7 @@
 
 
-resource "random_string" "app" {
-  length           = 16
+resource "random_string" "uid" {
+  length           = var.pw_length
   special          = true
   number           = true
   lower           = true
@@ -10,9 +10,5 @@ resource "random_string" "app" {
   min_lower        = 1
   min_upper        = 1
   min_numeric      = 1
-  min_sepcial      = 1
-}
-
-output "password" {
-  value = random_string.app.result
+  min_special      = 1
 }

@@ -1,6 +1,6 @@
-Arborist needs to have some tables and indexes defined due to the initialization requiring privs that we don't want
-to grant to the application id.  (CREATE EXTENSION IF NOT EXISTS ltree;)   Since this is part of the arborist init, it
-fails and has to have manual intervention.  Looking for a solution.
+Arborist database (arborist_db) needs to have an extension added manually.  This is in the migrations in the code, but we do not want
+to grant superuser privaleges to the application id.  (CREATE EXTENSION IF NOT EXISTS ltree;)
+This command is included in the database_setup.sql
 
 1. Once application is running make sure to go back to the Azure keyvault and update the secrets from
    the API_KEY in an admin account.  Commands to do such are...

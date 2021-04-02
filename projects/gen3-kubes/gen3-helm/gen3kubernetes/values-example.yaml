@@ -246,7 +246,7 @@ peregrine:
   bagitbucket: "noIdeaWhatThisIs"
   s3access: "notSureThisIsUsed"
   s3secret: "notSureThisIsUsed"
-  schemas: assets/my.schema.tar.gz.b64
+  schemas: assets/compose-services-schema.tgz
   resources:
     limits:
       cpu: 500m
@@ -276,8 +276,9 @@ tube:
   startupfileLocation: "assets/tube_startup.ksh"
   esrootcalocation: "assets/es-root-ca.pem"
   extrarunetllocation: "assets/run_optum_etl.py"
+  etlmappinglocation: assets/compose-services-etlmapping.yaml
   elasticusername: "gen3"
-  elasticpasswordb64: "R2VuM0Fubm95c01lMyE="
+  elasticpasswordb64: ""
   resources:
     limits:
       cpu: 500m
@@ -300,7 +301,7 @@ sheepdog:
   image: "quay.io/cdis/sheepdog:2021.03"
   s3access: "notSureThisIsUsed"
   s3secret: "notSureThisIsUsed"
-  schemas: assets/my.schema.tar.gz.b64
+  schemas: assets/compose-services-schema.tgz
   resources:
     limits:
       cpu: 500m
