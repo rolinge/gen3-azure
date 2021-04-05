@@ -1,7 +1,7 @@
 # Create a storage account
 
 resource "azurerm_storage_account" "gen3" {
-  name                     = format("stgacgen3%s%s",var.environment,random_string.uid.result)
+  name                     = format("stg%s%s",var.environment,random_string.uid.result)
   resource_group_name      = azurerm_resource_group.rg.name
   location                 = azurerm_resource_group.rg.location
   account_tier             = "Standard"
@@ -90,7 +90,7 @@ data "azurerm_storage_account_sas" "gen3sas" {
 # Create a storage account for ingesting data
 
 resource "azurerm_storage_account" "gen3ingest" {
-  name                     = format("stgacingest%s%s",var.environment,random_string.uid.result)
+  name                     = format("stgingest%s%s",var.environment,random_string.uid.result)
   resource_group_name      = azurerm_resource_group.rg.name
   location                 = azurerm_resource_group.rg.location
   account_tier             = "Standard"
@@ -114,8 +114,8 @@ resource "azurerm_storage_account" "gen3ingest" {
 
 # Create a storage account for color to drop off data
 
-resource "azurerm_storage_account" "colordropbox" {
-  name                     = format("stgaccolor%s%s",var.environment,random_string.uid.result)
+resource "azurerm_storage_account" "dropbox" {
+  name                     = format("stgdrop%s%s",var.environment,random_string.uid.result)
   resource_group_name      = azurerm_resource_group.rg.name
   location                 = azurerm_resource_group.rg.location
   account_tier             = "Standard"
@@ -139,7 +139,7 @@ resource "azurerm_storage_account" "colordropbox" {
 
 resource "azurerm_storage_share" "minioconfig" {
   name                 = "miniovolume"
-  storage_account_name = azurerm_storage_account.colordropbox.name
+  storage_account_name = azurerm_storage_account.dropbox.name
   quota                = 5
 
   acl {
@@ -154,7 +154,7 @@ resource "azurerm_storage_share" "minioconfig" {
 
 resource "time_sleep" "waitAccessPoliciesPlus30s" {
   depends_on = [ azurerm_key_vault_access_policy.gen3accesspolicy,
-                  azurerm_key_vault_access_policy.colordrop01,
+                  azurerm_key_vault_access_policy.drop01,
                   azurerm_key_vault_access_policy.ingest]
   create_duration = "30s"
 }
@@ -167,17 +167,17 @@ resource "azurerm_storage_account_customer_managed_key" "gen3keyassignment" {
   depends_on = [ azurerm_key_vault_access_policy.gen3accesspolicy,azurerm_storage_account.gen3,time_sleep.waitAccessPoliciesPlus30s]
 }
 
-resource "azurerm_storage_account_customer_managed_key" "gen3colorkeyassignment" {
-  storage_account_id = azurerm_storage_account.colordropbox.id
+resource "azurerm_storage_account_customer_managed_key" "gen3dropkeyassignment" {
+  storage_account_id = azurerm_storage_account.dropbox.id
   key_vault_id       = azurerm_key_vault.keyvault1.id
   key_name           = azurerm_key_vault_key.stgacctkey.name
-  depends_on = [  azurerm_key_vault_access_policy.colordrop01,azurerm_storage_account.colordropbox,time_sleep.waitAccessPoliciesPlus30s]
+  depends_on = [  azurerm_key_vault_access_policy.drop01,azurerm_storage_account.dropbox,time_sleep.waitAccessPoliciesPlus30s]
 }
 resource "azurerm_storage_account_customer_managed_key" "gen3ingestkeyassignment" {
   storage_account_id = azurerm_storage_account.gen3ingest.id
   key_vault_id       = azurerm_key_vault.keyvault1.id
   key_name           = azurerm_key_vault_key.stgacctkey.name
-  depends_on = [  azurerm_key_vault_access_policy.ingest,azurerm_storage_account.colordropbox,time_sleep.waitAccessPoliciesPlus30s]
+  depends_on = [  azurerm_key_vault_access_policy.ingest,azurerm_storage_account.gen3ingest,time_sleep.waitAccessPoliciesPlus30s]
 }
 
 # this adds the group AZU_Clinicogenomics_fileshare_rw ACL to the file share.

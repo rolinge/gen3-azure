@@ -1,3 +1,13 @@
+module "dropbox_password" {
+  source           = "./modules/password_module"
+  pw_length        = 32
+}
+module "dropbox_username" {
+  source           = "./modules/password_module"
+  pw_length        = 32
+}
+
+
 resource "azurerm_container_group" "minio" {
   name                = format("app-minio-%s-%s",var.environment,random_string.uid.result)
   location            = azurerm_resource_group.rg.location
@@ -19,10 +29,10 @@ resource "azurerm_container_group" "minio" {
       }
 
       environment_variables = {
-        AZURE_STORAGE_ACCOUNT = "colordropbox"
-        AZURE_STORAGE_KEY = "DsDRhqs2/X1Eqv1eyL/7nc754ewO4AXig9RqsT2Dr6SHrvqG2IaLmZ/OQUW6dq4Wb5RGoQ0BXBedKzB6fDcYmA=="
-        MINIO_ROOT_USER = "colordrop01"
-        MINIO_ROOT_PASSWORD = "NUMxODUxQjUtREZGRC00NEE1LTlFRDItRTVCREI2MjFDNDY0Cg=="
+        AZURE_STORAGE_ACCOUNT = "${azurerm_storage_account.dropbox.name}"
+        AZURE_STORAGE_KEY = azurerm_storage_account.dropbox.primary_connection_string
+        MINIO_ROOT_USER = module.dropbox_password.password
+        MINIO_ROOT_PASSWORD = module.dropbox_password.password
       }
     }
 

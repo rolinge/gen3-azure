@@ -23,8 +23,19 @@ az aks get-credentials --admin --name MyManagedCluster --resource-group MyResour
 kubectl config set-context xxxx-admin
 ```
 
-## Use kubernetes to create two namespaces
+## Map the file share to the functionapp
+Terraform attempts to do this action via the null resource.  If it fails due to a local issue,  You will need to know the resource group and get the storage account connectionstring, and the name of the blob index functionapp in order to run this command.
 
+```
+az webapp config storage-account add \
+    --resource-group <RESOURCEGROUPNAME>  --storage-type AzureFiles \
+    --account-name azgen3blobstorage --share-name azgen3blobstorage \
+    --mount-path /opt/shared -n <BLOBINDEXFUNCTIONAPPNAME> \
+    --custom-id CustomID --access-key <CONNECTIONSTRING>
+
+```
+
+## Use kubernetes to create two namespaces
 ```
 kubectl apply -f kubernetes-setup/namespaces.yaml
 ```
@@ -203,4 +214,3 @@ The following commands will help you diagnose and solve problems should they ari
 - kubectl delete deployment <deployment-name> # useful before running helm again, forces a redeploy.
 - kubectl scale deployment --replicas=n <deployment-name>   # add or remove counts of containers in a set
 - helm upgrade <name> --namespace=k8sgen3dev .   # new configuration after changing variables
-

@@ -1,13 +1,29 @@
 resource "azurerm_key_vault" "keyvault1" {
-  name                        = join("-", ["keyvault", var.environment,random_string.uid.result])
+  name                        = format("kv%s%s",var.environment,random_string.uid.result)
   location                    = azurerm_resource_group.rg.location
   resource_group_name         = azurerm_resource_group.rg.name
   enabled_for_disk_encryption = true
   tenant_id                   = data.azurerm_client_config.current.tenant_id
   soft_delete_retention_days = 7
-  soft_delete_enabled        = true
   purge_protection_enabled   = true
   sku_name = "standard"
+  access_policy {
+  tenant_id = data.azurerm_client_config.current.tenant_id
+  object_id = data.azurerm_client_config.current.object_id
+  key_permissions = [
+      "get",  "list", "delete", "recover",  "backup", "restore",
+      "create", "decrypt", "encrypt", "import", "sign",
+      "unwrapKey", "update", "verify" , "wrapKey" , "purge"
+    ]
+    secret_permissions = [
+    "get",  "list", "delete", "recover",  "backup", "restore",  "set" , "purge"
+    ]
+    storage_permissions = [
+    "get",  "list", "delete", "recover",  "backup", "restore",
+    "regeneratekey", "getsas", "listsas", "deletesas", "set", "setsas",
+    "update" , "purge"
+    ]
+  }
   network_acls {
     default_action = "Allow"
     bypass         = "AzureServices"
@@ -16,6 +32,18 @@ resource "azurerm_key_vault" "keyvault1" {
   tags = merge(var.tags, local.common_tags)
 }
 
+
+
+resource "azurerm_role_assignment" "keyvaultACL" {
+  scope                = azurerm_key_vault.keyvault1.id
+  role_definition_name = "Contributor"
+  # this is the subscription owners group, good for now...
+  principal_id         = "9b01c20a-8186-4eca-bb7e-33b6c624c48d"
+}
+
+
+### Access Policies
+###################
 resource "azurerm_key_vault_access_policy" "serviceaccount" {
   key_vault_id = azurerm_key_vault.keyvault1.id
 
@@ -96,7 +124,6 @@ resource "azurerm_key_vault_access_policy" "randy" {
   "DeleteIssuers","Purge"
   ]
 }
-
 #-----
 
 
@@ -115,26 +142,31 @@ resource "azurerm_key_vault_access_policy" "functionapp" {
   secret_permissions = [  "Get",  "List"  ]
 }
 
-resource "azurerm_key_vault_access_policy" "colordrop01" {
+resource "azurerm_key_vault_access_policy" "drop01" {
   key_vault_id = azurerm_key_vault.keyvault1.id
-
   tenant_id = data.azurerm_client_config.current.tenant_id
-  object_id = azurerm_storage_account.colordropbox.identity[0].principal_id
-
+  object_id = azurerm_storage_account.dropbox.identity[0].principal_id
   key_permissions = [   "Get",  "List" ,"Encrypt" ,"Decrypt"  ,"Wrapkey"  ,"Unwrapkey"  ,"Verify"  ,"Sign"]
-
+  secret_permissions = ["get"]
 }
 
 resource "azurerm_key_vault_access_policy" "gen3accesspolicy" {
   key_vault_id = azurerm_key_vault.keyvault1.id
-
   tenant_id = data.azurerm_client_config.current.tenant_id
   object_id = azurerm_storage_account.gen3.identity[0].principal_id
-
   key_permissions = [   "Get",  "List" ,"Encrypt" ,"Decrypt"  ,"Wrapkey"  ,"Unwrapkey"  ,"Verify"  ,"Sign"]
-
+  secret_permissions = ["get"]
+}
+resource "azurerm_key_vault_access_policy" "ingest" {
+  key_vault_id = azurerm_key_vault.keyvault1.id
+  tenant_id    = data.azurerm_client_config.current.tenant_id
+  object_id    = azurerm_storage_account.gen3ingest.identity.0.principal_id
+  key_permissions    = ["get", "create", "list", "restore", "recover", "unwrapkey", "wrapkey", "purge", "encrypt", "decrypt", "sign", "verify"]
+  secret_permissions = ["get"]
 }
 
+### Secrets
+###################
 
 
 #The gen3 secrets are created with junk data and need to be populated before the background jobs will run.
@@ -148,6 +180,10 @@ resource "azurerm_key_vault_secret" "gen3keyid" {
   name         = "gen3keyid"
   value        = "BLANK-FILLINLATER"
   key_vault_id = azurerm_key_vault.keyvault1.id
+  timeouts {
+    create = "2m"
+    delete = "2h"
+  }
   lifecycle {
     ignore_changes = [   value , tags ]
   }
@@ -188,6 +224,8 @@ resource "azurerm_key_vault_secret" "StorageaccountConnectString" {
 #}
 
 
+### Keys
+###################
 resource "azurerm_key_vault_key" "stgacctkey" {
   name         = "storageaccount-encryption-key"
   key_vault_id = azurerm_key_vault.keyvault1.id
@@ -195,19 +233,14 @@ resource "azurerm_key_vault_key" "stgacctkey" {
   key_size     = 4096
 
   key_opts = ["decrypt","encrypt","sign","unwrapKey","verify","wrapKey"  ]
-  depends_on = [    azurerm_key_vault_access_policy.ingest  ]
+  depends_on = [azurerm_key_vault_access_policy.ingest  ]
   tags = merge(var.tags, local.common_tags)
 }
 
 
-resource "azurerm_key_vault_access_policy" "ingest" {
-  key_vault_id = azurerm_key_vault.keyvault1.id
-  tenant_id    = data.azurerm_client_config.current.tenant_id
-  object_id    = azurerm_storage_account.gen3ingest.identity.0.principal_id
 
-  key_permissions    = ["get", "create", "list", "restore", "recover", "unwrapkey", "wrapkey", "purge", "encrypt", "decrypt", "sign", "verify"]
-  secret_permissions = ["get"]
-}
+### Data / Output
+###################
 
 output "keyvault1vault_uri" {
   value = azurerm_key_vault.keyvault1.vault_uri

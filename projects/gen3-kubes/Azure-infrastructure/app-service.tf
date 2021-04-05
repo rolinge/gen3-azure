@@ -1,9 +1,8 @@
 resource "azurerm_app_service_plan" "appplan1" {
-  name                = format("appsvcplangen3%s%s",var.environment,random_string.uid.result)
+  name                = format("app%s%s",var.environment,random_string.uid.result)
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
   kind                = "linux"
-#  kind                = "FunctionApp"
   reserved            = true
 
   sku {
@@ -53,4 +52,42 @@ resource "azurerm_function_app" "funcapp" {
     "DOCKER_REGISTRY_SERVER_PASSWORD" = local.registry_password
     #maybe later for /home "WEBSITES_ENABLE_APP_SERVICE_STORAGE"=true
     }
+}
+
+
+# Use the local-exec command to map the storage.  If it fails, the needful command is in the terraform output and in the instructions
+
+resource "null_resource" "mapstorage" {
+  provisioner "local-exec" {
+    command = "az webapp config storage-account add --resource-group $RG  --storage-type AzureFiles --account-name azgen3blobstorage --share-name azgen3blobstorage --mount-path /opt/shared -n $FUNCNAME --custom-id CustomID --access-key $ACCKEY || az webapp config storage-account update --resource-group $RG  --storage-type AzureFiles --account-name azgen3blobstorage --share-name azgen3blobstorage --mount-path /opt/shared -n $FUNCNAME --custom-id CustomID --access-key $ACCKEY"
+    environment = {
+      RG= azurerm_resource_group.rg.name
+      ACCKEY = azurerm_storage_account.gen3.primary_connection_string
+      FUNCNAME = azurerm_function_app.funcapp.name
+    }
+  }
+}
+# instead of defining outputs with the resource, define in one file.
+# maybe helps with formatting and management
+
+output "mapstorage" {
+  value = <<EOT
+
+  ###
+  #  Below is the command to map the blob storage as specified in the instructions.
+  #  The command will try to add the mount, if that fails it will try to update the setting
+  ###
+  az webapp config storage-account add \
+      --resource-group "${azurerm_resource_group.rg.name}"  --storage-type AzureFiles \
+      --account-name azgen3blobstorage --share-name azgen3blobstorage \
+      --mount-path /opt/shared -n "${azurerm_function_app.funcapp.name}" \
+      --custom-id CustomID --access-key "${azurerm_storage_account.gen3.primary_connection_string}" || \
+      az webapp config storage-account update \
+          --resource-group "${azurerm_resource_group.rg.name}"  --storage-type AzureFiles \
+          --account-name azgen3blobstorage --share-name azgen3blobstorage \
+          --mount-path /opt/shared -n "${azurerm_function_app.funcapp.name}" \
+          --custom-id CustomID --access-key "${azurerm_storage_account.gen3.primary_connection_string}"
+
+
+EOT
 }

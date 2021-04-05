@@ -1,5 +1,5 @@
 resource "azurerm_postgresql_server" "g3DATA" {
-  name                            = "postgres-${var.cluster_name}"
+  name                            = format("pg%s%s",var.environment,random_string.uid.result)
   location                        = azurerm_resource_group.rg.location
   resource_group_name             = azurerm_resource_group.rg.name
 
@@ -10,7 +10,7 @@ resource "azurerm_postgresql_server" "g3DATA" {
   version                         = "11"
   ssl_enforcement_enabled         = false
   administrator_login             = "postgres"
-  administrator_login_password    = var.POSTGRES_PASSWORD
+  administrator_login_password    = module.postgres_password.password
   auto_grow_enabled               = true
 
   public_network_access_enabled    = true
@@ -30,8 +30,8 @@ resource "azurerm_postgresql_configuration" "g3DATA" {
   ]
 }
 
-resource "azurerm_postgresql_virtual_network_rule" "g3DATA" {
-  name                = format("postgres-%s%s",var.environment,random_string.uid.result)
+resource "azurerm_postgresql_virtual_network_rule" "pgruleprimary" {
+  name                = format("pgprimary-%s%s",var.environment,random_string.uid.result)
   resource_group_name = azurerm_resource_group.rg.name
   server_name         = azurerm_postgresql_server.g3DATA.name
   subnet_id           = azurerm_subnet.aks_subnet.id
@@ -42,8 +42,8 @@ resource "azurerm_postgresql_virtual_network_rule" "g3DATA" {
 }
 
 
-resource "azurerm_postgresql_virtual_network_rule" "g3DATA2" {
-  name                = format("postgres-%s%s-2",var.environment,random_string.uid.result)
+resource "azurerm_postgresql_virtual_network_rule" "pgrulesecondary" {
+  name                = format("pgsecondary-%s%s-2",var.environment,random_string.uid.result)
   resource_group_name = azurerm_resource_group.rg.name
   server_name         = azurerm_postgresql_server.g3DATA.name
   subnet_id           = azurerm_subnet.aks_subnet2.id
@@ -108,4 +108,40 @@ module "indexd_password" {
 
 module "opendistro_password" {
   source           = "./modules/password_module"
+}
+
+
+
+output "postgres-user-permissions" {
+value = <<EOT
+
+#Connect to your postgres database using psql
+
+ $  psql "host=postgres-${var.cluster_name}.postgres.database.azure.com \
+          port=5432 dbname=postgres \
+          user=postgres@postgres-${var.cluster_name}.postgres.database.azure.com \
+          password=${module.postgres_password.password} \
+          sslmode=require"
+
+#These queries create the users and assign permissions to teh databases that were created by terraform.
+
+CREATE USER fence_gen3dev_user with  createdb login password '${module.fence_password.password}';
+CREATE USER arborist_gen3dev_user with  createdb login password '${module.arborist_password.password}';
+CREATE USER peregrine_gen3dev_user with  createdb login password '${module.peregrine_password.password}';
+CREATE USER sheepdog_gen3dev_user with  createdb login password '${module.sheepdog_password.password}';
+CREATE USER indexd_gen3dev_user with  createdb login password '${module.indexd_password.password}';
+
+
+grant all on database fence_db to fence_gen3dev_user;
+grant all on database arborist_db to arborist_gen3dev_user;
+grant all on database indexd_db to indexd_gen3dev_user;
+grant all on database metadata_db to sheepdog_gen3dev_user;
+grant all on database metadata_db to peregrine_gen3dev_user;
+grant sheepdog_gen3dev_user to peregrine_gen3dev_user ;
+
+\c arborist_db
+CREATE EXTENSION IF NOT EXISTS ltree;
+
+EOT
+
 }

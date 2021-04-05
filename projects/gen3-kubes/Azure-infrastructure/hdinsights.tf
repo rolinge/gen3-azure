@@ -1,5 +1,5 @@
 resource "azurerm_storage_account" "gen3hdinsightsstorage" {
-  name                            = "hdstg${var.cluster_name}"
+  name                            = format("stghdi%s%s",var.environment,random_string.uid.result)
   location                        = azurerm_resource_group.rg.location
   resource_group_name             = azurerm_resource_group.rg.name
   account_tier                    = "Standard"
@@ -44,7 +44,7 @@ resource "azurerm_role_assignment" "stg_auth_hdiuseridentity" {
 }
 
 resource "azurerm_hdinsight_spark_cluster" "gen3spark" {
-  name                          = "hdinsights-${var.cluster_name}"
+  name                          = format("spark%s%s",var.environment,random_string.uid.result)
   location                      = azurerm_resource_group.rg.location
   resource_group_name           = azurerm_resource_group.rg.name
   cluster_version               = "4.0"
