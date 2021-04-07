@@ -31,6 +31,9 @@ output "postgresql_server_version" {
 output "postgresql_server_fqdn" {
   value = azurerm_postgresql_server.g3DATA.fqdn
 }
+output "postgresql_server_password" {
+  value = module.postgres_password.password
+}
 
 output "gen3keyid" {
   value = azurerm_key_vault_secret.gen3keyid.id

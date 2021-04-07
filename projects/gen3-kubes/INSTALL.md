@@ -40,10 +40,12 @@ az webapp config storage-account add \
 kubectl apply -f kubernetes-setup/namespaces.yaml
 ```
 
-## Create Ingress controller in kubernetes
+## Create an ingress controller for the kubernetes cluster
+This command creates the controller pair and Azure will give a public IP.  You can assign a domain name to it via the portal if you wish, or use your own DNS system to resolve your name.
 
 ```
-helm install nginx-ingress ingress-nginx/ingress-nginx \
+helm repo add nginx-stable https://helm.nginx.com/stable && helm repo update
+helm install nginx-ingress nginx-stable/nginx-ingress \
     --namespace default \
     --set controller.replicaCount=2
 ```
@@ -51,19 +53,24 @@ helm install nginx-ingress ingress-nginx/ingress-nginx \
 ## Decide on  your security model and either create or authorize accounts in K8s (optional)
 You can also use RBAC in Azure to grant roles and clusterroles to peoples accounts.  This is an example.
 ```
-cp kubernetes-setup/example-roles.yaml kubernetes-setup/roles.yaml
-vi kubernetes-setup/roles.yaml
-kubectl apply kubernetes-setup/roles.yaml
+cp restricted/example-roles.yaml restricted/myroles.yaml
+vi restricted/myroles.yaml  #Make changes for YOUR system users and groups.
+kubectl apply -f restricted/myroles.yaml
+```
+
+## Create a jump-server pod that can be used to run postgres commands.
+
+```
+kubectl apply -f kubernetes_setup/initialjumpserver.yaml
+<wait about a minute for pod to start>
+kubectl exec -it --namespace=gen3k8dev jumpserver-initial -- bash
+  >> yum -y update && yum -y  install postgresql
 ```
 
 ## create the database users and grant permissions.
-You can find unique generated passwords in the terraform output.  You can also use any passwords that you like.  Once you enter them into the config files, you don't have to deal with them anymore, so no reason to make them easy to remember.
-
-Connect to the database server with your favorite tool or command line.
+Terraform out contains the complete script that resembles what is below.  Just copy and past the entire script into the postgres command line using the jumpserver pod above.
 
 ```
-#POSTGRES_PASSWORD will come from the Terraform Output
-
 # Your Terraform Output will supply the values for these password strings. Manually enter them inside the single quotes.
 
 CREATE USER fence_gen3dev_user with  createdb login password '<Password>';
@@ -87,19 +94,15 @@ CREATE EXTENSION ltree ;
 ```
 
 
-## Get kubernetes credentials for the first admin
-This command will populte your .kube/config file with the admin creds.
-
+cd to the kubernetes_setup directory.  You may want to modify the clusterroles.yaml file to grant specific permissions to different groups in your organization.
 ```
-# use the az command to get the kubernetes
-az aks get-credentials --resource-group <yourRG> --name <k8s_Clustername>  --admin
-```
-
-cd to the kubernetes_setup directory
-```
-kubectl apply -f namespaces.yaml      #create the namespaces
-kubectl apply -f clusteroles -f roles #create the cluster roles and such
-kubectl apply -f StorageConfig.yaml   #create the storage tier
+cd kubernets-setup
+cp clusterroles-example.yaml clusterroles.yaml
+cp roles-example.yaml roles.yaml
+# Change these two files to your needs
+kubectl apply -f namespaces.yaml                  #create the namespaces
+kubectl apply -f clusteroles.yaml -f roles.yaml   #create the cluster roles and such
+kubectl apply -f StorageConfig.yaml               #create the storage tier
 # Now set your default namespace to the gen3 namespace
 kubectl config  set-context --current --namespace=gen3k8dev
 ```
@@ -110,70 +113,13 @@ kubectl config  set-context --current --namespace=gen3k8dev
 vi opendistro/customevalues.yaml   (change the name)
 cd <opendistro>/helm  && helm install <name> -f customvalues.yaml  --namespace=gen3elastic .
 ```
-## Change the OpenDistro default password and create a gen3 account
-Follow the [instructions](https://opendistro.github.io/for-elasticsearch-docs/docs/security/access-control/users-roles/#internal_usersyml) or use the technique below.
-
- ### log into elasticsearch pod
-Use the hash.sh program to create a hash of a new password.  The output of terraform has a suggestion for Opendistro (Elastic)
-
- ```
- kubectl exec -it --namespace=gen3elastic <xxx>elastic-opendistro-es-master-0 -- bash
-[root@master-0]# cd /usr/share/elasticsearch/plugins/opendistro_security/securityconfig
-chmod 755 /usr/share/elasticsearch/plugins/opendistro_security/tools/hash.sh
-/usr/share/elasticsearch/plugins/opendistro_security/tools/hash.sh -p <MyNewAdminPassword>
-/usr/share/elasticsearch/plugins/opendistro_security/tools/hash.sh -p <MyNewGen3Password>
- ```
-
-### Update the Admin and Gen3 passwords in the internal_users.yml file
-```
-# add a user to the end of the file
-echo "
-gen3:
-  hash: "xxx"
-  reserved: false
-  backend_roles:
-  - "admin"
-  description: "Gen3 user"
-" >> internal_users.yml
-
-vi internal_users.yml
-# Find the stanzas for the admin and gen3 users and change the hash value to the out of the previous steps above. Save and exit.
-```
-
-```
-#Run the opendistro security command to update the passwords in the system
-
-/usr/share/elasticsearch/plugins/opendistro_security/tools/securityadmin.sh \
- -cd "/usr/share/elasticsearch/plugins/ \
- opendistro_security/securityconfig" -icl \
- -key /usr/share/elasticsearch/config/kirk-key.pem \
- -cert /usr/share/elasticsearch/config/kirk.pem \
- -cacert /usr/share/elasticsearch/config/root-ca.pem \
- -nhnv
-```
-
-
-
-### Exit the pod by typing exit
-
-Or if you are fancy use ctl-d
-
-## Create an ingress controller for the kubernetes cluster
-This command creates the controller pair and Azure will give a public IP.  You can assign a domain name to it via the portal if you wish, or use your own DNS system to resolve your name.
-
-```
-helm install nginx-ingress \
-   ingress-nginx/ingress-nginx \
-   --namespace default \
-   --set controller.replicaCount=2
-
-```
-
 ## Handle TLS/SSL
+You need to decide on the URL for your site, this drives many settings later.  For instance, you may want the site to be https://gen3-is-awesome.mycompany.com
 
-Create ingres secret in file <secret-k8sxxxdev-ingress-tls.yaml>
-(Debt - This should be templated in Helm...)
-Follow the [instructions here](INSTALL.md)
+Then go get SSL/TLS certificates created for this domain name and set it up in DNS as an alias for the ingres.
+
+Use the two TLS files (certificate and key) to create an ingres secret of type TLS in the file <secret-k8sxxxdev-ingress-tls.yaml>.  Create this secret in kubernetes using the kubectl apply command.  The secret is used by the ingress to terminate ssl to the browser.
+Follow the [instructions here](SSL.md)
 
 ## Authentication - Google
 Follow the [instructions for Fence](https://github.com/uc-cdis/fence/blob/master/README.md#oidc--oauth2) to set up the google google developer console
@@ -183,7 +129,10 @@ Updates in the values.yaml file for help.
 [instructions for Fence](https://github.com/uc-cdis/fence/blob/master/README.md#oidc--oauth2)
 
 ## Create DNS cname in your favorite DNS resolver
-The IP address can be found in the public-ip that is created in the kubernetes resources.
+The IP address can be found in the public-ip that is created in the kubernetes resources such as the INGRES controller in the default namespace.
+```
+kubectl describe  ingress gen3-ingress-dev | grep Address
+```
 
 ## Customize Gen3 settings to  your specific needs
 cp the projects/gen3-kubes/gen3-helm/gen3kubernetes/values-example.yaml file to something that you will use for your helm install.  This is where the majority of changes will be made to control your gen3 instance configuration.  The configuration of variables is a huge part of this, espeically for authentication and authorization.
@@ -207,10 +156,11 @@ helm install <name> -f values-myinstance.yaml --namespace=gen3k8dev  .
 While this is a very complex process with many steps, with a little debugging you can have a system up in no time.  Probably the most difficult service to get running is fence, as it interacts with external entities like cloud storage and authentication.  Pay VERY close attention to detail when entering the OAUTH settings.
 
 The following commands will help you diagnose and solve problems should they arise.  This is no substitute for a solid grasp of helm and kubernetes.
-
+```
 - kubectl get pods           # see which pods are running or dead
 - kubectl logs -f <pod-name> # see real time output from a pod
 - kubectl exec -it <pod-name> -- bash   # run linux command line in a running pod.
 - kubectl delete deployment <deployment-name> # useful before running helm again, forces a redeploy.
 - kubectl scale deployment --replicas=n <deployment-name>   # add or remove counts of containers in a set
 - helm upgrade <name> --namespace=k8sgen3dev .   # new configuration after changing variables
+```

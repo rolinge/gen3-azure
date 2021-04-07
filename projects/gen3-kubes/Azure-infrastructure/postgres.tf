@@ -117,9 +117,9 @@ value = <<EOT
 
 #Connect to your postgres database using psql
 
- $  psql "host=postgres-${var.cluster_name}.postgres.database.azure.com \
+ $  psql "host=${azurerm_postgresql_server.g3DATA.fqdn} \
           port=5432 dbname=postgres \
-          user=postgres@postgres-${var.cluster_name}.postgres.database.azure.com \
+          user=postgres@${azurerm_postgresql_server.g3DATA.fqdn} \
           password=${module.postgres_password.password} \
           sslmode=require"
 

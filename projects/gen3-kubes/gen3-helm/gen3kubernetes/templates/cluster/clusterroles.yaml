@@ -1,0 +1,93 @@
+---
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: "admin-manage-namespaces"
+  namespace: "default"
+rules:
+  - apiGroups: ["", "extensions", "apps","networking.k8s.io"]
+    resources: ["namespaces", "roles", "persistentvolumeclaims", "persistentvolumes", \
+                "rolebindings", "clusterroles", "clusterrolebindings", "secrets", \
+                "storageclasses", "pods", "pods/logs", "pods/exec", "deployments", "services", "endpoints", \
+                "nodes", "ingresses", "statefulsets", "replicasets", "configmaps" ,\
+                "networkpolicies", "events" ]
+    verbs: ["*"]
+  - apiGroups: ["policy"]
+    resources: ["poddisruptionbudgets", "podsecuritypolicies"]
+    verbs: ["*"]
+  - apiGroups: ["rbac.authorization.k8s.io"]
+    resources: ["clusterrolebindings", "clusterroles", "rolebindings","roles" ]
+    verbs: ["*"]
+  - apiGroups: ["admissionregistration.k8s.io"]
+    resources: ["mutatingwebhookconfigurations", "validatingwebhookconfigurations" ]
+    verbs: ["*"]
+---
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: user-view-namespaces
+  namespace: default
+rules:
+  - apiGroups: ["", "extensions", "apps","networking.k8s.io"]
+    resources: ["namespaces", "roles",  "persistentvolumeclaims", \
+                "persistentvolumes", "rolebindings", "clusterroles", "clusterrolebindings", \
+                "storageclasses", "pods", "pods/logs", "deployments", "services", "endpoints", \
+                "nodes", "ingresses", "statefulsets", "replicasets", "configmaps"]
+    verbs: ["get", "watch", "list"]
+  - apiGroups: ["policy"]
+    resources: ["poddisruptionbudgets", "podsecuritypolicies"]
+    verbs: ["get", "watch", "list"]
+
+
+#This will bind the roles to those users specified in the values file.
+# If none are defined, then this will be skipped.
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: "admin-manage-namespaces"
+  namespace: "default"
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: "ClusterRole"
+  name: "admin-manage-namespaces"
+subjects:
+{{- with .Values.kubernetescluster.administrators }}
+  {{- range . }}
+  - kind: "User"
+    name: {{ . | quote }}
+  {{- end }}
+{{- end }}
+{{- with .Values.kubernetescluster.administratorgroupoids }}  
+  {{- range . }}
+  - kind: "Group"
+    name: {{ . | quote }}
+  {{- end }}
+{{- end }}
+
+
+---
+
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: "user-view-namespaces"
+  namespace: default
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: "user-view-namespaces"
+subjects:
+{{- with .Values.kubernetescluster.contributors }}
+  {{- range . }}
+  - kind: User
+    name: {{ . | quote }}
+  {{- end }}
+{{- end }}
+
+{{- with .Values.kubernetescluster.contributorgroupsoid }}
+  {{- range . }}
+  - kind: Group
+    name: {{ . | quote }}
+  {{- end }}
+{{- end }}

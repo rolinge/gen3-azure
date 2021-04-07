@@ -12,6 +12,23 @@ database_servername: "postgres-k8sgen3.postgres.database.azure.com" #this needs 
 database_port: "5432"
 #dictionary_url: "https://s3.amazonaws.com/dictionary-artifacts/datadictionary/develop/schema.json"
 path_to_schema_dir: "/schemas_dir/schemas"
+kubernetescluster:
+  # This section can be used to define your cluster admins and developers.
+  # uncomment the admins and contributors sections and add your users.
+  # users are identified by their servicePrincipalIdentifier
+  # which is usually their username.  Groups are identified by the OID of the group.
+  # Skip this unless you really know what you are doing in both Azure IAM and Kubernetes.
+  administrators:
+  #   - "user1@yourcompany.com"
+  #   - "user2@yourcompany.com"
+  administratorgroupoids:
+  #   - "123-4567-99873-223"
+  contributors:
+  #   - developer1@yourcompany.com
+  #   - developer2@yourcompany.com
+  contributorgroupsoid:
+  #   - "987-5433-24865-099"
+
 fence:
   serviceport: 80
   database:
@@ -195,7 +212,7 @@ ingress:
     - host: mysitename.mydomain.com
       paths:
         - path :
-          actualPath: "/(.*)"
+          actualPath: "/"
           serviceName: service-revproxy-<$ENV>
           servicePort: 80
         - path:

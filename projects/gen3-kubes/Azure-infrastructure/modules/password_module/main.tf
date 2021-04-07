@@ -2,7 +2,7 @@
 
 resource "random_string" "uid" {
   length           = var.pw_length
-  special          = true
+  special          = false
   number           = true
   lower           = true
   upper           = true
@@ -10,5 +10,4 @@ resource "random_string" "uid" {
   min_lower        = 1
   min_upper        = 1
   min_numeric      = 1
-  min_special      = 1
 }
