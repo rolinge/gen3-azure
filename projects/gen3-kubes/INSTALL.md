@@ -152,6 +152,26 @@ cd projects/gen3-kubes/gen3-helm/gen3kubernetes
 helm install <name> -f values-myinstance.yaml --namespace=gen3k8dev  .
 ```
 
+
+## Update the secrets for backend automation
+
+One of the processes that runs in the background uses secrets from the keyvault that need to be entered by someone with access to the portal.  So the procedure follows...
+
+	
+1. Log into the portal and select the 'Profile' tab
+2. Create an api key by pressing the "Creat API key" button and saving the file on your workstations
+3. use the included helper script to parse the file and create the azure cli commands.  The script is found at [projects/gen3-kubes/kubernetes-setup/update-secrets.ksh](kubernetes-setup/update-secrets.ksh)
+4. Copy and paste the commands and run them. (Mac and Linux)
+5. Use this same API credential file to set up gen3-client for uploads.   (not docuemnted here)
+
+The commands look something like this
+
+```
+az keyvault secret set --name gen3keyid     --value "myKeyID" --vault-name <MyKeyVault> --resource-group <MyResourceGroup>
+az keyvault secret set --name gen3KeySecret --value "MyAPIKey" --vault-name <MyKeyVault> --resource-group <MyResourceGroup>
+```
+
+
 ## Happy Gen3!
 While this is a very complex process with many steps, with a little debugging you can have a system up in no time.  Probably the most difficult service to get running is fence, as it interacts with external entities like cloud storage and authentication.  Pay VERY close attention to detail when entering the OAUTH settings.
 
