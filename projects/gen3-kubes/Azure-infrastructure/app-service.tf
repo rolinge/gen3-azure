@@ -62,7 +62,7 @@ resource "null_resource" "mapstorage" {
     command = "az webapp config storage-account add --resource-group $RG  --storage-type AzureFiles --account-name $ACCOUNTNAME --share-name $SHARENAME --mount-path /opt/shared -n $FUNCNAME --custom-id CustomID --access-key $ACCKEY || az webapp config storage-account update --resource-group $RG  --storage-type AzureFiles --account-name $ACCOUNTNAME --share-name $SHARENAME --mount-path /opt/shared -n $FUNCNAME --custom-id CustomID --access-key $ACCKEY"
     environment = {
       RG= azurerm_resource_group.rg.name
-      ACCKEY = azurerm_storage_account.gen3.primary_connection_string
+      ACCKEY = azurerm_storage_account.gen3.primary_access_key
       FUNCNAME = azurerm_function_app.funcapp.name
       ACCOUNTNAME = azurerm_storage_account.gen3.name
       SHARENAME = azurerm_storage_share.gen3.name
@@ -83,12 +83,12 @@ output "mapstorage" {
       --resource-group "${azurerm_resource_group.rg.name}"  --storage-type AzureFiles \
       --account-name ${azurerm_storage_account.gen3.name} --share-name ${azurerm_storage_share.gen3.name} \
       --mount-path /opt/shared -n "${azurerm_function_app.funcapp.name}" \
-      --custom-id CustomID --access-key "${azurerm_storage_account.gen3.primary_connection_string}" || \
+      --custom-id CustomID --access-key "${azurerm_storage_account.gen3.primary_access_key}" || \
       az webapp config storage-account update \
           --resource-group "${azurerm_resource_group.rg.name}"  --storage-type AzureFiles \
           --account-name ${azurerm_storage_account.gen3.name} --share-name ${azurerm_storage_share.gen3.name} \
           --mount-path /opt/shared -n "${azurerm_function_app.funcapp.name}" \
-          --custom-id CustomID --access-key "${azurerm_storage_account.gen3.primary_connection_string}"
+          --custom-id CustomID --access-key "${azurerm_storage_account.gen3.primary_access_key}"
 
 
 EOT
