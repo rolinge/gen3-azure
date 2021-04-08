@@ -67,6 +67,7 @@ kubectl exec -it --namespace=gen3k8dev jumpserver-initial -- bash
   >> yum -y update && yum -y  install postgresql
 ```
 
+
 ## create the database users and grant permissions.
 Terraform out contains the complete script that resembles what is below.  Just copy and past the entire script into the postgres command line using the jumpserver pod above.
 
@@ -115,8 +116,8 @@ cd <opendistro>/helm  && helm install <name> -f customvalues.yaml  --namespace=g
 ```
 ## Handle TLS/SSL
 You need to decide on the URL for your site, this drives many settings later.  For instance, you may want the site to be https://gen3-is-awesome.mycompany.com
-
 Then go get SSL/TLS certificates created for this domain name and set it up in DNS as an alias for the ingres.
+
 
 Use the two TLS files (certificate and key) to create an ingres secret of type TLS in the file <secret-k8sxxxdev-ingress-tls.yaml>.  Create this secret in kubernetes using the kubectl apply command.  The secret is used by the ingress to terminate ssl to the browser.
 Follow the [instructions here](SSL.md)

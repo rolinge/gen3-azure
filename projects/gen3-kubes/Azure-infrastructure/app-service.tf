@@ -59,11 +59,13 @@ resource "azurerm_function_app" "funcapp" {
 
 resource "null_resource" "mapstorage" {
   provisioner "local-exec" {
-    command = "az webapp config storage-account add --resource-group $RG  --storage-type AzureFiles --account-name azgen3blobstorage --share-name azgen3blobstorage --mount-path /opt/shared -n $FUNCNAME --custom-id CustomID --access-key $ACCKEY || az webapp config storage-account update --resource-group $RG  --storage-type AzureFiles --account-name azgen3blobstorage --share-name azgen3blobstorage --mount-path /opt/shared -n $FUNCNAME --custom-id CustomID --access-key $ACCKEY"
+    command = "az webapp config storage-account add --resource-group $RG  --storage-type AzureFiles --account-name $ACCOUNTNAME --share-name $SHARENAME --mount-path /opt/shared -n $FUNCNAME --custom-id CustomID --access-key $ACCKEY || az webapp config storage-account update --resource-group $RG  --storage-type AzureFiles --account-name $ACCOUNTNAME --share-name $SHARENAME --mount-path /opt/shared -n $FUNCNAME --custom-id CustomID --access-key $ACCKEY"
     environment = {
       RG= azurerm_resource_group.rg.name
       ACCKEY = azurerm_storage_account.gen3.primary_connection_string
       FUNCNAME = azurerm_function_app.funcapp.name
+      ACCOUNTNAME = azurerm_storage_account.gen3.name
+      SHARENAME = azurerm_storage_share.gen3.name
     }
   }
 }
@@ -79,12 +81,12 @@ output "mapstorage" {
   ###
   az webapp config storage-account add \
       --resource-group "${azurerm_resource_group.rg.name}"  --storage-type AzureFiles \
-      --account-name azgen3blobstorage --share-name azgen3blobstorage \
+      --account-name ${azurerm_storage_account.gen3.name} --share-name ${azurerm_storage_share.gen3.name} \
       --mount-path /opt/shared -n "${azurerm_function_app.funcapp.name}" \
       --custom-id CustomID --access-key "${azurerm_storage_account.gen3.primary_connection_string}" || \
       az webapp config storage-account update \
           --resource-group "${azurerm_resource_group.rg.name}"  --storage-type AzureFiles \
-          --account-name azgen3blobstorage --share-name azgen3blobstorage \
+          --account-name ${azurerm_storage_account.gen3.name} --share-name ${azurerm_storage_share.gen3.name} \
           --mount-path /opt/shared -n "${azurerm_function_app.funcapp.name}" \
           --custom-id CustomID --access-key "${azurerm_storage_account.gen3.primary_connection_string}"
 
