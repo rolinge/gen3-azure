@@ -1,9 +1,21 @@
 # High level Installation
 
 ## Create service principle in Azure
-This principle should have the ability to create and manage resource in the Azure subscription.  This will be the account used in Terraform.
+This principle should have the ability to create and manage resource in the Azure subscription.  This will be the account used in Terraform. This only needs to be done once per Azure subscription. The same AppID created for terraform can be re-used. Create One for non-prod subscription, and one for a prod subscription. 
 
 ## Clone the git repository and look at Azure-Infrastructure folder
+Update the following variable files as appropriate the the environment you are building out. 
+backend.tf
+backend.tfvars
+CREDENTIALS.auto.tfvars
+terraform.tfvars
+variables.tf
+
+## Initialize Terraform with the backend.
+```
+terraform init -backend-config=backend.tfvars
+```
+? under what conditions do we need to delete the local and azure state file ?
 ## Initialize Terraform with the backend.
 ```
 terraform init -backend-config=backend.tfvars
@@ -35,11 +47,6 @@ az webapp config storage-account add \
 
 ```
 
-## Use kubernetes to create two namespaces
-```
-kubectl apply -f kubernetes-setup/namespaces.yaml
-```
-
 ## Create an ingress controller for the kubernetes cluster
 This command creates the controller pair and Azure will give a public IP.  You can assign a domain name to it via the portal if you wish, or use your own DNS system to resolve your name.
 
@@ -50,21 +57,13 @@ helm install nginx-ingress nginx-stable/nginx-ingress \
     --set controller.replicaCount=2
 ```
 
-## Decide on  your security model and either create or authorize accounts in K8s (optional)
-You can also use RBAC in Azure to grant roles and clusterroles to peoples accounts.  This is an example.
-```
-cp restricted/example-roles.yaml restricted/myroles.yaml
-vi restricted/myroles.yaml  #Make changes for YOUR system users and groups.
-kubectl apply -f restricted/myroles.yaml
-```
-
 ## Create a jump-server pod that can be used to run postgres commands.
 
 ```
 kubectl apply -f kubernetes_setup/initialjumpserver.yaml
 <wait about a minute for pod to start>
 kubectl exec -it --namespace=gen3k8dev jumpserver-initial -- bash
-  >> yum -y update && yum -y  install postgresql
+yum -y update && yum -y  install postgresql
 ```
 
 
@@ -94,26 +93,10 @@ CREATE EXTENSION ltree ;
 
 ```
 
-
-cd to the kubernetes_setup directory.  You may want to modify the clusterroles.yaml file to grant specific permissions to different groups in your organization.
-```
-cd kubernets-setup
-cp clusterroles-example.yaml clusterroles.yaml
-cp roles-example.yaml roles.yaml
-# Change these two files to your needs
-kubectl apply -f namespaces.yaml                  #create the namespaces
-kubectl apply -f clusteroles.yaml -f roles.yaml   #create the cluster roles and such
-kubectl apply -f StorageConfig.yaml               #create the storage tier
-# Now set your default namespace to the gen3 namespace
-kubectl config  set-context --current --namespace=gen3k8dev
-```
+## Modify cluster settings
+cd gen3-helm/gen3kubernetes/templates/cluster. You may want to modify the files to suit your needs.
 
 
-## Create the OpenDistro system in its own K8S namespace (substitute for ElasticSearch)
-```
-vi opendistro/customevalues.yaml   (change the name)
-cd <opendistro>/helm  && helm install <name> -f customvalues.yaml  --namespace=gen3elastic .
-```
 ## Handle TLS/SSL
 You need to decide on the URL for your site, this drives many settings later.  For instance, you may want the site to be https://gen3-is-awesome.mycompany.com
 Then go get SSL/TLS certificates created for this domain name and set it up in DNS as an alias for the ingres.
@@ -150,9 +133,38 @@ vi projects/gen3-kubes/gen3-helm/gen3kubernetes/values-myinstance.yaml
 Make up a name to define this instance.  It will be used for all subsequent helm commands.
 ```
 cd projects/gen3-kubes/gen3-helm/gen3kubernetes
-helm install <name> -f values-myinstance.yaml --namespace=gen3k8dev  .
+helm install <name> -f values-myinstance.yaml  --namespace=gen3k8dev .
 ```
 
+## Create the OpenDistro system in its own K8S namespace (substitute for ElasticSearch)
+```
+cd gen3-kubes/elastic-search-helm/opendistro-es
+vi customvalues.yaml   (change the name)
+helm install <name> -f customvalues.yaml  --namespace=gen3elastic .
+```
+
+## Create Registry pull secret
+Before you can run start your kubernetes cluster, you need to create a registry pull secret, so custom images can be pulled from the azure container registry.
+
+```
+	kubectl create secret docker-registry <secret-name> \
+	    --namespace <namespace> \
+	    --docker-server=<container-registry-name>.azurecr.io \
+	    --docker-username=<service-principal-ID> \
+	    --docker-password=<service-principal-password>
+```
+
+- For secret-name you can use anything you'd like, but can use: registrypullsecret if you want to make fewer edits to the values-myinstance.yml file. 
+- For namespace this should be the kubectl namepsace you want to create your cluster in, we created 2: gen3k8dev and gen3elastic, use gen3k8dev.
+- For docker-server use the acrHost from the terraform output.
+- For service-principal-ID use acrPassword from the terraform output.
+- For service-principal-password use acrUsername from the terraform output.
+
+
+
+## Now set your default namespace to the gen3 namespace
+kubectl config  set-context --current --namespace=gen3k8dev
+=======
 
 ## Update the secrets for backend automation
 
