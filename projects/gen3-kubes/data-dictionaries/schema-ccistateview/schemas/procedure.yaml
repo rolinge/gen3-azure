@@ -1,0 +1,92 @@
+$schema: "http://json-schema.org/draft-04/schema#"
+
+id: "procedure"
+title: Procedure 
+type: object
+namespace: http://gdc.nci.nih.gov
+category: clinical
+program: '*'
+project: '*'
+description: >
+  Health Procedure
+additionalProperties: false
+submittable: true
+validators: null
+
+systemProperties:
+  - id
+  - project_id
+  - state
+  - created_datetime
+  - updated_datetime
+
+links:
+  - name: encounters
+    backref: procedures
+    label: describes
+    target_type: encounter
+    multiplicity: many_to_one
+    required: true
+
+required:
+  - submitter_id
+  - type
+
+uniqueKeys:
+  #unclear if want submitter ID for clinical
+  - [id]
+  - [project_id, submitter_id]
+
+properties:
+  type:
+    type: string
+
+  id:
+    $ref: "_definitions.yaml#/UUID"
+    systemAlias: node_id
+
+  state:
+    $ref: "_definitions.yaml#/state"
+
+  submitter_id:
+    type:
+      - string
+      - "null"
+  
+  panther_id:
+    description: "panther_id"
+    type: string
+
+  encid:
+    description: "Encounter ID"
+    type: string
+
+  proc_date: 
+    description: "Proc  Date"
+    type: string
+
+  proc_code_type:
+    description: "Proc Code Type"
+    type: string
+
+  proc_code:
+    description: "Procedure Code"
+    type: string
+
+  betos_code:
+    description: "BETOS code"
+    type: string
+
+  betos_description:
+    description: "BETOS description"
+    type: string
+
+  encounters:
+    $ref: "_definitions.yaml#/to_one"
+
+  project_id:
+    $ref: "_definitions.yaml#/project_id"
+  created_datetime:
+    $ref: "_definitions.yaml#/datetime"
+  updated_datetime:
+    $ref: "_definitions.yaml#/datetime"

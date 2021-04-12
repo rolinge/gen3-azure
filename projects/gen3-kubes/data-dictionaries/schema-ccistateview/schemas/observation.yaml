@@ -1,0 +1,100 @@
+$schema: "http://json-schema.org/draft-04/schema#"
+
+id: "observation"
+title: Observation
+type: object
+namespace: http://gdc.nci.nih.gov
+category: clinical
+program: '*'
+project: '*'
+description: >
+  Health Observation
+additionalProperties: false
+submittable: true
+validators: null
+
+systemProperties:
+  - id
+  - project_id
+  - state
+  - created_datetime
+  - updated_datetime
+
+links:
+  - name: encounters
+    backref: observations
+    label: describes
+    target_type: encounter
+    multiplicity: many_to_one
+    required: true
+
+required:
+  - submitter_id
+  - type
+
+uniqueKeys:
+  #unclear if want submitter ID for clinical
+  - [id]
+  - [project_id, submitter_id]
+
+properties:
+  type:
+    type: string
+
+  id:
+    $ref: "_definitions.yaml#/UUID"
+    systemAlias: node_id
+
+  state:
+    $ref: "_definitions.yaml#/state"
+
+  submitter_id:
+    type:
+      - string
+      - "null"
+  
+  panther_id:
+    description: "panther_id"
+    type: string
+
+  encid:
+    description: "Encounter ID"
+    type: string
+
+  obs_date: 
+    description: "Observation  Date"
+    type: string
+
+  obs_type:
+    description: "Observation Type"
+    type: string
+
+  nlp:
+    description: "NLP Derrived?"
+    type: string
+
+  obs_result:
+    description: "Observation Result"
+    type: string
+
+  obs_unit:
+    description: "Unit of Measurement"
+    type: string
+
+  evaluated_for_range:
+    description: "Was Observation Evaluated for Range"
+    type: string
+
+  evaluated_within_range:
+    description: "Was the measurement within Range"
+    type: string
+
+  project_id:
+    $ref: "_definitions.yaml#/project_id"
+  created_datetime:
+    $ref: "_definitions.yaml#/datetime"
+  updated_datetime:
+    $ref: "_definitions.yaml#/datetime"
+
+  encounters:
+    $ref: "_definitions.yaml#/to_one"

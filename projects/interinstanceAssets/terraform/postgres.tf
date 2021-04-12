@@ -8,7 +8,7 @@ resource "azurerm_postgresql_server" "clinicogenomics" {
   backup_retention_days        = 7
   geo_redundant_backup_enabled = false
   version                      = "11"
-  ssl_enforcement_enabled      = false
+  ssl_enforcement_enabled      = true
   administrator_login          = "postgres"
   administrator_login_password = module.postgres_password.password
   auto_grow_enabled            = true

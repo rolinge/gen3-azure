@@ -1,0 +1,76 @@
+$schema: "http://json-schema.org/draft-04/schema#"
+
+id: "encounter"
+title: Encounter
+type: object
+nodeTerms: null
+namespace: https://gen3.datacommons.io/
+category: clinical
+program: '*'
+project: '*'
+description: A record of a study subject's encounter to or remote contact with a medical
+  professional or study administrator to capture time-based data from longitudinal
+  studies. A clinical encounter that encompasses planned and unplanned trial interventions,
+  procedures and assessments that may be performed on a subject. A visit has a start
+  and an end, each described with a rule. The process by which information about the
+  health status of an individual is obtained before and after a study has officially
+  closed; an activity that continues something that has already begun or that repeats
+  something that has already been done.
+additionalProperties: false
+submittable: true
+validators: null
+
+systemProperties:
+  - id
+  - project_id
+  - state
+  - created_datetime
+  - updated_datetime
+
+links:
+  - name: subjects
+    backref: encounters
+    label: describes
+    target_type: subject
+    multiplicity: many_to_one
+    required: true
+
+required:
+  - submitter_id
+  - type
+  - subjects
+
+uniqueKeys:
+  - [id]
+  - [project_id, submitter_id]
+
+properties:
+
+  $ref: "_definitions.yaml#/ubiquitous_properties"
+
+  panther_id:
+    description: The panther_id of patient
+    type: string 
+
+  encid:
+    description: The Encounter ID
+    type: string
+
+  visitid:
+    description: The visit id
+    type: string 
+
+  interaction_type:
+    description: The interaction type
+    type: string 
+
+  interaction_datetime:
+    description: The interaction date time
+    type: string 
+
+  academic_community_flag:
+    description: academic community flag 
+    type: string 
+
+  subjects:
+    $ref: "_definitions.yaml#/to_one"
