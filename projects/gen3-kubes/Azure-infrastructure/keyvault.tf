@@ -152,6 +152,9 @@ resource "azurerm_key_vault_access_policy" "ingest" {
 # $ az keyvault secret set --name gen3keyid --value "xxx" --vault-name keyvault-dev-klnow
 # $ az keyvault secret set --name gen3KeySecret  --value "yyy"  --vault-name keyvault-dev-klnow
 
+# Need to wait 60s before creating secrets so Azure can apply permissions properly.
+
+
 resource "azurerm_key_vault_secret" "gen3keyid" {
   name         = "gen3keyid"
   value        = "BLANK-FILLINLATER"
@@ -172,8 +175,8 @@ resource "azurerm_key_vault_secret" "gen3KeySecret" {
   lifecycle {
     ignore_changes = [value, tags]
   }
-
-  tags = merge(var.tags, local.common_tags)
+  depends_on = [time_sleep.waitAccessPoliciesPlus30s]
+  tags       = merge(var.tags, local.common_tags)
 }
 
 resource "azurerm_key_vault_secret" "StorageaccountConnectString" {
@@ -183,7 +186,8 @@ resource "azurerm_key_vault_secret" "StorageaccountConnectString" {
   lifecycle {
     ignore_changes = [value, tags]
   }
-  tags = merge(var.tags, local.common_tags)
+  depends_on = [time_sleep.waitAccessPoliciesPlus30s]
+  tags       = merge(var.tags, local.common_tags)
 }
 
 #resource "azurerm_key_vault_secret" "acrAdminPassword" {
@@ -208,17 +212,18 @@ resource "azurerm_key_vault_key" "stgacctkey" {
   key_type     = "RSA"
   key_size     = 4096
 
-  key_opts   = ["decrypt", "encrypt", "sign", "unwrapKey", "verify", "wrapKey"]
-  depends_on = [azurerm_key_vault_access_policy.ingest]
-  tags       = merge(var.tags, local.common_tags)
+  key_opts = ["decrypt", "encrypt", "sign", "unwrapKey", "verify", "wrapKey"]
+  depends_on = [
+    azurerm_key_vault_access_policy.ingest,
+    time_sleep.waitAccessPoliciesPlus30s
+  ]
+  tags = merge(var.tags, local.common_tags)
 }
-
-
 
 resource "azurerm_key_vault_certificate" "gen3appgwcrt" {
   name         = "appgw"
   key_vault_id = azurerm_key_vault.keyvault1.id
-
+  depends_on   = [time_sleep.waitAccessPoliciesPlus30s]
   certificate {
     contents = filebase64(var.sslCertificatefile)
     password = var.sslCertificatePassword

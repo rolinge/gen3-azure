@@ -46,11 +46,6 @@ resource "azurerm_kubernetes_cluster" "aks_cluster" {
       enabled = false
     }
 
-    http_application_routing {
-      enabled = false
-    }
-
-
   }
 
   tags = merge(var.tags, local.common_tags)

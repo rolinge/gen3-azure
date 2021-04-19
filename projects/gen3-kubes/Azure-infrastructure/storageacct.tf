@@ -153,9 +153,12 @@ resource "azurerm_storage_share" "minioconfig" {
 
 
 resource "time_sleep" "waitAccessPoliciesPlus30s" {
-  depends_on = [azurerm_key_vault_access_policy.gen3accesspolicy,
+  depends_on = [
+    azurerm_key_vault_access_policy.gen3accesspolicy,
     azurerm_key_vault_access_policy.drop01,
-  azurerm_key_vault_access_policy.ingest]
+    azurerm_key_vault_access_policy.appgwaccesspolicy,
+    azurerm_key_vault_access_policy.ingest
+  ]
   create_duration = "30s"
 }
 
