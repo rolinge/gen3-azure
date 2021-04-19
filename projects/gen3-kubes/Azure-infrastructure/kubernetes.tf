@@ -43,6 +43,11 @@ resource "azurerm_kubernetes_cluster" "aks_cluster" {
       log_analytics_workspace_id = azurerm_log_analytics_workspace.k8.id
     }
 
+    http_application_routing {
+      enabled = false
+    }
+
+
   }
 
   tags = merge(var.tags, local.common_tags)

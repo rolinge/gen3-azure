@@ -181,8 +181,8 @@ resource "azurerm_storage_account_customer_managed_key" "gen3ingestkeyassignment
 }
 
 # this adds the group AZU_Clinicogenomics_fileshare_rw ACL to the file share.
-resource "azurerm_role_assignment" "gen3ingest" {
-  scope                = azurerm_storage_account.gen3hdinsightsstorage.id
-  role_definition_name = "Contributor"
-  principal_id         = "40e2f0b8-827b-4db4-b110-885a474d2945"
-}
+#resource "azurerm_role_assignment" "gen3ingest" {
+#  scope                = azurerm_storage_account.gen3hdinsightsstorage.id
+#  role_definition_name = "Contributor"
+#  principal_id         = "40e2f0b8-827b-4db4-b110-885a474d2945"
+#}

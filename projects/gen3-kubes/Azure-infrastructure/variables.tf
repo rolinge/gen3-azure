@@ -22,9 +22,14 @@ variable "agent_count" {
   default = 2
 }
 
-variable "commons_url" {
+variable "commons_dns_name" {
   type          = string
-  description   = "The web address of the final site"
+  description   = "The web address of the final site, minus the dns suffix"
+}
+
+variable "commons_dns_suffix" {
+  type          = string
+  description   = "The web dns suffix of the final site"
 }
 
 variable "functionapp" {
@@ -204,4 +209,14 @@ variable color_ip_address_range {
 variable "hdiWorkerNodSize" {
   type        = string
   description = "HDInsights worker head node machine size"
+}
+
+variable "sslCertificatefile" {
+  type = string
+  description = "Name of the file that holds the SSL certificate for the application gateway.  Certifiate is stored in Keyvault"
+}
+
+variable "sslCertificatePassword" {
+  type = string
+  description = "Passphrase for the Certificate named"
 }

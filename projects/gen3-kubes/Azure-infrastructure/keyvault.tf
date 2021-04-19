@@ -7,23 +7,6 @@ resource "azurerm_key_vault" "keyvault1" {
   soft_delete_retention_days = 7
   purge_protection_enabled   = true
   sku_name = "standard"
-  access_policy {
-  tenant_id = data.azurerm_client_config.current.tenant_id
-  object_id = data.azurerm_client_config.current.object_id
-  key_permissions = [
-      "get",  "list", "delete", "recover",  "backup", "restore",
-      "create", "decrypt", "encrypt", "import", "sign",
-      "unwrapKey", "update", "verify" , "wrapKey" , "purge"
-    ]
-    secret_permissions = [
-    "get",  "list", "delete", "recover",  "backup", "restore",  "set" , "purge"
-    ]
-    storage_permissions = [
-    "get",  "list", "delete", "recover",  "backup", "restore",
-    "regeneratekey", "getsas", "listsas", "deletesas", "set", "setsas",
-    "update" , "purge"
-    ]
-  }
   network_acls {
     default_action = "Allow"
     bypass         = "AzureServices"
@@ -70,21 +53,19 @@ resource "azurerm_key_vault_access_policy" "serviceaccount" {
   "DeleteIssuers","Purge"
   ]
 }
-#----- Delete these once we get the group synched.
-
-resource "azurerm_key_vault_access_policy" "carlos" {
+resource "azurerm_key_vault_access_policy" "SubscriptionContributor" {
   key_vault_id = azurerm_key_vault.keyvault1.id
 
   tenant_id = data.azurerm_client_config.current.tenant_id
-  object_id = "8d1aadf7-0913-4e23-a653-72ff9de2c226"
+  object_id = "26a01eec-7c1d-46f3-ba32-d2eb1081f37f"
 
   key_permissions = [
   "Get",  "List", "Delete", "Recover",  "Backup", "Restore",
   "Create", "Decrypt", "Encrypt", "Import", "Sign",
-  "UnwrapKey", "Update", "Verify" , "WrapKey", "Purge"
+  "UnwrapKey", "Update", "Verify" , "WrapKey"
   ]
   secret_permissions = [
-  "get",  "list", "delete", "recover",  "backup", "restore",  "set", "Purge"
+  "get",  "list", "delete", "recover",  "backup", "restore",  "set"
   ]
   storage_permissions = [
   "get",  "list", "delete", "recover",  "backup", "restore",
@@ -94,15 +75,14 @@ resource "azurerm_key_vault_access_policy" "carlos" {
   certificate_permissions = [
   "Get",  "List", "Delete", "Recover",  "Backup", "Restore",
   "Update" , "Create", "Import", "ManageContacts",  "ManageIssuers",
-  "GetIssuers","ListIssuers","SetIssuers",
-  "DeleteIssuers","Purge"
+  "GetIssuers","ListIssuers","SetIssuers", "DeleteIssuers"
   ]
 }
-resource "azurerm_key_vault_access_policy" "randy" {
+resource "azurerm_key_vault_access_policy" "SubscriptionOwner" {
   key_vault_id = azurerm_key_vault.keyvault1.id
 
   tenant_id = data.azurerm_client_config.current.tenant_id
-  object_id = "be2b3c36-2c8b-4905-a81b-cc3c9c58e66e"
+  object_id = "9b01c20a-8186-4eca-bb7e-33b6c624c48d"
 
   key_permissions = [
   "Get",  "List", "Delete", "Recover",  "Backup", "Restore",
@@ -125,11 +105,6 @@ resource "azurerm_key_vault_access_policy" "randy" {
   ]
 }
 #-----
-
-
-
-
-
 
 resource "azurerm_key_vault_access_policy" "functionapp" {
   key_vault_id = azurerm_key_vault.keyvault1.id
@@ -164,6 +139,7 @@ resource "azurerm_key_vault_access_policy" "ingest" {
   key_permissions    = ["get", "create", "list", "restore", "recover", "unwrapkey", "wrapkey", "purge", "encrypt", "decrypt", "sign", "verify"]
   secret_permissions = ["get"]
 }
+
 
 ### Secrets
 ###################
@@ -235,6 +211,48 @@ resource "azurerm_key_vault_key" "stgacctkey" {
   key_opts = ["decrypt","encrypt","sign","unwrapKey","verify","wrapKey"  ]
   depends_on = [azurerm_key_vault_access_policy.ingest  ]
   tags = merge(var.tags, local.common_tags)
+}
+
+
+
+resource "azurerm_key_vault_certificate" "gen3appgwcrt" {
+  name         = "appgw"
+  key_vault_id = azurerm_key_vault.keyvault1.id
+
+  certificate {
+    contents = filebase64(var.sslCertificatefile)
+    password = var.sslCertificatePassword
+  }
+
+  certificate_policy {
+    issuer_parameters {
+      name = "Unknown"
+    }
+
+    key_properties {
+      exportable = true
+      key_size   = 4096
+      key_type   = "RSA"
+      reuse_key  = false
+    }
+
+    secret_properties {
+      content_type = "application/x-pkcs12"
+    }
+  }
+}
+
+resource "azurerm_key_vault_access_policy" "appgwaccesspolicy" {
+  key_vault_id = azurerm_key_vault.keyvault1.id
+  tenant_id = data.azurerm_client_config.current.tenant_id
+  object_id = azurerm_user_assigned_identity.appgw-usermanagedidentity.principal_id
+  key_permissions = [   "Get",  "List" ,"Encrypt" ,"Decrypt"  ,"Wrapkey"  ,"Unwrapkey"  ,"Verify"  ,"Sign"]
+  secret_permissions = ["get", "list"]
+  certificate_permissions = [
+  "Get",  "List", "Delete", "Recover",  "Backup", "Restore",
+  "Update" , "Create", "Import", "ManageContacts",  "ManageIssuers",
+  "GetIssuers","ListIssuers","SetIssuers", "DeleteIssuers"
+  ]
 }
 
 

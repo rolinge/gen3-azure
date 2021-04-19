@@ -41,7 +41,7 @@ resource "azurerm_function_app" "funcapp" {
     FUNCTIONS_WORKER_RUNTIME = "python"
     FUNCTIONS_EXTENSION_VERSION = "~3"
     #AzureWebJobsStorage = ""
-    COMMONS_URL = var.commons_url
+    COMMONS_URL = format("https://%s.%s",var.commons_dns_name,var.commons_dns_suffix)
     gen3KeyID = format("@Microsoft.KeyVault(VaultName=%s;SecretName=%s)",azurerm_key_vault.keyvault1.name ,azurerm_key_vault_secret.gen3keyid.name)
     gen3KeySecret = format("@Microsoft.KeyVault(VaultName=%s;SecretName=%s)", azurerm_key_vault.keyvault1.name ,azurerm_key_vault_secret.gen3KeySecret.name)
     MOUNT_POINT = "/opt/shared"

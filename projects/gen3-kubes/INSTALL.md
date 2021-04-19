@@ -17,34 +17,32 @@ terraform init -backend-config=backend.tfvars
 ```
 ? under what conditions do we need to delete the local and azure state file ?
 ## Initialize Terraform with the backend.
+
+All subsequent commands are run from the folder projects/gen3-kubes/
+
 ```
+cd Azure-Infrastructure
 terraform init -backend-config=backend.tfvars
 ```
+## Create a PFX certificate for TLS and store it in the Assets directory
+
+## Make changes to the terraform.tfvars file to reflect your wishes.
 
 ## Run the terraform scripts to create kubernetes, storage accounts and other resources
 
 ```
 terraform plan -out=/tmp/myplan
 terraform apply /tmp/myplan | tee /tmp/mygen3_environment.log
+
+cd ..
 ```
 
-## Capture the output of Terraform and create the .kube/config file
+Capture the output of Terraform , always a good idea to save the text as it comes in handy later.
+
+## Create your .kube/config file
 
 ```
 az aks get-credentials --admin --name MyManagedCluster --resource-group MyResourceGroup
-kubectl config set-context xxxx-admin
-```
-
-## Map the file share to the functionapp
-Terraform attempts to do this action via the null resource.  If it fails due to a local issue,  You will need to know the resource group and get the storage account connectionstring, and the name of the blob index functionapp in order to run this command.
-
-```
-az webapp config storage-account add \
-    --resource-group <RESOURCEGROUPNAME>  --storage-type AzureFiles \
-    --account-name azgen3blobstorage --share-name azgen3blobstorage \
-    --mount-path /opt/shared -n <BLOBINDEXFUNCTIONAPPNAME> \
-    --custom-id CustomID --access-key <CONNECTIONSTRING>
-
 ```
 
 ## Create namespaces in kubernetes
@@ -54,28 +52,25 @@ cd templates/cluster
 kubectl apply -f namespaces.yaml 
 ```
 
-## Create an ingress controller for the kubernetes cluster
-This command creates the controller pair and Azure will give a public IP.  You can assign a domain name to it via the portal if you wish, or use your own DNS system to resolve your name.
-
+## Decide on  your security model and either create or authorize accounts in K8s (optional)
+You can also use RBAC in Azure to grant roles and clusterroles to peoples accounts.  This is an example.
+Nedt to add the RBAC group id's to the clusterroles if you want others to be able to manage your K8s instance.  Ignore this unless you are familiar with [AKS RBAC](https://docs.microsoft.com/en-us/azure/aks/azure-ad-rbac).
 ```
-helm repo add nginx-stable https://helm.nginx.com/stable && helm repo update
-helm install nginx-ingress nginx-stable/nginx-ingress \
-    --namespace default \
-    --set controller.replicaCount=2
+vi gen3-helm/gen3kubernetes/templates/cluster/clusterroles.yaml
 ```
 
 ## Create a jump-server pod that can be used to run postgres commands.
 
 ```
-kubectl apply -f kubernetes_setup/initialjumpserver.yaml
-<wait about a minute for pod to start>
-kubectl exec -it --namespace=gen3k8dev jumpserver-initial -- bash
-yum -y update && yum -y  install postgresql
+kubectl apply --namespace=default -f kubernetes_setup/initialjumpserver.yaml
+sleep 60  # wait for pod to start
+kubectl exec -it --namespace=default jumpserver-initial -- bash
+  >> yum -y update && yum -y  install postgresql
 ```
 
 
 ## create the database users and grant permissions.
-Terraform out contains the complete script that resembles what is below.  Just copy and past the entire script into the postgres command line using the jumpserver pod above.
+Terraform out contains the complete script that **resembles** what is below.  Just copy and past the entire script into the postgres command line using the jumpserver pod above.
 
 ```
 # Your Terraform Output will supply the values for these password strings. Manually enter them inside the single quotes.
@@ -100,17 +95,21 @@ CREATE EXTENSION ltree ;
 
 ```
 
-## Modify cluster settings
-cd gen3-helm/gen3kubernetes/templates/cluster. You may want to modify the files to suit your needs.
+
+cd to the kubernetes_setup directory.  You may want to modify the clusterroles.yaml file to grant specific permissions to different groups in your organization.
+```
+cd kubernets-setup
+kubectl config  set-context --current --namespace=gen3k8dev
+```
 
 
-## Handle TLS/SSL
-You need to decide on the URL for your site, this drives many settings later.  For instance, you may want the site to be https://gen3-is-awesome.mycompany.com
-Then go get SSL/TLS certificates created for this domain name and set it up in DNS as an alias for the ingres.
-
-
-Use the two TLS files (certificate and key) to create an ingres secret of type TLS in the file <secret-k8sxxxdev-ingress-tls.yaml>.  Create this secret in kubernetes using the kubectl apply command.  The secret is used by the ingress to terminate ssl to the browser.
-Follow the [instructions here](SSL.md)
+## Create the OpenDistro system in its own K8S namespace (substitute for ElasticSearch)
+```
+cd elastic-search-helm
+vi opendistro/customevalues.yaml   (change the name)
+cd <opendistro>/helm  && helm install <name> -f customvalues.yaml  --namespace=gen3elastic .
+cd ..
+```
 
 ## Authentication - Google
 Follow the [instructions for Fence](https://github.com/uc-cdis/fence/blob/master/README.md#oidc--oauth2) to set up the google google developer console
@@ -177,7 +176,7 @@ kubectl config  set-context --current --namespace=gen3k8dev
 
 One of the processes that runs in the background uses secrets from the keyvault that need to be entered by someone with access to the portal.  So the procedure follows...
 
-	
+
 1. Log into the portal and select the 'Profile' tab
 2. Create an api key by pressing the "Creat API key" button and saving the file on your workstations
 3. use the included helper script to parse the file and create the azure cli commands.  The script is found at [projects/gen3-kubes/kubernetes-setup/update-secrets.ksh](kubernetes-setup/update-secrets.ksh)
