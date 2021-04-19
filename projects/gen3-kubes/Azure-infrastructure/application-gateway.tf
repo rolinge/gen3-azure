@@ -44,6 +44,9 @@ resource "azurerm_application_gateway" "network" {
   resource_group_name = azurerm_kubernetes_cluster.aks_cluster.node_resource_group
   location            = azurerm_resource_group.rg.location
   tags                = merge(var.tags, local.common_tags, local.gw_tags)
+  lifecycle {
+    ignore_changes = [tags, backend_http_settings, request_routing_rule, probe, http_listener, frontend_port, backend_address_pool]
+  }
 
   sku {
     name     = "Standard_v2"

@@ -11,7 +11,7 @@ output "kublet_identity" {
 }
 
 output "resource_group_name" {
-    value = azurerm_resource_group.rg.name
+  value = azurerm_resource_group.rg.name
 }
 
 
@@ -47,8 +47,8 @@ output "acrUsername" {
 }
 
 output "acrPassword" {
-value = local.registry_password
+  value = local.registry_password
 }
 output "acrHost" {
-value = local.registry_hostname
+  value = local.registry_hostname
 }

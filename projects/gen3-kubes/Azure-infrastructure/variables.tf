@@ -23,19 +23,19 @@ variable "agent_count" {
 }
 
 variable "commons_dns_name" {
-  type          = string
-  description   = "The web address of the final site, minus the dns suffix"
+  type        = string
+  description = "The web address of the final site, minus the dns suffix"
 }
 
 variable "commons_dns_suffix" {
-  type          = string
-  description   = "The web dns suffix of the final site"
+  type        = string
+  description = "The web dns suffix of the final site"
 }
 
 variable "functionapp" {
-  type          = string
-  description   = "The local file that has the code for blobindexfunc"
-  default       = "assets/blobindexcode.zip"
+  type        = string
+  description = "The local file that has the code for blobindexfunc"
+  default     = "assets/blobindexcode.zip"
 }
 
 variable "k8s_os_disk_size" {
@@ -66,7 +66,7 @@ variable "vnet" {
   default = "vnet"
 }
 
-variable cluster_name {
+variable "cluster_name" {
 }
 
 variable "resource_group_name" {
@@ -80,7 +80,7 @@ variable "location" {
 }
 
 # az aks get-versions --location centralus --output table
-variable aks_k8s_version {
+variable "aks_k8s_version" {
   default = "1.19.7"
 }
 
@@ -144,8 +144,8 @@ variable "AZ_TENANT_ID" {
 # Use these permitted IP ranges to setup your network profile.
 variable "api_server_authorized_ip_ranges" {
   description = "The IP ranges to whitelist for incoming traffic to the masters"
-  type        = list
-  default     = ["168.183.0.0/16", "149.111.0.0/16", "128.35.0.0/16", "161.249.0.0/16", "198.203.174.0/23", "198.203.176.0/22", "198.203.180.0/23","75.73.11.0/24"]
+  type        = list(any)
+  default     = ["168.183.0.0/16", "149.111.0.0/16", "128.35.0.0/16", "161.249.0.0/16", "198.203.174.0/23", "198.203.176.0/22", "198.203.180.0/23", "75.73.11.0/24"]
 }
 
 variable "sshKeyPath_hdinsights" {
@@ -185,14 +185,14 @@ variable "hdi_ssh_Password" {
 variable "hdiHeadNodeSize" {
   type        = string
   description = "HDInsights server head node machine size"
-  default = "STANDARD_DS12_V2"
-# valid sizes (2021) A6,A7,EXTRALARGE,LARGE,STANDARD_D12_V2,STANDARD_D13_V2,STANDARD_D14_V2,STANDARD_D3_V2,
-#                     STANDARD_D4_V2,STANDARD_D5_V2,STANDARD_DS12_V2,STANDARD_DS13_V2,STANDARD_DS14_V2,
-#                     STANDARD_DS3_V2,STANDARD_DS4_V2,STANDARD_DS5_V2,STANDARD_A4_V2,STANDARD_A8_V2,
-#                     STANDARD_A4M_V2,STANDARD_A8M_V2,STANDARD_E16_V3,STANDARD_E2_V3,STANDARD_E20_V3,
-#                     STANDARD_E32_V3,STANDARD_E4_V3,STANDARD_E64_V3,STANDARD_E64I_V3,STANDARD_E8_V3,
-#                     STANDARD_A5,STANDARD_A6,STANDARD_A7,STANDARD_D16A_V4,STANDARD_D32A_V4,STANDARD_D48A_V4,
-#                     STANDARD_D4A_V4,STANDARD_D64A_V4,STANDARD_D8A_V4,STANDARD_D96A_V4
+  default     = "STANDARD_DS12_V2"
+  # valid sizes (2021) A6,A7,EXTRALARGE,LARGE,STANDARD_D12_V2,STANDARD_D13_V2,STANDARD_D14_V2,STANDARD_D3_V2,
+  #                     STANDARD_D4_V2,STANDARD_D5_V2,STANDARD_DS12_V2,STANDARD_DS13_V2,STANDARD_DS14_V2,
+  #                     STANDARD_DS3_V2,STANDARD_DS4_V2,STANDARD_DS5_V2,STANDARD_A4_V2,STANDARD_A8_V2,
+  #                     STANDARD_A4M_V2,STANDARD_A8M_V2,STANDARD_E16_V3,STANDARD_E2_V3,STANDARD_E20_V3,
+  #                     STANDARD_E32_V3,STANDARD_E4_V3,STANDARD_E64_V3,STANDARD_E64I_V3,STANDARD_E8_V3,
+  #                     STANDARD_A5,STANDARD_A6,STANDARD_A7,STANDARD_D16A_V4,STANDARD_D32A_V4,STANDARD_D48A_V4,
+  #                     STANDARD_D4A_V4,STANDARD_D64A_V4,STANDARD_D8A_V4,STANDARD_D96A_V4
 }
 
 variable "blobindexfunction_version" {
@@ -200,7 +200,7 @@ variable "blobindexfunction_version" {
   description = "version (tag) on the function that indexes the blobs"
 }
 
-variable color_ip_address_range {
+variable "color_ip_address_range" {
   type        = string
   description = "The ip address of Color Genomics which accesses our storage account"
   default     = "127.0.0.1"
@@ -212,11 +212,11 @@ variable "hdiWorkerNodSize" {
 }
 
 variable "sslCertificatefile" {
-  type = string
+  type        = string
   description = "Name of the file that holds the SSL certificate for the application gateway.  Certifiate is stored in Keyvault"
 }
 
 variable "sslCertificatePassword" {
-  type = string
+  type        = string
   description = "Passphrase for the Certificate named"
 }

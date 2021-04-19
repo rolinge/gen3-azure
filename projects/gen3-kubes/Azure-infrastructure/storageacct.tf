@@ -1,11 +1,11 @@
 # Create a storage account
 
 resource "azurerm_storage_account" "gen3" {
-  name                     = format("stg%s%s",var.environment,random_string.uid.result)
-  resource_group_name      = azurerm_resource_group.rg.name
-  location                 = azurerm_resource_group.rg.location
-  account_tier             = "Standard"
-  account_replication_type = "LRS"
+  name                      = format("stg%s%s", var.environment, random_string.uid.result)
+  resource_group_name       = azurerm_resource_group.rg.name
+  location                  = azurerm_resource_group.rg.location
+  account_tier              = "Standard"
+  account_replication_type  = "LRS"
   enable_https_traffic_only = "true"
   min_tls_version           = "TLS1_2"
   account_kind              = "StorageV2"
@@ -19,7 +19,7 @@ resource "azurerm_storage_account" "gen3" {
 
 
 resource "azurerm_storage_share" "gen3" {
-  name                 = format("sh%s",azurerm_storage_account.gen3.name)
+  name                 = format("sh%s", azurerm_storage_account.gen3.name)
   storage_account_name = azurerm_storage_account.gen3.name
   quota                = 100
 
@@ -60,41 +60,41 @@ resource "azurerm_storage_container" "registry" {
 
 
 data "azurerm_storage_account_sas" "gen3sas" {
-    connection_string = azurerm_storage_account.gen3.primary_connection_string
-    https_only = true
-    start = "2020-12-02"
-    expiry = "2021-02-28"
-    resource_types {
-        object = true
-        container = false
-        service = false
-    }
-    services {
-        blob = true
-        queue = false
-        table = false
-        file = false
-    }
-    permissions {
-        read = true
-        write = false
-        delete = false
-        list = false
-        add = false
-        create = false
-        update = false
-        process = false
-    }
+  connection_string = azurerm_storage_account.gen3.primary_connection_string
+  https_only        = true
+  start             = "2020-12-02"
+  expiry            = "2021-02-28"
+  resource_types {
+    object    = true
+    container = false
+    service   = false
+  }
+  services {
+    blob  = true
+    queue = false
+    table = false
+    file  = false
+  }
+  permissions {
+    read    = true
+    write   = false
+    delete  = false
+    list    = false
+    add     = false
+    create  = false
+    update  = false
+    process = false
+  }
 }
 
 # Create a storage account for ingesting data
 
 resource "azurerm_storage_account" "gen3ingest" {
-  name                     = format("stgingest%s%s",var.environment,random_string.uid.result)
-  resource_group_name      = azurerm_resource_group.rg.name
-  location                 = azurerm_resource_group.rg.location
-  account_tier             = "Standard"
-  account_replication_type = "LRS"
+  name                      = format("stgingest%s%s", var.environment, random_string.uid.result)
+  resource_group_name       = azurerm_resource_group.rg.name
+  location                  = azurerm_resource_group.rg.location
+  account_tier              = "Standard"
+  account_replication_type  = "LRS"
   enable_https_traffic_only = "true"
   min_tls_version           = "TLS1_2"
   account_kind              = "StorageV2"
@@ -106,7 +106,7 @@ resource "azurerm_storage_account" "gen3ingest" {
   network_rules {
     default_action             = "Deny"
     ip_rules                   = var.api_server_authorized_ip_ranges
-    virtual_network_subnet_ids = [azurerm_subnet.aks_subnet.id,azurerm_subnet.aks_subnet2.id]
+    virtual_network_subnet_ids = [azurerm_subnet.aks_subnet.id, azurerm_subnet.aks_subnet2.id]
   }
 
   tags = merge(var.tags, local.common_tags)
@@ -115,11 +115,11 @@ resource "azurerm_storage_account" "gen3ingest" {
 # Create a storage account for color to drop off data
 
 resource "azurerm_storage_account" "dropbox" {
-  name                     = format("stgdrop%s%s",var.environment,random_string.uid.result)
-  resource_group_name      = azurerm_resource_group.rg.name
-  location                 = azurerm_resource_group.rg.location
-  account_tier             = "Standard"
-  account_replication_type = "LRS"
+  name                      = format("stgdrop%s%s", var.environment, random_string.uid.result)
+  resource_group_name       = azurerm_resource_group.rg.name
+  location                  = azurerm_resource_group.rg.location
+  account_tier              = "Standard"
+  account_replication_type  = "LRS"
   enable_https_traffic_only = "true"
   min_tls_version           = "TLS1_2"
   account_kind              = "StorageV2"
@@ -131,7 +131,7 @@ resource "azurerm_storage_account" "dropbox" {
   network_rules {
     default_action             = "Deny"
     ip_rules                   = var.api_server_authorized_ip_ranges
-    virtual_network_subnet_ids = [azurerm_subnet.aks_subnet.id,azurerm_subnet.aks_subnet2.id]
+    virtual_network_subnet_ids = [azurerm_subnet.aks_subnet.id, azurerm_subnet.aks_subnet2.id]
   }
 
   tags = merge(var.tags, local.common_tags)
@@ -153,9 +153,9 @@ resource "azurerm_storage_share" "minioconfig" {
 
 
 resource "time_sleep" "waitAccessPoliciesPlus30s" {
-  depends_on = [ azurerm_key_vault_access_policy.gen3accesspolicy,
-                  azurerm_key_vault_access_policy.drop01,
-                  azurerm_key_vault_access_policy.ingest]
+  depends_on = [azurerm_key_vault_access_policy.gen3accesspolicy,
+    azurerm_key_vault_access_policy.drop01,
+  azurerm_key_vault_access_policy.ingest]
   create_duration = "30s"
 }
 
@@ -164,20 +164,20 @@ resource "azurerm_storage_account_customer_managed_key" "gen3keyassignment" {
   storage_account_id = azurerm_storage_account.gen3.id
   key_vault_id       = azurerm_key_vault.keyvault1.id
   key_name           = azurerm_key_vault_key.stgacctkey.name
-  depends_on = [ azurerm_key_vault_access_policy.gen3accesspolicy,azurerm_storage_account.gen3,time_sleep.waitAccessPoliciesPlus30s]
+  depends_on         = [azurerm_key_vault_access_policy.gen3accesspolicy, azurerm_storage_account.gen3, time_sleep.waitAccessPoliciesPlus30s]
 }
 
 resource "azurerm_storage_account_customer_managed_key" "gen3dropkeyassignment" {
   storage_account_id = azurerm_storage_account.dropbox.id
   key_vault_id       = azurerm_key_vault.keyvault1.id
   key_name           = azurerm_key_vault_key.stgacctkey.name
-  depends_on = [  azurerm_key_vault_access_policy.drop01,azurerm_storage_account.dropbox,time_sleep.waitAccessPoliciesPlus30s]
+  depends_on         = [azurerm_key_vault_access_policy.drop01, azurerm_storage_account.dropbox, time_sleep.waitAccessPoliciesPlus30s]
 }
 resource "azurerm_storage_account_customer_managed_key" "gen3ingestkeyassignment" {
   storage_account_id = azurerm_storage_account.gen3ingest.id
   key_vault_id       = azurerm_key_vault.keyvault1.id
   key_name           = azurerm_key_vault_key.stgacctkey.name
-  depends_on = [  azurerm_key_vault_access_policy.ingest,azurerm_storage_account.gen3ingest,time_sleep.waitAccessPoliciesPlus30s]
+  depends_on         = [azurerm_key_vault_access_policy.ingest, azurerm_storage_account.gen3ingest, time_sleep.waitAccessPoliciesPlus30s]
 }
 
 # this adds the group AZU_Clinicogenomics_fileshare_rw ACL to the file share.

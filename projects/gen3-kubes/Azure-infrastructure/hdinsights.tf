@@ -1,16 +1,16 @@
 resource "azurerm_storage_account" "gen3hdinsightsstorage" {
-  name                            = format("stghdi%s%s",var.environment,random_string.uid.result)
-  location                        = azurerm_resource_group.rg.location
-  resource_group_name             = azurerm_resource_group.rg.name
-  account_tier                    = "Standard"
-  account_replication_type        = "LRS"
+  name                     = format("stghdi%s%s", var.environment, random_string.uid.result)
+  location                 = azurerm_resource_group.rg.location
+  resource_group_name      = azurerm_resource_group.rg.name
+  account_tier             = "Standard"
+  account_replication_type = "LRS"
   account_kind             = "StorageV2"
   is_hns_enabled           = "true"
 
   network_rules {
     default_action             = "Deny"
     ip_rules                   = var.api_server_authorized_ip_ranges
-    virtual_network_subnet_ids = [azurerm_subnet.aks_subnet.id,azurerm_subnet.aks_subnet2.id]
+    virtual_network_subnet_ids = [azurerm_subnet.aks_subnet.id, azurerm_subnet.aks_subnet2.id]
   }
 
 }
@@ -33,7 +33,7 @@ resource "azurerm_storage_container" "gen3hdinsightcontainer" {
 resource "azurerm_user_assigned_identity" "hdi-usermanagedidentity" {
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
-  name = "${var.prefix}hdiumi"
+  name                = "${var.prefix}hdiumi"
 }
 
 
@@ -44,11 +44,11 @@ resource "azurerm_role_assignment" "stg_auth_hdiuseridentity" {
 }
 
 resource "azurerm_hdinsight_spark_cluster" "gen3spark" {
-  name                          = format("spark%s%s",var.environment,random_string.uid.result)
-  location                      = azurerm_resource_group.rg.location
-  resource_group_name           = azurerm_resource_group.rg.name
-  cluster_version               = "4.0"
-  tier                          = "Standard"
+  name                = format("spark%s%s", var.environment, random_string.uid.result)
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+  cluster_version     = "4.0"
+  tier                = "Standard"
 
   component_version {
     spark = "2.3"
@@ -66,35 +66,35 @@ resource "azurerm_hdinsight_spark_cluster" "gen3spark" {
   }
 
   storage_account_gen2 {
-    is_default           = true
+    is_default                   = true
     managed_identity_resource_id = azurerm_user_assigned_identity.hdi-usermanagedidentity.id
-    storage_resource_id = azurerm_storage_account.gen3hdinsightsstorage.id
-    filesystem_id = azurerm_storage_data_lake_gen2_filesystem.gen3hdinsights.id
+    storage_resource_id          = azurerm_storage_account.gen3hdinsightsstorage.id
+    filesystem_id                = azurerm_storage_data_lake_gen2_filesystem.gen3hdinsights.id
   }
 
   roles {
     head_node {
-      vm_size  = "STANDARD_A4_V2"
-      username = var.hdinsight_node_username
-      ssh_keys = [file(var.sshKeyPath_hdinsights)]
-      subnet_id = azurerm_subnet.aks_subnet2.id
+      vm_size            = "STANDARD_A4_V2"
+      username           = var.hdinsight_node_username
+      ssh_keys           = [file(var.sshKeyPath_hdinsights)]
+      subnet_id          = azurerm_subnet.aks_subnet2.id
       virtual_network_id = azurerm_virtual_network.aks_vnet.id
     }
 
     worker_node {
-      vm_size  = "STANDARD_A4_V2"
-      username = var.hdinsight_node_username
-      ssh_keys = [file(var.sshKeyPath_hdinsights)]
+      vm_size               = "STANDARD_A4_V2"
+      username              = var.hdinsight_node_username
+      ssh_keys              = [file(var.sshKeyPath_hdinsights)]
       target_instance_count = 3
-      subnet_id = azurerm_subnet.aks_subnet2.id
-      virtual_network_id = azurerm_virtual_network.aks_vnet.id
+      subnet_id             = azurerm_subnet.aks_subnet2.id
+      virtual_network_id    = azurerm_virtual_network.aks_vnet.id
     }
 
     zookeeper_node {
-      vm_size  = "Medium"
-      username = var.hdinsight_node_username
-      ssh_keys = [file(var.sshKeyPath_hdinsights)]
-      subnet_id = azurerm_subnet.aks_subnet2.id
+      vm_size            = "Medium"
+      username           = var.hdinsight_node_username
+      ssh_keys           = [file(var.sshKeyPath_hdinsights)]
+      subnet_id          = azurerm_subnet.aks_subnet2.id
       virtual_network_id = azurerm_virtual_network.aks_vnet.id
     }
   }

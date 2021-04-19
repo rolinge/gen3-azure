@@ -1,12 +1,12 @@
 resource "azurerm_key_vault" "keyvault1" {
-  name                        = format("kv%s%s",var.environment,random_string.uid.result)
+  name                        = format("kv%s%s", var.environment, random_string.uid.result)
   location                    = azurerm_resource_group.rg.location
   resource_group_name         = azurerm_resource_group.rg.name
   enabled_for_disk_encryption = true
   tenant_id                   = data.azurerm_client_config.current.tenant_id
-  soft_delete_retention_days = 7
-  purge_protection_enabled   = true
-  sku_name = "standard"
+  soft_delete_retention_days  = 7
+  purge_protection_enabled    = true
+  sku_name                    = "standard"
   network_acls {
     default_action = "Allow"
     bypass         = "AzureServices"
@@ -21,7 +21,7 @@ resource "azurerm_role_assignment" "keyvaultACL" {
   scope                = azurerm_key_vault.keyvault1.id
   role_definition_name = "Contributor"
   # this is the subscription owners group, good for now...
-  principal_id         = "9b01c20a-8186-4eca-bb7e-33b6c624c48d"
+  principal_id = "9b01c20a-8186-4eca-bb7e-33b6c624c48d"
 }
 
 
@@ -34,23 +34,23 @@ resource "azurerm_key_vault_access_policy" "serviceaccount" {
   object_id = "bc9ed98e-b121-4bdc-8894-3f21554d4215"
 
   key_permissions = [
-  "Get",  "List", "Delete", "Recover",  "Backup", "Restore",
-  "Create", "Decrypt", "Encrypt", "Import", "Sign",
-  "UnwrapKey", "Update", "Verify" , "WrapKey", "Purge"
+    "Get", "List", "Delete", "Recover", "Backup", "Restore",
+    "Create", "Decrypt", "Encrypt", "Import", "Sign",
+    "UnwrapKey", "Update", "Verify", "WrapKey", "Purge"
   ]
   secret_permissions = [
-  "get",  "list", "delete", "recover",  "backup", "restore",  "set", "Purge"
+    "get", "list", "delete", "recover", "backup", "restore", "set", "Purge"
   ]
   storage_permissions = [
-  "get",  "list", "delete", "recover",  "backup", "restore",
-  "regeneratekey", "getsas", "listsas", "deletesas", "set", "setsas",
-  "update"
+    "get", "list", "delete", "recover", "backup", "restore",
+    "regeneratekey", "getsas", "listsas", "deletesas", "set", "setsas",
+    "update"
   ]
   certificate_permissions = [
-  "Get",  "List", "Delete", "Recover",  "Backup", "Restore",
-  "Update" , "Create", "Import", "ManageContacts",  "ManageIssuers",
-  "GetIssuers","ListIssuers","SetIssuers",
-  "DeleteIssuers","Purge"
+    "Get", "List", "Delete", "Recover", "Backup", "Restore",
+    "Update", "Create", "Import", "ManageContacts", "ManageIssuers",
+    "GetIssuers", "ListIssuers", "SetIssuers",
+    "DeleteIssuers", "Purge"
   ]
 }
 resource "azurerm_key_vault_access_policy" "SubscriptionContributor" {
@@ -60,22 +60,22 @@ resource "azurerm_key_vault_access_policy" "SubscriptionContributor" {
   object_id = "26a01eec-7c1d-46f3-ba32-d2eb1081f37f"
 
   key_permissions = [
-  "Get",  "List", "Delete", "Recover",  "Backup", "Restore",
-  "Create", "Decrypt", "Encrypt", "Import", "Sign",
-  "UnwrapKey", "Update", "Verify" , "WrapKey"
+    "Get", "List", "Delete", "Recover", "Backup", "Restore",
+    "Create", "Decrypt", "Encrypt", "Import", "Sign",
+    "UnwrapKey", "Update", "Verify", "WrapKey"
   ]
   secret_permissions = [
-  "get",  "list", "delete", "recover",  "backup", "restore",  "set"
+    "get", "list", "delete", "recover", "backup", "restore", "set"
   ]
   storage_permissions = [
-  "get",  "list", "delete", "recover",  "backup", "restore",
-  "regeneratekey", "getsas", "listsas", "deletesas", "set", "setsas",
-  "update"
+    "get", "list", "delete", "recover", "backup", "restore",
+    "regeneratekey", "getsas", "listsas", "deletesas", "set", "setsas",
+    "update"
   ]
   certificate_permissions = [
-  "Get",  "List", "Delete", "Recover",  "Backup", "Restore",
-  "Update" , "Create", "Import", "ManageContacts",  "ManageIssuers",
-  "GetIssuers","ListIssuers","SetIssuers", "DeleteIssuers"
+    "Get", "List", "Delete", "Recover", "Backup", "Restore",
+    "Update", "Create", "Import", "ManageContacts", "ManageIssuers",
+    "GetIssuers", "ListIssuers", "SetIssuers", "DeleteIssuers"
   ]
 }
 resource "azurerm_key_vault_access_policy" "SubscriptionOwner" {
@@ -85,23 +85,23 @@ resource "azurerm_key_vault_access_policy" "SubscriptionOwner" {
   object_id = "9b01c20a-8186-4eca-bb7e-33b6c624c48d"
 
   key_permissions = [
-  "Get",  "List", "Delete", "Recover",  "Backup", "Restore",
-  "Create", "Decrypt", "Encrypt", "Import", "Sign",
-  "UnwrapKey", "Update", "Verify" , "WrapKey", "Purge"
+    "Get", "List", "Delete", "Recover", "Backup", "Restore",
+    "Create", "Decrypt", "Encrypt", "Import", "Sign",
+    "UnwrapKey", "Update", "Verify", "WrapKey", "Purge"
   ]
   secret_permissions = [
-  "get",  "list", "delete", "recover",  "backup", "restore",  "set", "Purge"
+    "get", "list", "delete", "recover", "backup", "restore", "set", "Purge"
   ]
   storage_permissions = [
-  "get",  "list", "delete", "recover",  "backup", "restore",
-  "regeneratekey", "getsas", "listsas", "deletesas", "set", "setsas",
-  "update"
+    "get", "list", "delete", "recover", "backup", "restore",
+    "regeneratekey", "getsas", "listsas", "deletesas", "set", "setsas",
+    "update"
   ]
   certificate_permissions = [
-  "Get",  "List", "Delete", "Recover",  "Backup", "Restore",
-  "Update" , "Create", "Import", "ManageContacts",  "ManageIssuers",
-  "GetIssuers","ListIssuers","SetIssuers",
-  "DeleteIssuers","Purge"
+    "Get", "List", "Delete", "Recover", "Backup", "Restore",
+    "Update", "Create", "Import", "ManageContacts", "ManageIssuers",
+    "GetIssuers", "ListIssuers", "SetIssuers",
+    "DeleteIssuers", "Purge"
   ]
 }
 #-----
@@ -112,30 +112,30 @@ resource "azurerm_key_vault_access_policy" "functionapp" {
   tenant_id = data.azurerm_client_config.current.tenant_id
   object_id = azurerm_function_app.funcapp.identity[0].principal_id
 
-  key_permissions = [   "Get",  "List"  ]
+  key_permissions = ["Get", "List"]
 
-  secret_permissions = [  "Get",  "List"  ]
+  secret_permissions = ["Get", "List"]
 }
 
 resource "azurerm_key_vault_access_policy" "drop01" {
-  key_vault_id = azurerm_key_vault.keyvault1.id
-  tenant_id = data.azurerm_client_config.current.tenant_id
-  object_id = azurerm_storage_account.dropbox.identity[0].principal_id
-  key_permissions = [   "Get",  "List" ,"Encrypt" ,"Decrypt"  ,"Wrapkey"  ,"Unwrapkey"  ,"Verify"  ,"Sign"]
+  key_vault_id       = azurerm_key_vault.keyvault1.id
+  tenant_id          = data.azurerm_client_config.current.tenant_id
+  object_id          = azurerm_storage_account.dropbox.identity[0].principal_id
+  key_permissions    = ["Get", "List", "Encrypt", "Decrypt", "Wrapkey", "Unwrapkey", "Verify", "Sign"]
   secret_permissions = ["get"]
 }
 
 resource "azurerm_key_vault_access_policy" "gen3accesspolicy" {
-  key_vault_id = azurerm_key_vault.keyvault1.id
-  tenant_id = data.azurerm_client_config.current.tenant_id
-  object_id = azurerm_storage_account.gen3.identity[0].principal_id
-  key_permissions = [   "Get",  "List" ,"Encrypt" ,"Decrypt"  ,"Wrapkey"  ,"Unwrapkey"  ,"Verify"  ,"Sign"]
+  key_vault_id       = azurerm_key_vault.keyvault1.id
+  tenant_id          = data.azurerm_client_config.current.tenant_id
+  object_id          = azurerm_storage_account.gen3.identity[0].principal_id
+  key_permissions    = ["Get", "List", "Encrypt", "Decrypt", "Wrapkey", "Unwrapkey", "Verify", "Sign"]
   secret_permissions = ["get"]
 }
 resource "azurerm_key_vault_access_policy" "ingest" {
-  key_vault_id = azurerm_key_vault.keyvault1.id
-  tenant_id    = data.azurerm_client_config.current.tenant_id
-  object_id    = azurerm_storage_account.gen3ingest.identity.0.principal_id
+  key_vault_id       = azurerm_key_vault.keyvault1.id
+  tenant_id          = data.azurerm_client_config.current.tenant_id
+  object_id          = azurerm_storage_account.gen3ingest.identity.0.principal_id
   key_permissions    = ["get", "create", "list", "restore", "recover", "unwrapkey", "wrapkey", "purge", "encrypt", "decrypt", "sign", "verify"]
   secret_permissions = ["get"]
 }
@@ -161,7 +161,7 @@ resource "azurerm_key_vault_secret" "gen3keyid" {
     delete = "2h"
   }
   lifecycle {
-    ignore_changes = [   value , tags ]
+    ignore_changes = [value, tags]
   }
   tags = merge(var.tags, local.common_tags)
 }
@@ -170,7 +170,7 @@ resource "azurerm_key_vault_secret" "gen3KeySecret" {
   value        = "BLANK-FILLINLATER"
   key_vault_id = azurerm_key_vault.keyvault1.id
   lifecycle {
-    ignore_changes = [   value , tags ]
+    ignore_changes = [value, tags]
   }
 
   tags = merge(var.tags, local.common_tags)
@@ -181,7 +181,7 @@ resource "azurerm_key_vault_secret" "StorageaccountConnectString" {
   value        = azurerm_storage_account.gen3.primary_connection_string
   key_vault_id = azurerm_key_vault.keyvault1.id
   lifecycle {
-    ignore_changes = [   value , tags ]
+    ignore_changes = [value, tags]
   }
   tags = merge(var.tags, local.common_tags)
 }
@@ -208,9 +208,9 @@ resource "azurerm_key_vault_key" "stgacctkey" {
   key_type     = "RSA"
   key_size     = 4096
 
-  key_opts = ["decrypt","encrypt","sign","unwrapKey","verify","wrapKey"  ]
-  depends_on = [azurerm_key_vault_access_policy.ingest  ]
-  tags = merge(var.tags, local.common_tags)
+  key_opts   = ["decrypt", "encrypt", "sign", "unwrapKey", "verify", "wrapKey"]
+  depends_on = [azurerm_key_vault_access_policy.ingest]
+  tags       = merge(var.tags, local.common_tags)
 }
 
 
@@ -243,17 +243,19 @@ resource "azurerm_key_vault_certificate" "gen3appgwcrt" {
 }
 
 resource "azurerm_key_vault_access_policy" "appgwaccesspolicy" {
-  key_vault_id = azurerm_key_vault.keyvault1.id
-  tenant_id = data.azurerm_client_config.current.tenant_id
-  object_id = azurerm_user_assigned_identity.appgw-usermanagedidentity.principal_id
-  key_permissions = [   "Get",  "List" ,"Encrypt" ,"Decrypt"  ,"Wrapkey"  ,"Unwrapkey"  ,"Verify"  ,"Sign"]
+  key_vault_id       = azurerm_key_vault.keyvault1.id
+  tenant_id          = data.azurerm_client_config.current.tenant_id
+  object_id          = azurerm_user_assigned_identity.appgw-usermanagedidentity.principal_id
+  key_permissions    = ["Get", "List", "Encrypt", "Decrypt", "Wrapkey", "Unwrapkey", "Verify", "Sign"]
   secret_permissions = ["get", "list"]
   certificate_permissions = [
-  "Get",  "List", "Delete", "Recover",  "Backup", "Restore",
-  "Update" , "Create", "Import", "ManageContacts",  "ManageIssuers",
-  "GetIssuers","ListIssuers","SetIssuers", "DeleteIssuers"
+    "Get", "List", "Delete", "Recover", "Backup", "Restore",
+    "Update", "Create", "Import", "ManageContacts", "ManageIssuers",
+    "GetIssuers", "ListIssuers", "SetIssuers", "DeleteIssuers"
   ]
 }
+
+
 
 
 

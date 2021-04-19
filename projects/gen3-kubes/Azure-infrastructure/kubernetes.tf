@@ -1,14 +1,14 @@
 resource "azurerm_kubernetes_cluster" "aks_cluster" {
-  name                            = format("k8-%s%s",var.environment,random_string.uid.result)
+  name                            = format("k8-%s%s", var.environment, random_string.uid.result)
   location                        = azurerm_resource_group.rg.location
   dns_prefix                      = var.prefix
   resource_group_name             = azurerm_resource_group.rg.name
   api_server_authorized_ip_ranges = var.api_server_authorized_ip_ranges
   kubernetes_version              = var.aks_k8s_version
-  node_resource_group             = format("k8-nodes-%s%s",var.environment,random_string.uid.result)
+  node_resource_group             = format("k8-nodes-%s%s", var.environment, random_string.uid.result)
 
   default_node_pool {
-    name                = "nodepool"
+    name = "nodepool"
 
     vm_size             = var.k8_agents_big
     enable_auto_scaling = true
@@ -34,13 +34,16 @@ resource "azurerm_kubernetes_cluster" "aks_cluster" {
     }
   }
   network_profile {
-    network_plugin     = "azure"
-    network_policy     = "azure"
+    network_plugin = "azure"
+    network_policy = "azure"
   }
   addon_profile {
     oms_agent {
       enabled                    = true
       log_analytics_workspace_id = azurerm_log_analytics_workspace.k8.id
+    }
+    http_application_routing {
+      enabled = false
     }
 
     http_application_routing {
