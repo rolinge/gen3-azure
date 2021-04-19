@@ -47,6 +47,13 @@ az webapp config storage-account add \
 
 ```
 
+## Create namespaces in kubernetes
+
+```
+cd templates/cluster
+kubectl apply -f namespaces.yaml 
+```
+
 ## Create an ingress controller for the kubernetes cluster
 This command creates the controller pair and Azure will give a public IP.  You can assign a domain name to it via the portal if you wish, or use your own DNS system to resolve your name.
 

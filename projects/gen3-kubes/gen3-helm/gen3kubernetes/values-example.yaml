@@ -290,6 +290,7 @@ tube:
   image: "quay.io/cdis/tube:2021.03"
   serviceport: 80
   replicas: 1
+  etlmappinglocation: "assets/etlMapping.yaml"
   startupfileLocation: "assets/tube_startup.ksh"
   esrootcalocation: "assets/es-root-ca.pem"
   extrarunetllocation: "assets/run_optum_etl.py"
