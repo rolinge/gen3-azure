@@ -180,4 +180,7 @@ The following commands will help you diagnose and solve problems should they ari
 - kubectl delete deployment <deployment-name> # useful before running helm again, forces a redeploy.
 - kubectl scale deployment --replicas=n <deployment-name>   # add or remove counts of containers in a set
 - helm upgrade <name> --namespace=k8sgen3dev .   # new configuration after changing variables
+- helm delete <name>                             # Start over
+- kubectl delete pods <pod_name>                 # easy way to restart a pods
+- kubectl rollout restart deployment <deployment> # easy way to restart a deployment when config changes.
 ```

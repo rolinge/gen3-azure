@@ -141,7 +141,6 @@ resource "azurerm_storage_share" "minioconfig" {
   name                 = "miniovolume"
   storage_account_name = azurerm_storage_account.dropbox.name
   quota                = 5
-
   acl {
     id = "CE1362BF-7414-4A26-9A0B-42D95F2DC400"
 

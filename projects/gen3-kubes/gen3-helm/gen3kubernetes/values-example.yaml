@@ -1,6 +1,8 @@
 # Default values for gen3kubernetes.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
+#
+# Pay strict attention to the database_servername and the various database passwords
 
 replicaCount: 1
 config_helper: "assets/config_helper.py"
@@ -56,33 +58,33 @@ fence:
       cpu: '500m'
       memory: '256Mi'
   googleOauth:
-    client_id: '459263570125-3hl550dfsjej6v16m7go20i7ovkol8pn.apps.googleusercontent.com'
-    client_secret: 'qxRkPreusEWF60lhM4-tH7O7'
+    client_id: 'xxx.apps.googleusercontent.com'
+    client_secret: 'yyyy-tH7O7'
   microsoftOauth:
-    client_id: '9db77a3b-3f63-4093-a9e8-96a9d6cc711b'
-    client_secret: 'a-7H-z1041Ki7T5_v6jtGi5vtRCTq-_D.I'
+    client_id: 'mmmmmmmm-nnn-40oooo93-a9e8'
+    client_secret: 'm-99-uibgyugvbijknlhj-_D.I'
   oktaOauth:
     client_id: ""
   defaultLoginURLSuffix: 'login/google'
   amazonStorageCreds:
     - name: 'CREDS1'
-      accesskeyid: 'stgaccvprh'
-      secretkey: 'V6c8rNTDPxAozgf3M6ewHd+7A9XnTw8MNSfsQ63QLY1+nzloas6rSp0GsZuOK+Q+oT7gi5Cpdj8TEvqaC5xvOQ=='
+      accesskeyid: 'GADFGDFSHSTRDFAGADF'
+      secretkey: '+jiogdfanklmnlkmnlmadfgjlojlk;fgdsmnlk+nzloas6rSp0GsZuOK+Q+oT7gi5Cpdj8TEvqaC5xvOQ=='
     - name: 'CREDS2'
-      accesskeyid: 'AKIAU2FCYYEUXZPLWKZF'
-      secretkey: '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'
+      accesskeyid: 'HGERTTRGFDSGFDSDFGBDFA'
+      secretkey: '2+iongfkoafd9987nkljlgfdankl/njfgdsanbji'
   amazonBuckets:
     - name: 'bucket1'
       credentialname: 'CREDS1'
       endpoint_url: 'https://minio-app-service-bfncrxya.azurewebsites.net'
       region: 'us-east-1'
-    - name: 'gen3bucket88997'
+    - name: 'bucket2'
       credentialname: 'CREDS2'
       region: 'us-east-1'
   azCredentials:
     - name: 'CREDA'
-      az_stgacctname: 'stgacgen3devklnow'
-      az_connection_string: 'DefaultEndpointsProtocol=https;AccountName=stgacgen3devklnow;AccountKey=KY0cSrSewNiDsYuRzw2jGBc8DWXmhee9vjP/bohCNbjfkrVzg2HkIJ1EKL8I3pfyiIBjzVozPMNx1PfSD8pG6Q==;EndpointSuffix=core.windows.net'
+      az_stgacctname: 'stgacctaaaa'
+      az_connection_string: 'DefaultEndpointsProtocol=https;AccountName=stgacctaaaa;AccountKey=nkljKLJnLKNklNLKn98y789bJG/klnklnl==;EndpointSuffix=core.windows.net'
   azureBlobstores:
     - name: 'azgen3blobstorage'
       credentialname: 'CREDA'
@@ -104,6 +106,7 @@ fence:
   cacrtFiles:
     - name: "myprivatecert.crt"
       fileLocation: "assets/myprivatecert.crt"
+  #While not necessary, you should consider setting up your own JWT keys for your instance.
   jwt_private_key: |
     -----BEGIN PRIVATE KEY-----
     MIIEwAIBADANBgkqhkiG9w0BAQEFAASCBKowggSmAgEAAoIBAQDkS+nTVWUnXgIQ
@@ -202,13 +205,14 @@ service:
 ingress:
   enabled: true
   annotations:
-    kubernetes.io/ingress.class: nginx
-    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    kubernetes.io/ingress.class: azure/application-gateway
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
     nginx.ingress.kubernetes.io/use-regex: "true"
-    nginx.ingress.kubernetes.io/rewrite-target: /$1
-    # kubernetes.io/ingress.class: nginx
-    # kubernetes.io/tls-acme: "true"
-  hosts:
+    #nginx.ingress.kubernetes.io/rewrite-target: /$1
+    appgw.ingress.kubernetes.io/appgw-ssl-certificate: g3vnet-sslcert
+    appgw.ingress.kubernetes.io/backend-protocol: "http"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"  hosts:
     - host: mysitename.mydomain.com
       paths:
         - path :
@@ -216,14 +220,9 @@ ingress:
           serviceName: service-revproxy-<$ENV>
           servicePort: 80
         - path:
-          actualPath: "/colordropboxdev"
+          actualPath: "/dropboxdev"
           serviceName: service-minio-gen3k8dev
           servicePort: 9000
-  tls:
-    - secretName: k8sgen3dev-ingress-tls
-      hosts:
-        - mysitename.mydomain.com
-
 
 autoscaling:
   enabled: false
@@ -271,21 +270,6 @@ peregrine:
     requests:
       cpu: 200m
       memory: 256Mi
-minio:
-  image: "minio/minio"
-  pullPolicy: IfNotPresent
-  serviceport: 9000
-  AZURE_STORAGE_ACCOUNT: stgaccolordevklnow
-  AZURE_STORAGE_KEY: "Hm8r2OSVwC8pgZlWl7IoOGAgJIWiw6yLAsRy7C42ZK+BMU0eD1ZD2RAS9JW3l3pBGiNgD1vSHjwKfYK27GjvLA=="
-  MINIO_ROOT_USER: "colordropgen3dev"
-  MINIO_ROOT_PASSWORD: "NUMxODUxQjUtREZGRC00NEE1LTlFRDItRTVCREI2MjFDNDY0Cg=="
-  resources:
-    limits:
-      cpu: 500m
-      memory: 1024Mi
-    requests:
-      cpu: 200m
-      memory: 512Mi
 tube:
   image: "quay.io/cdis/tube:2021.03"
   serviceport: 80
@@ -390,10 +374,10 @@ guppy:
       cpu: 100m
       memory: 256Mi
 jupyter:
-  image: "acrgen3klnow.azurecr.io/jupyter-slim:rolingeg3kubes-23"
+  image: "quay.io/occ_data/jupyternotebook:1.7.2"
   replicas: 1
   serviceport: 8888
-  userDirSize: "10Gi"
+  userDirSize: "32Gi"
   resources:
     limits:
       cpu: 2000m
@@ -436,3 +420,20 @@ kibana:
     requests:
       cpu: 500m
       memory: 1024Mi
+#
+# The block below is optional as the minio dropbox S3 emulator is not yet working.
+minio:
+  image: "minio/minio"
+  pullPolicy: IfNotPresent
+  serviceport: 9000
+  AZURE_STORAGE_ACCOUNT: stgacctdropaaaa
+  AZURE_STORAGE_KEY: "noadfnIJOIONOonoer9089054j+8998jignjogsdfoieonko34ojn34no=="
+  MINIO_ROOT_USER: "dropgen3dev"
+  MINIO_ROOT_PASSWORD: "NUMxODUxQjUtREZGRC00NEE1LTlFRDItRTVCREI2MjFDNDY0Cg=="
+  resources:
+    limits:
+      cpu: 500m
+      memory: 1024Mi
+    requests:
+      cpu: 200m
+      memory: 512Mi

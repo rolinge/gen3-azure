@@ -10,7 +10,7 @@ data:
   fence-config.yaml: |
     APP_NAME: 'Gen3 Data Commons'
     BASE_URL: '{{ .Values.fence.base_url }}'
-    DB: 'postgresql://{{ .Values.fence.database.username }}:{{ .Values.fence.database.db_password }}@{{ .Values.database_servername }}:{{ .Values.database_port }}/{{ .Values.fence.database.databasename }}'
+    DB: 'postgresql://{{ .Values.fence.database.username }}@{{ .Values.database_servername }}:{{ .Values.fence.database.db_password }}@{{ .Values.database_servername }}:{{ .Values.database_port }}/{{ .Values.fence.database.databasename }}'
     DEBUG: true
     MOCK_AUTH: false
     MOCK_GOOGLE_AUTH: false

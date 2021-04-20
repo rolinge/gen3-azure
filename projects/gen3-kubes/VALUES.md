@@ -34,9 +34,6 @@ Postgres server  | database_servername:  |  Terraform build a postgres server fo
 | | ingress.tls.secretName: | You need to create a K8S secret that has the certificate files for doing TLS/SSL for your site.  See the [guide to SSL and Auth](SSL.md)
 | | ingress.hosts.secretName.hosts: | This is the host name of your site. (Debt - generate this automatically and remove from values file)
 **ReverseProxy** | | This is the front door of your gen3 web site, it directs traffic to all other microservices, and even between them.
-|   | revproxy.crtFile:  |  Path to the requisit TLS file see [guide to SSL and Auth](SSL.md)
-|   | revproxy.keyFile:  |  Path to the requisit TLS file see [guide to SSL and Auth](SSL.md) |
-|   | revproxy.cacrtFile:|  Path to the requisit TLS file see [guide to SSL and Auth](SSL.md) |
 **Peregrine** |   | [CDIS Documentation](https://github.com/uc-cdis/peregrine/blob/master/README.md)  |
 |   | peregrine.database:  |  Name of the peregrine database, also username and password |
 |   | peregrine.gdcapi_secret_key:  | A random string for seeding something in peregrine  |
@@ -52,8 +49,8 @@ Postgres server  | database_servername:  |  Terraform build a postgres server fo
 | | sheepdog.schemas:   (in case you have a custom schema)
 **Indexd** | | [CDIS Documentation](https://github.com/uc-cdis/indexd/blob/master/README.md)
  | | indexd.database: |  Name of the indexd database, also username and password
- | | indexd.username: |   |
- | | indexd.password: |   |
+ | | indexd.username: |  Actual username to the indexd daemon |
+ | | indexd.password: |  Corresponding password to the indexd daemon |
 **Portal** (Windmill)  |   |  [CDIS Documentation](https://github.com/uc-cdis/data-portal/blob/master/README.md) |
   | | portal.externalhostname: | (Debt - generate this automatically and remove from values file)
   | | portal.gitops: | path to PNG logo file that shows up on the portal.
