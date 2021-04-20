@@ -1,38 +1,19 @@
-# Settins for SSL in Gen3 Data Commons
+# Settings for SSL in Gen3 Data Commons
 The job of setting up and managing SSL(TLS) for any web site is not for the timid, especially if you have a private CA.
 
 ## Preperation
 1. Decide on a URL for your site.
 2. Generate a CSR
 3. Get the CSR signed by a CA, or sign using your own CA
-4. Capture certificate file, key file, and ca-certificate file.  (PEM format)
-5. Copy those files to the 'secrets' directory.
-   1. projects/gen3kubes/secrets/<certfile>.PEM
-   2. projects/gen3kubes/secrets<keyfile>.PEM
-   3. projects/gen3kubes/secrets<cacert>.PEM
+4. Generate certificate file with the cert, key, and CA certificates.  (PFX format)
+5. Copy that file to the assets directory in Azure-Infrastrucutre
+6. Edit the terraform.tfvars file and change the entries sslCertificatefile  and sslCertificatePassword to the needful.
 
-## Create a Kubernetes secret yaml file
-Each file must be encoded with base64 and the string placed in the secret yaml file as below.
+Terraform will build the application gateway with the certificate installed, and as long as it matches your site URL, it will work.
 
-base64 the files
-```
-cat <certfile>.PEM | base64 -b 0 >certfile.crt.b64
-cat <keyfile>.PEM | base64 -b 0  >keyfile.crt.b64
-```
-Replace those base64 strings into the secrets file template below.
-```
-apiVersion: v1
-data:
-  tls.crt:   <file contents of certfile.b64>
-  tls.key:   <file contents of certfile.b64>
-kind: Secret
-metadata:
-  name: k8scg2dev-ingress-tls
-  namespace: gen3k8dev
-type: kubernetes.io/tls
-```
-## Load the secret into Kubernetes
-Before deploying with Helm, This secret file will get loaded into the ingress object and provide TLS termination for your site.
-```
-kubectl apply -f <secretfile.yaml>
-```
+## References
+- [Create a PFX certificate](https://www.ssl.com/how-to/create-a-pfx-p12-certificate-file-using-openssl/)
+- [Convert PEM to PFX certificate format](https://stackoverflow.com/questions/808669/convert-a-cert-pem-certificate-to-a-pfx-certificate)
+- Create a [self signed certificate](https://stackoverflow.com/questions/10175812/how-to-create-a-self-signed-certificate-with-openssl)
+- Use Azure Portal to [configure Application Gateway](https://docs.microsoft.com/en-us/azure/application-gateway/create-ssl-portal)
+- 
