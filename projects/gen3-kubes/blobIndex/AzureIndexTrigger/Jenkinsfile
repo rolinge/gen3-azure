@@ -8,21 +8,9 @@ pipeline {
 
     environment {
         TAG = "${SAFE_BRANCH_NAME}"
-
     }
+
     stages {
-        stage('Source Code') {
-            steps {
-                sh 'ls -l'
-            }
-        }
-
-        stage('Connect to Azure') {
-            steps {
-                sh 'which az'
-            }
-        }
-
         stage('Build and Push Docker Image') {
             steps {
                 withDockerRegistry([credentialsId: 'gen3registryoptum', url: "https://gen3registryoptum.azurecr.io/"]) {
@@ -31,22 +19,6 @@ pipeline {
                     docker build -t gen3registryoptum.azurecr.io/gen3/blobtriggerdocker:$TAG .
                     docker push gen3registryoptum.azurecr.io/gen3/blobtriggerdocker:$TAG
                     '''
-                    }
-                }
-        }
-
-        stage('Terraform Commands') {
-            environment {
-                USER_CREDENTIALS = credentials('gen3registryoptum')
-            }
-            steps {
-                withCredentials([azureServicePrincipal('azure-ectgenomics-deploy')]) {
-                    withDockerRegistry([credentialsId: 'gen3registryoptum', url: "https://gen3registryoptum.azurecr.io/"]) {
-                        sh ''' 
-                        az login --service-principal -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET -t $AZURE_TENANT_ID
-                        az webapp config container set --docker-custom-image-name gen3registryoptum.azurecr.io/gen3/blobtriggerdocker:$TAG --name blobindexfuncdevklnow --resource-group k8s-gen3 --docker-registry-server-url https://gen3registryoptum.azurecr.io/ --docker-registry-server-password $USER_CREDENTIALS_PSW --docker-registry-server-user $USER_CREDENTIALS_USR 
-                        '''
-                    }
                 }
             }
         }
