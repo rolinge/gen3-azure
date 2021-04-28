@@ -45,7 +45,7 @@ resource "azurerm_application_gateway" "network" {
   location            = azurerm_resource_group.rg.location
   tags                = merge(var.tags, local.common_tags, local.gw_tags)
   lifecycle {
-    ignore_changes = [tags, backend_http_settings, request_routing_rule, probe, http_listener, frontend_port, backend_address_pool]
+    ignore_changes = [tags, backend_http_settings, request_routing_rule, probe, http_listener, frontend_port, backend_address_pool, ssl_certificate, url_path_map]
   }
 
   sku {

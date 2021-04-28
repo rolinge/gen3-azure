@@ -35,3 +35,5 @@ node_modules
 .python_packages
 __pycache__
 .venv
+projects/gen3-kubes/Azure-infrastructure/.terraform.lock.hcl
+projects/gen3-kubes/gen3-helm/gen3kubernetes/terraform.tfstate
