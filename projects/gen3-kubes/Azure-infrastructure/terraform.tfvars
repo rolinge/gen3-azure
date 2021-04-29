@@ -6,7 +6,7 @@ commons_dns_name                = "mysite"
 commons_dns_suffix              = "example.com"
 environment                     = "dev"
 max_count                       = 5
-api_server_authorized_ip_ranges = ["0.0.0.0/0"]
+api_server_authorized_ip_ranges = ["127.0.0.1/24"]
 aks_k8s_version                 = "1.19.7"
 
 hdinsight_node_username   = "gen3_hdinsight_nodes"

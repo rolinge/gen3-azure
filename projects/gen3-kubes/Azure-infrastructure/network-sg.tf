@@ -27,12 +27,12 @@ resource "azurerm_network_security_group" "network_sg_frontend" {
     source_address_prefix      = "*"
     destination_address_prefix = "VirtualNetwork"
   }
-   tags = merge(var.tags, local.common_tags)
+  tags = merge(var.tags, local.common_tags)
 }
 
 resource "azurerm_subnet_network_security_group_association" "network_sg_frontend" {
-    subnet_id                  = azurerm_subnet.appgw_frontend.id
-    network_security_group_id  = azurerm_network_security_group.network_sg_frontend.id
+  subnet_id                 = azurerm_subnet.appgw_frontend.id
+  network_security_group_id = azurerm_network_security_group.network_sg_frontend.id
 }
 
 resource "azurerm_network_security_group" "network_sg_primary" {
@@ -64,12 +64,12 @@ resource "azurerm_network_security_group" "network_sg_primary" {
     source_address_prefix      = "10.1.0.0/24"
     destination_address_prefix = "10.1.0.0/24"
   }
-   tags = merge(var.tags, local.common_tags)
+  tags = merge(var.tags, local.common_tags)
 }
 
 resource "azurerm_subnet_network_security_group_association" "network_sg_primary" {
-    subnet_id                  = azurerm_subnet.aks_subnet.id
-    network_security_group_id  = azurerm_network_security_group.network_sg_primary.id
+  subnet_id                 = azurerm_subnet.aks_subnet.id
+  network_security_group_id = azurerm_network_security_group.network_sg_primary.id
 }
 
 resource "azurerm_network_security_group" "network_sg_secondary" {
@@ -101,10 +101,14 @@ resource "azurerm_network_security_group" "network_sg_secondary" {
     source_address_prefix      = "10.1.32.0/22"
     destination_address_prefix = "10.1.32.0/22"
   }
-   tags = merge(var.tags, local.common_tags)
+  tags = merge(var.tags, local.common_tags)
 }
 
 resource "azurerm_subnet_network_security_group_association" "network_sg_secondary" {
-    subnet_id                  = azurerm_subnet.aks_subnet2.id
-    network_security_group_id  = azurerm_network_security_group.network_sg_secondary.id
+  subnet_id                 = azurerm_subnet.aks_subnet2.id
+  network_security_group_id = azurerm_network_security_group.network_sg_secondary.id
+}
+resource "azurerm_subnet_network_security_group_association" "network_sg_appintegration" {
+  subnet_id                 = azurerm_subnet.aks_appintegration.id
+  network_security_group_id = azurerm_network_security_group.network_sg_secondary.id
 }

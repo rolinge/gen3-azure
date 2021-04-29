@@ -437,3 +437,12 @@ minio:
     requests:
       cpu: 200m
       memory: 512Mi
+jumpserver:
+  image: centos:7
+  resources:
+    limits:
+      cpu: 200m
+      memory: 1024Mi
+    requests:
+      cpu: 100m
+      memory: 312Mi

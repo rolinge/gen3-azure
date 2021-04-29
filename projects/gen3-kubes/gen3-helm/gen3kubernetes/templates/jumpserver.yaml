@@ -9,7 +9,7 @@ spec:
   restartPolicy: 'Never'
   containers:
     - name: jump
-      image: centos:7
+      image: {{ .Values.jupmserver.image }}
       command: ['sleep']
       args: ['60000000']
       env:
@@ -17,16 +17,15 @@ spec:
           value: {{ quote .Values.database_servername }}
         - name: "DBUSER"
           value: {{ quote .Values.fence.database.username }}
-        - name:  "DBPASS"
+        - name:  "DBPASSFENCE"
           value: {{ quote .Values.fence.database.db_password }}
+        - name:  "DBPASSARBORIST"
+          value: {{ quote .Values.arborist.database.db_password }}
         - name: "DBFENCE"
+          value: {{ quote .Values.fence.database.databasename }}
+        - name: "DBARBORIST"
           value: {{ quote .Values.fence.database.databasename }}
         - name:  "FENCECONNECT"
           value: "echo $DBPASS | psql -h {{  .Values.database_servername }} -U {{  .Values.fence.database.username }}@{{  .Values.database_servername }} {{  .Values.fence.database.databasename }}"
       resources:
-        limits:
-          cpu: '200m'
-          memory: '720Mi'
-        requests:
-          cpu: '100m'
-          memory: '512Mi'
+        {{- toYaml .Values.fence.resources | nindent 8 }}

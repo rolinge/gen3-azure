@@ -25,6 +25,20 @@ resource "azurerm_subnet" "aks_subnet2" {
 
 }
 
+resource "azurerm_subnet" "aks_appintegration" {
+  name                 = "appintegration-subnet"
+  resource_group_name  = azurerm_resource_group.rg.name
+  address_prefixes     = ["10.1.44.64/26"]
+  virtual_network_name = azurerm_virtual_network.aks_vnet.name
+  service_endpoints    = ["Microsoft.Sql", "Microsoft.Storage"]
+  delegation {
+    name = "appintegrationdelegation"
+    service_delegation {
+      name = "Microsoft.Web/serverFarms"
+    }
+  }
+}
+
 resource "azurerm_subnet" "appgw_frontend" {
   name                 = "frontend"
   resource_group_name  = azurerm_resource_group.rg.name
@@ -42,3 +56,20 @@ resource "azurerm_public_ip" "appgw_public" {
   sku                 = "Standard"
   domain_name_label   = var.commons_dns_name
 }
+
+
+
+# resource "azurerm_private_endpoint" "dropbox" {
+#
+#   name                = "stgdropbox-endpoint"
+#   location            = azurerm_resource_group.rg.location
+#   resource_group_name = azurerm_resource_group.rg.name
+#   subnet_id           = azurerm_subnet.aks_subnet.id
+#
+#   private_service_connection {
+#     name                           = "stgdropboxprivateconnection"
+#     private_connection_resource_id = azurerm_storage_account.dropbox.id
+#     is_manual_connection           = false
+#     subresource_names              = ["blob"]
+#   }
+# }

@@ -129,9 +129,13 @@ resource "azurerm_storage_account" "dropbox" {
     type = "SystemAssigned"
   }
   network_rules {
-    default_action             = "Deny"
-    ip_rules                   = var.api_server_authorized_ip_ranges
-    virtual_network_subnet_ids = [azurerm_subnet.aks_subnet.id, azurerm_subnet.aks_subnet2.id]
+    default_action = "Deny"
+    ip_rules       = var.api_server_authorized_ip_ranges
+    virtual_network_subnet_ids = [azurerm_subnet.aks_subnet.id,
+      azurerm_subnet.aks_subnet2.id,
+      azurerm_subnet.aks_appintegration.id
+    ]
+
   }
 
   tags = merge(var.tags, local.common_tags)

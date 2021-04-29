@@ -55,6 +55,60 @@ resource "azurerm_function_app" "funcapp" {
 }
 
 
+
+resource "azurerm_app_service" "minio" {
+  name                = format("miniofunc%s%s", var.environment, random_string.uid.result)
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+  app_service_plan_id = azurerm_app_service_plan.appplan1.id
+  https_only          = true
+  tags                = merge(var.tags, local.common_tags)
+
+  site_config {
+    linux_fx_version          = format("DOCKER|%s/minio:gen3", local.registry_hostname)
+    use_32_bit_worker_process = false
+    always_on                 = true
+    app_command_line          = "gateway azure"
+    ftps_state                = "Disabled"
+    http2_enabled             = true
+    min_tls_version           = "1.2"
+
+  }
+
+  identity {
+    type = "SystemAssigned"
+  }
+
+  app_settings = {
+    APPINSIGHTS_INSTRUMENTATIONKEY        = azurerm_application_insights.gen3.instrumentation_key
+    APPLICATIONINSIGHTS_CONNECTION_STRING = azurerm_application_insights.gen3.connection_string
+    AZURE_STORAGE_ACCOUNT                 = azurerm_storage_account.dropbox.name
+    AZURE_STORAGE_KEY                     = azurerm_storage_account.dropbox.primary_access_key
+    MINIO_ROOT_USER                       = format("gen3s3drop%s", random_string.uid.result)
+    MINIO_ROOT_PASSWORD                   = module.minio_password.password
+    "DOCKER_REGISTRY_SERVER_URL"          = format("https://%s/", local.registry_hostname)
+    "DOCKER_REGISTRY_SERVER_USERNAME"     = local.registry_username
+    "DOCKER_REGISTRY_SERVER_PASSWORD"     = local.registry_password
+    #maybe later for /home "WEBSITES_ENABLE_APP_SERVICE_STORAGE"=true
+  }
+}
+
+resource "azurerm_app_service_virtual_network_swift_connection" "minioconnection" {
+  app_service_id = azurerm_app_service.minio.id
+  subnet_id      = azurerm_subnet.aks_appintegration.id
+}
+
+resource "azurerm_app_service_virtual_network_swift_connection" "blobfunctionconnection" {
+  app_service_id = azurerm_function_app.funcapp.id
+  subnet_id      = azurerm_subnet.aks_appintegration.id
+}
+
+
+module "minio_password" {
+  source    = "./modules/password_module"
+  pw_length = 20
+}
+
 # Use the local-exec command to map the storage.  If it fails, the needful command is in the terraform output and in the instructions
 
 resource "null_resource" "mapstorage" {
@@ -92,4 +146,16 @@ output "mapstorage" {
 
 
 EOT
+}
+
+output "minio_S3_ACCESSKEY" {
+  value = format("gen3s3drop%s", random_string.uid.result)
+}
+
+output "minio_S3_SECRETKEY" {
+  value = module.minio_password.password
+}
+
+output "minio_S3_ENDPOINT" {
+  value = azurerm_app_service.minio.default_site_hostname
 }
