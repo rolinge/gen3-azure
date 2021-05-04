@@ -1,5 +1,0 @@
-location                        = "West US 2"
-environment                     = "iidev"
-api_server_authorized_ip_ranges = ["168.183.0.0/16", "149.111.0.0/16", "128.35.0.0/16", "161.249.0.0/16", "198.203.174.0/23", "198.203.176.0/22", "198.203.180.0/23"]
-public_ssh_key                  = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDgS2v7p4M4wpUIP1sNoE+GaKHud4Qyk1Dp/VvCc3X2EEDjRmuaTce9mTyChrvI/P6MqZBY59Cza+84KCvMuW3gju8FncLjcyM8JSc6lBiFQkkaYpLtg7Qt/jBRTHxhwlniQpyw+eDpbxRafg1O5aUTok3Rmw8BlbsS6v2xRGAqsCydWxVO9vfkxQCr2qyCyhJmrXlOM/038KHVqCYHtROKoSZYbVJdFr3erEAfUkzemjYy+eR5eSIQoBPkMIN16WMMcS79uQsDq+BPJTUdEI1d3XLgJ7nDTsjujZTku1YXFEymM0tuhDj8WRe/SO0SEEMcJeAXtWvzJYUFtc65wIZcTH+Ov8nYjSEv8dVf//b2BmQWEjFJ3OStqcd83mZ62dIhWImxeYIUGO4+DX2vQ6E+Y7L8/W1oYfvaRdoZw/jIpsCeABoqzaw14biSXrOEmLeGWBB9HBxYHsd1kIbOaO2AjmzrjROPfM35FHlOk9H3xoRsSvpwmz//jhXeXw+HpikGHdTSxBQqO3gos90FxGnPA9uPBAU1Fr+0Wa+bPOsjMDEAgcJrDREH6ehHyCGHbpFOw1xcB8CriuUeAjdDza+ReIA8x9HpAENMUAkOTuK4+oi/Du0/liu73GF9VM/TqQTjpQePvfFghcksW/wbu8ZrqF9/btpFThrmACo1kAQM7w== rolinger@optumgenomixoutlook.onmicrosoft.com"
-resource_group_name             = "rg-iidev"
